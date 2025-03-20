@@ -27,7 +27,7 @@ export default function TrendingProducts() {
     fetchProducts();
   }, []);
   return (
-    <div className="py-5 bg-transparent text-black z-10 w-full min-h-[50vh] flex flex-col gap-5">
+    <div className="py-5 bg-transparent text-black z-10 w-full min-h-[50vh] flex flex-col gap-5 px-4 sm:px-0">
       <h1
         className={`${Style.h1} text-start text-black flex items-center gap-2 min-w-fit`}
       >

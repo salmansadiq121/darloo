@@ -77,7 +77,7 @@ export default function FilterProducts({
         {/* Filter by Price */}
         <div className="flex flex-col gap-3">
           <div className="p-5 bg-white  shadow-lg rounded-xl border border-gray-200 ">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+            <h3 className="text-lg font-semibold text-gray-900 ">
               Price Range
             </h3>
 

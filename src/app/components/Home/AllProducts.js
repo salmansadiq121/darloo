@@ -138,7 +138,7 @@ export default function AllProducts() {
           <p className="text-gray-500">Try adjusting your filters.</p>
         </motion.div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 px-6 sm:px-0">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 px-4 sm:px-0">
           {isFetching
             ? Array.from({ length: 12 }).map((_, index) => (
                 <div

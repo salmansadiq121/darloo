@@ -198,7 +198,7 @@ function ProductsContent() {
               <div className="relative w-full sm:w-auto max-w-[10rem]">
                 <button
                   onClick={() => setOpenSort(!openSort)}
-                  className="px-4 py-2 w-full sm:w-auto rounded-lg cursor-pointer text-sm font-medium bg-gray-200 hover:bg-gray-300 dark:bg-gray-800 dark:hover:bg-gray-700 transition-all flex items-center justify-between"
+                  className="px-4 py-2 w-full sm:w-auto rounded-lg cursor-pointer text-sm font-medium bg-gray-200 hover:bg-gray-300  transition-all flex items-center justify-between"
                 >
                   <Filter size={16} className="mr-2 text-gray-600 " />
                   Sort By
@@ -214,16 +214,16 @@ function ProductsContent() {
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
-                    className="absolute top-12 right-0 w-56 bg-white dark:bg-gray-800 shadow-lg rounded-lg z-20"
+                    className="absolute top-12 right-0 w-56 bg-white  shadow-lg rounded-lg z-20"
                   >
-                    <ul className="flex flex-col divide-y divide-gray-100 dark:divide-gray-700">
+                    <ul className="flex flex-col divide-y divide-gray-100 ">
                       {sortingOptions.map((option) => (
                         <li
                           key={option.value}
-                          className="flex items-center gap-2 p-3 cursor-pointer text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all"
+                          className="flex items-center gap-2 p-3 cursor-pointer text-gray-700  hover:bg-gray-100  transition-all"
                           onClick={() => {
                             setSortOption(option.value);
-                            // setOpenSort(false);
+                            setOpenSort(false);
                           }}
                         >
                           {option.icon}

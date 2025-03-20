@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, Suspense } from "react";
 import MainLayout from "@/app/components/Layout/Layout";
 import { useAuth } from "@/app/content/authContent";
 import FilterProducts from "@/app/components/Product/FilterProducts";
@@ -30,6 +30,14 @@ const sortingOptions = [
 ];
 
 export default function Products() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <ProductsContent />
+    </Suspense>
+  );
+}
+
+function ProductsContent() {
   const { products, isFetching, search } = useAuth();
   const searchParams = useSearchParams();
   const selectedCategory = searchParams.get("category") || "";

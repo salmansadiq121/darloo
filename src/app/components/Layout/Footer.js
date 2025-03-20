@@ -1,0 +1,289 @@
+"use client";
+import React from "react";
+import { Twitter, Instagram, Linkedin, Facebook, Youtube } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+
+const Footer = () => {
+  return (
+    <footer className=" bg-slate-100 border-t border-gray-200 ">
+      <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+          {/* Company Info */}
+          <div>
+            <div className="flex items-center mb-4">
+              <div className="h-8 w-8 rounded-full bg-gradient-to-r from-[#c6080a] to-[#ac0205] flex items-center justify-center">
+                <span className="text-white font-bold font-serif ">Ay</span>
+              </div>
+              <span className="ml-2 text-2xl font-bold font-serif bg-clip-text text-transparent bg-gradient-to-r from-[#c6080a] to-[#ac0205]">
+                Ayoob
+              </span>
+            </div>
+            <p className=" text-gray-800 text-sm mb-4">
+              Your one-stop online marketplace for the latest fashion,
+              electronics, home essentials, and more—secure shopping with fast
+              delivery.
+            </p>
+            <div className="flex space-x-3">
+              <a
+                href="#"
+                className="dark:  text-gray-800 hover:text-red-600 transition-colors duration-200"
+              >
+                <Twitter size={18} />
+              </a>
+              <a
+                href="#"
+                className=" text-gray-800 hover:text-red-600 transition-colors duration-200"
+              >
+                <Instagram size={18} />
+              </a>
+              <a
+                href="#"
+                className=" text-gray-800 hover:text-red-600 transition-colors duration-200"
+              >
+                <Linkedin size={18} />
+              </a>
+              <a
+                href="#"
+                className=" text-gray-800 hover:text-red-600 transition-colors duration-200"
+              >
+                <Facebook size={18} />
+              </a>
+              <a
+                href="#"
+                className=" text-gray-800 hover:text-red-600 transition-colors duration-200"
+              >
+                <Youtube size={18} />
+              </a>
+            </div>
+          </div>
+
+          {/* Company */}
+          <div>
+            <h3 className="text-black font-medium text-[17px] mb-4">Company</h3>
+            <ul className="space-y-2">
+              <li>
+                <a
+                  href="#"
+                  className=" text-gray-800 hover:text-red-600 transition-colors duration-200 text-sm"
+                >
+                  About Us
+                </a>
+              </li>
+              <li>
+                <a
+                  href="#"
+                  className=" text-gray-800 hover:text-red-600 transition-colors duration-200 text-sm"
+                >
+                  Blog
+                </a>
+              </li>
+              <li>
+                <a
+                  href="#"
+                  className=" text-gray-800 hover:text-red-600 transition-colors duration-200 text-sm"
+                >
+                  Careers
+                </a>
+              </li>
+              <li>
+                <a
+                  href="#"
+                  className=" text-gray-800 hover:text-red-600 transition-colors duration-200 text-sm"
+                >
+                  Press
+                </a>
+              </li>
+              <li>
+                <a
+                  href="#"
+                  className=" text-gray-800 hover:text-red-600 transition-colors duration-200 text-sm"
+                >
+                  Partners
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          {/* Support */}
+          <div>
+            <h3 className="text-black font-medium text-[17px] mb-4">Support</h3>
+            <ul className="space-y-2">
+              <li>
+                <a
+                  href="#"
+                  className=" text-gray-800 hover:text-red-600 transition-colors duration-200 text-sm"
+                >
+                  Help Center
+                </a>
+              </li>
+              <li>
+                <a
+                  href="#"
+                  className=" text-gray-800 hover:text-red-600 transition-colors duration-200 text-sm"
+                >
+                  FAQs
+                </a>
+              </li>
+              <li>
+                <a
+                  href="#"
+                  className=" text-gray-800 hover:text-red-600 transition-colors duration-200 text-sm"
+                >
+                  Escrow & Refund Policy
+                </a>
+              </li>
+              <li>
+                <a
+                  href="#"
+                  className=" text-gray-800 hover:text-red-600 transition-colors duration-200 text-sm"
+                >
+                  Account Security
+                </a>
+              </li>
+              <li>
+                <a
+                  href="#"
+                  className=" text-gray-800 hover:text-red-600 transition-colors duration-200 text-sm"
+                >
+                  Contact Us
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          {/* Legal */}
+          <div>
+            <h3 className="text-black font-medium text-[17px] mb-4">
+              Download Our App
+            </h3>
+            <div className="flex flex-col gap-4">
+              <Link
+                href="https://play.google.com/store/apps/details?id=com.solutionshub.app"
+                className="text-white hover:text-gray-100 transition-colors duration-200 text-sm bg-black rounded-md px-4 py-3 flex  items-center gap-1 max-w-fit"
+              >
+                <Image
+                  src="/playstore.svg"
+                  alt="Google Play"
+                  width={70}
+                  height={70}
+                  className="h-11 w-auto  rounded px-2"
+                />
+                <div className="flex flex-col gap-1">
+                  <span className="text-[13px] text-gray-100">
+                    Android App on
+                  </span>
+                  <h3 className="text-white font-semibold text-[18px]">
+                    Google Play
+                  </h3>
+                </div>
+              </Link>
+              <Link
+                href="https://apps.apple.com/in/app/solutions-hub/id1605778691"
+                className="text-white hover:text-gray-100 transition-colors duration-200 text-sm bg-black rounded-md px-4 py-3 flex items-center gap-1 max-w-fit"
+              >
+                <Image
+                  src="/appstore.svg"
+                  alt="Apple Store"
+                  width={70}
+                  height={70}
+                  className="h-11 w-auto  rounded px-2"
+                />
+                <div className="flex flex-col gap-1">
+                  <span className="text-[13px] text-gray-100">
+                    Download on the
+                  </span>
+                  <h3 className="text-white font-semibold text-[18px]">
+                    App Store
+                  </h3>
+                </div>
+              </Link>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-12 pt-8 border-t border-gray-800">
+          <div className="flex flex-col md:flex-row justify-between items-center">
+            <div className="mb-4 md:mb-0">
+              <p className=" text-gray-800 text-sm">
+                © 2025 Ayoob. All rights reserved.
+              </p>
+            </div>
+
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center">
+                <form className="flex">
+                  <input
+                    type="email"
+                    placeholder="Enter your email address"
+                    className="px-4 py-2 rounded-l-lg bg-white border border-gray-400 focus:border-red-500  text-sm focus:outline-none focus:ring-2 focus:ring-red-600 min-w-[200px]"
+                  />
+                  <button
+                    type={"submit"}
+                    className="px-4 py-2 rounded-r-lg bg-red-500 text-white text-sm font-medium hover:bg-red-600 transition-colors duration-200"
+                  >
+                    Subscribe
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-6 flex flex-wrap justify-center md:justify-start space-x-4">
+            <Image
+              src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg"
+              alt="Visa"
+              width={100}
+              height={50}
+              className="h-8 bg-white rounded px-2"
+            />
+            <Image
+              src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg"
+              alt="Mastercard"
+              width={100}
+              height={50}
+              className="h-8 bg-white rounded px-2"
+            />
+            <Image
+              src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg"
+              alt="PayPal"
+              width={100}
+              height={50}
+              className="h-8 bg-white rounded px-2"
+            />
+            <Image
+              src="https://upload.wikimedia.org/wikipedia/commons/4/46/Bitcoin.svg"
+              alt="Bitcoin"
+              width={50}
+              height={50}
+              className="h-8 bg-white rounded px-2"
+            />
+            <div className="dark:bg-[#1E293B] bg-slate-300/80 px-3 py-1 rounded flex items-center">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="text-[#06B6D4] mr-1"
+              >
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"></path>
+                <path d="M12 8v4"></path>
+                <path d="M12 16h.01"></path>
+              </svg>
+              <span className="text-xs dark:text-white text-black">
+                Secure Escrow Service
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+  );
+};
+
+export default Footer;

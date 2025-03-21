@@ -11,7 +11,7 @@ import { IoMdNotifications } from "react-icons/io";
 import { useAuth } from "@/app/content/authContent";
 
 const Header = () => {
-  const { search, setSearch } = useAuth();
+  const { setSearch, selectedProduct } = useAuth();
   const pathName = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -93,7 +93,7 @@ const Header = () => {
               href="/top-sale"
               className={` border-b-2 ${
                 pathName === "/top-sale"
-                  ? "border-orange-500 text-orange-600 bg-gradient-to-b from-white via-red-500/10 to-red-500/30 "
+                  ? "border-red-500 text-red-600 bg-gradient-to-b from-white via-red-500/10 to-red-500/30 "
                   : "border-transparent text-gray-950"
               }  inline-flex items-center px-1 pt-1 text-sm font-medium`}
             >
@@ -103,7 +103,7 @@ const Header = () => {
               href="/popular"
               className={` border-b-2 ${
                 pathName === "/popular"
-                  ? "border-orange-500 text-orange-600 bg-gradient-to-b from-white via-red-500/10 to-red-500/30 "
+                  ? "border-red-500 text-red-600 bg-gradient-to-b from-white via-red-500/10 to-red-500/30 "
                   : "border-transparent text-gray-950"
               }  inline-flex items-center px-1 pt-1 text-sm font-medium`}
             >
@@ -113,7 +113,7 @@ const Header = () => {
               href="/categories"
               className={` border-b-2 ${
                 pathName === "/categories"
-                  ? "border-orange-500 text-orange-600 bg-gradient-to-b from-white via-red-500/10 to-red-500/30 "
+                  ? "border-red-500 text-red-600 bg-gradient-to-b from-white via-red-500/10 to-red-500/30 "
                   : "border-transparent text-gray-950"
               }  inline-flex items-center px-1 pt-1 text-sm font-medium`}
             >
@@ -123,7 +123,7 @@ const Header = () => {
               href="/products"
               className={` border-b-2 ${
                 pathName === "/products"
-                  ? "border-orange-500 text-orange-600 bg-gradient-to-b from-white via-red-500/10 to-red-500/30 "
+                  ? "border-red-500 text-red-600 bg-gradient-to-b from-white via-red-500/10 to-red-500/30 "
                   : "border-transparent text-gray-950"
               }  inline-flex items-center px-1 pt-1 text-sm font-medium`}
             >
@@ -133,7 +133,7 @@ const Header = () => {
               href="/user-manual"
               className={` border-b-2 ${
                 pathName === "/user-manual"
-                  ? "border-orange-500 text-orange-600 bg-gradient-to-b from-white via-red-500/10 to-red-500/30 "
+                  ? "border-red-500 text-red-600 bg-gradient-to-b from-white via-red-500/10 to-red-500/30 "
                   : "border-transparent text-gray-950"
               }  inline-flex items-center px-1 pt-1 text-sm font-medium`}
             >
@@ -158,14 +158,14 @@ const Header = () => {
               className="relative cursor-pointer ml-4"
             >
               <IoMdNotificationsOutline
-                className="h-6 w-6 text-gray-900 "
+                className="h-6 w-6 text-gray-900 hover:text-red-600 transition-all duration-300 "
                 onClick={() => setShowNotification(!showNotification)}
               />
-              <span className="absolute -top-4 -right-3 inline-flex items-center px-2 py-1 text-xs font-semibold text-red-700 bg-red-100 rounded-full">
+              <span className="absolute -top-4 -right-3 inline-flex items-center w-5 h-5  justify-center text-xs font-semibold text-red-700 bg-red-100 rounded-full">
                 5
               </span>
               {showNotification && (
-                <div className="absolute top-5 right-3 text-xs font-semibold rounded-md shadow-md bg-gray-100 w-[18rem] min-h-[15rem] overflow-hidden">
+                <div className="absolute top-5 right-3 text-xs font-semibold rounded-md shadow-md bg-gray-100 w-[18rem] min-h-[15rem] overflow-hidden ">
                   <div className="w-full py-2 bg-red-600 text-white flex items-center justify-between px-2">
                     <h3 className="text-lg font-medium text-white flex items-center gap-1">
                       <IoMdNotifications className="h-6 w-6 text-white animate-pulse " />
@@ -176,9 +176,9 @@ const Header = () => {
               )}
             </div>
             <div className="relative cursor-pointer ml-4">
-              <FaShoppingCart className="h-6 w-6 text-gray-900" />
-              <span className="absolute -top-4 -right-3 inline-flex items-center px-2 py-1 text-xs font-semibold bg-red-700 text-white rounded-full">
-                5
+              <FaShoppingCart className="h-6 w-6 text-gray-900 hover:text-red-600 transition-all duration-300" />
+              <span className="absolute -top-4 -right-3 inline-flex items-center w-5 h-5  justify-center text-xs font-semibold bg-red-700 text-white rounded-full">
+                {selectedProduct ? selectedProduct.length : 0}
               </span>
             </div>
             {/* Profile */}
@@ -200,15 +200,15 @@ const Header = () => {
               <IoSearch className="h-6 w-6 text-gray-900" />
             </div>
             <div className="relative cursor-pointer mr-5">
-              <IoMdNotificationsOutline className="h-6 w-6 text-gray-900" />
-              <span className="absolute -top-4 -right-3 inline-flex items-center px-2 py-1 text-xs font-semibold text-red-700 bg-red-100 rounded-full">
-                5
+              <IoMdNotificationsOutline className="h-6 w-6 text-gray-900 hover:text-red-600 transition-all duration-300" />
+              <span className="absolute -top-4 -right-3 inline-flex items-center w-5 h-5  justify-center text-xs font-semibold text-red-700 bg-red-100 rounded-full">
+                4
               </span>
             </div>
             <div className="relative cursor-pointer mr-4">
-              <FaShoppingCart className="h-6 w-6 text-gray-900" />
-              <span className="absolute -top-4 -right-3 inline-flex items-center px-2 py-1 text-xs font-semibold bg-red-700 text-white rounded-full">
-                5
+              <FaShoppingCart className="h-6 w-6 text-gray-900 hover:text-red-600 transition-all duration-300" />
+              <span className="absolute -top-4 -right-3 inline-flex items-center w-5 h-5  justify-center text-xs font-semibold bg-red-700 text-white rounded-full">
+                {selectedProduct ? selectedProduct.length : 0}
               </span>
             </div>
             <button

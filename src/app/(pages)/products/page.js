@@ -262,7 +262,7 @@ function ProductsContent() {
                     ? Array.from({ length: 12 }).map((_, index) => (
                         <div
                           key={index}
-                          className="w-[230px] min-w-[280px] h-[300px] bg-gray-600 animate-pulse rounded-lg"
+                          className="w-full min-w-[320px] h-[300px] bg-gray-600 animate-pulse rounded-lg"
                         ></div>
                       ))
                     : currentProducts?.map((product) => (

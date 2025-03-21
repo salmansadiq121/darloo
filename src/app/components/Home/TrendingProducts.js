@@ -39,7 +39,7 @@ export default function TrendingProducts() {
           ? Array.from({ length: 8 }).map((_, index) => (
               <div
                 key={index}
-                className="w-[230px] min-w-[280px] h-[280px] bg-gray-600 animate-pulse rounded-lg"
+                className="w-full min-w-[320px] h-[280px] bg-gray-600 animate-pulse rounded-lg"
               ></div>
             ))
           : products?.map((product) => (

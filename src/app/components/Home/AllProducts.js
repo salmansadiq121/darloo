@@ -143,7 +143,7 @@ export default function AllProducts() {
             ? Array.from({ length: 12 }).map((_, index) => (
                 <div
                   key={index}
-                  className="w-[230px] min-w-[280px] h-[300px] bg-gray-600 animate-pulse rounded-lg"
+                  className="w-full min-w-[320px] h-[300px] bg-gray-600 animate-pulse rounded-lg"
                 ></div>
               )) // ?.slice(0, visibleProducts)
             : currentProducts?.map((product) => (
@@ -159,7 +159,7 @@ export default function AllProducts() {
       )}
 
       {/* Pegination */}
-      {currentPage.length > 0 && (
+      {currentProducts.length > 0 && (
         <div className="flex items-center justify-center w-full">
           <Pagination
             totalPages={totalPages}
@@ -168,6 +168,7 @@ export default function AllProducts() {
           />
         </div>
       )}
+
       {/* {!isFetching && visibleProducts < products.length && (
         <div
           ref={observerRef}

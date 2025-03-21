@@ -50,7 +50,7 @@ export default function SalesProducts() {
               {Array.from({ length: 10 }).map((_, index) => (
                 <div
                   key={index}
-                  className="w-[230px] min-w-[230px] h-[250px] bg-gray-600 animate-pulse rounded-lg"
+                  className="w-full min-w-[320px] h-[250px] bg-gray-600 animate-pulse rounded-lg"
                 ></div>
               ))}
             </div>

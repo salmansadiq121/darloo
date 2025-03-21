@@ -16,6 +16,9 @@ export const AuthProvider = ({ children }) => {
     token: "",
   });
   const [search, setSearch] = useState("");
+  const [selectedProduct, setSelectedProduct] = useState([]);
+
+  console.log("selectedProduct:", selectedProduct);
 
   //   Token Check
   axios.defaults.headers.common["Authorization"] = auth.token;
@@ -49,6 +52,14 @@ export const AuthProvider = ({ children }) => {
     refetchOnWindowFocus: false,
   });
 
+  // Load cart from localStorage on mount
+  useEffect(() => {
+    const savedCart = localStorage.getItem("cart");
+    if (savedCart) {
+      setSelectedProduct(JSON.parse(savedCart));
+    }
+  }, []);
+
   return (
     <AuthContext.Provider
       value={{
@@ -64,6 +75,8 @@ export const AuthProvider = ({ children }) => {
         setSearch,
         products: products || [],
         isFetching,
+        selectedProduct,
+        setSelectedProduct,
       }}
     >
       {children}

@@ -770,31 +770,33 @@ export default function ProductDetail() {
                 >
                   Buy Now
                 </Button>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className={`h-12 w-12 rounded-xl border-red-200 cursor-pointer ${
-                    isWishlisted
-                      ? "bg-red-100 text-primary border-primary/20"
-                      : "hover:bg-gray-100 hover:text-gray-900"
-                  }`}
-                  onClick={() => setIsWishlisted(!isWishlisted)}
-                >
-                  <Heart
-                    className={`h-6 w-6 ${
-                      isWishlisted ? "fill-primary text-primary" : ""
+                <div className="flex items-center gap-4">
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className={`h-12 w-12 rounded-xl border-red-200 cursor-pointer ${
+                      isWishlisted
+                        ? "bg-red-100 text-primary border-primary/20"
+                        : "hover:bg-gray-100 hover:text-gray-900"
                     }`}
-                  />
-                  <span className="sr-only">Add to wishlist</span>
-                </Button>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="h-12 w-12 rounded-xl border-sky-200 cursor-pointer hover:bg-sky-100 hover:text-sky-900"
-                >
-                  <Share2 className="h-6 w-6" />
-                  <span className="sr-only">Share product</span>
-                </Button>
+                    onClick={() => setIsWishlisted(!isWishlisted)}
+                  >
+                    <Heart
+                      className={`h-6 w-6 ${
+                        isWishlisted ? "fill-primary text-primary" : ""
+                      }`}
+                    />
+                    <span className="sr-only">Add to wishlist</span>
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="h-12 w-12 rounded-xl border-sky-200 cursor-pointer hover:bg-sky-100 hover:text-sky-900"
+                  >
+                    <Share2 className="h-6 w-6" />
+                    <span className="sr-only">Share product</span>
+                  </Button>
+                </div>
               </div>
 
               <div className="mt-6 bg-gray-100 rounded-xl p-4 border border-gray-200">
@@ -824,22 +826,22 @@ export default function ProductDetail() {
 
           {/* Product Details and Reviews */}
           <Tabs defaultValue="details" className="w-full mt-12">
-            <TabsList className="w-full max-w-md grid grid-cols-3 h-14 rounded-xl bg-red-100 border border-red-200 p-1">
+            <TabsList className="w-full max-w-fit grid grid-cols-3 overflow-y-auto  shidden h-14 rounded-xl bg-red-100 border border-red-200 p-1">
               <TabsTrigger
                 value="details"
-                className="rounded-lg cursor-pointer data-[state=active]:bg-red-600 data-[state=active]:text-white data-[state=active]:shadow-sm transition-all duration-300"
+                className="rounded-lg cursor-pointer px-4 min-w-fit  data-[state=active]:bg-red-600 data-[state=active]:text-white data-[state=active]:shadow-sm transition-all duration-300"
               >
                 Product Details
               </TabsTrigger>
               <TabsTrigger
                 value="reviews"
-                className="rounded-lg cursor-pointer data-[state=active]:bg-red-600 data-[state=active]:text-white data-[state=active]:shadow-sm transition-all duration-300"
+                className="rounded-lg cursor-pointer px-4 min-w-fit mx-6 sm:mx-0 data-[state=active]:bg-red-600 data-[state=active]:text-white data-[state=active]:shadow-sm transition-all duration-300"
               >
                 Reviews ({product?.reviews?.length})
               </TabsTrigger>
               <TabsTrigger
                 value="shipping"
-                className="rounded-lg cursor-pointer data-[state=active]:bg-red-600 data-[state=active]:text-white data-[state=active]:shadow-sm transition-all duration-300"
+                className="rounded-lg cursor-pointer px-4 min-w-fit mx-6 sm:mx-0 data-[state=active]:bg-red-600 data-[state=active]:text-white data-[state=active]:shadow-sm transition-all duration-300"
               >
                 Shipping & Returns
               </TabsTrigger>
@@ -982,7 +984,7 @@ export default function ProductDetail() {
 
                   {product?.reviews?.length > 0 && (
                     <div
-                      className=" w-full  overflow-y-auto  p-1 border border-red-200 rounded-2xl"
+                      className=" w-full  overflow-y-auto shidden p-1 border border-red-200 rounded-2xl"
                       style={{
                         maxHeight: "30rem",
                         overflowY: "auto",

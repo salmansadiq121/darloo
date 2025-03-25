@@ -1,13 +1,66 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import { FaCartPlus } from "react-icons/fa";
 import Ratings from "../utils/Ratings";
 import { Diamond, Eye, Flame } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { useAuth } from "../content/authContent";
+import toast from "react-hot-toast";
 
 export default function ProductCard({ product, sale, tranding, isDesc }) {
   const router = useRouter();
+  const { setSelectedProduct } = useAuth();
+  const [selectedColor, setSelectedColor] = useState("");
+  const [selectedSize, setSelectedSize] = useState("");
+  const [quantity, setQuantity] = useState(1);
+
+  // Handle Add to Cart
+  const handleAddToCart = (product) => {
+    if (!product || !product._id) return;
+
+    setSelectedProduct((prevProducts) => {
+      let updatedProducts = [...prevProducts];
+
+      const existingProductIndex = updatedProducts.findIndex(
+        (p) => p.product === product._id
+      );
+
+      if (existingProductIndex !== -1) {
+        let existingProduct = { ...updatedProducts[existingProductIndex] };
+
+        if (!existingProduct.colors.includes(selectedColor)) {
+          existingProduct.colors = [...existingProduct.colors, selectedColor];
+        }
+
+        if (!existingProduct.sizes.includes(selectedSize)) {
+          existingProduct.sizes = [...existingProduct.sizes, selectedSize];
+        }
+
+        existingProduct.quantity += quantity;
+
+        updatedProducts[existingProductIndex] = existingProduct;
+      } else {
+        updatedProducts.push({
+          product: product._id,
+          quantity,
+          price: product.price,
+          colors: [selectedColor],
+          sizes: [selectedSize],
+          image: product.thumbnails[0],
+          title: product.name,
+          _id: product._id,
+        });
+      }
+
+      // Save the updated cart to localStorage
+      localStorage.setItem("cart", JSON.stringify(updatedProducts));
+
+      toast.success("Product added to cart");
+
+      return updatedProducts;
+    });
+  };
   return (
     <div className="group bg-white min-w-[17rem]  rounded-xl border border-gray-300  shadow-xl overflow-hidden transition-all duration-300 hover:shadow-[#9333EA]/20 hover:shadow-2xl  hover:border-red-500/50 hover:-translate-y-1">
       <div className="relative ">
@@ -85,7 +138,10 @@ export default function ProductCard({ product, sale, tranding, isDesc }) {
               €{product?.estimatedPrice}
             </div>
           </div>
-          <button className="w-[1.8rem] h-[1.8rem] cursor-pointer flex items-center justify-center rounded-full  bg-gradient-to-r from-orange-600 via-orange-500 to-amber-500 text-white hover:opacity-90 transition-opacity duration-200 ">
+          <button
+            onClick={() => handleAddToCart(product)}
+            className="w-[1.8rem] h-[1.8rem] cursor-pointer flex items-center justify-center rounded-full  bg-gradient-to-r from-orange-600 via-orange-500 to-amber-500 text-white hover:opacity-90 transition-opacity duration-200 "
+          >
             <FaCartPlus size={16} className=" text-white" />
           </button>
         </div>

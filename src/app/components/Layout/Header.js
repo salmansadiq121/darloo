@@ -2,7 +2,7 @@
 import { Search, Menu, X, Moon, Sun } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { IoMdNotificationsOutline } from "react-icons/io";
 import { FaShoppingCart } from "react-icons/fa";
@@ -11,7 +11,7 @@ import { IoMdNotifications } from "react-icons/io";
 import { useAuth } from "@/app/content/authContent";
 
 const Header = () => {
-  const { setSearch, selectedProduct } = useAuth();
+  const { auth, setAuth, setSearch, selectedProduct } = useAuth();
   const pathName = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -19,6 +19,7 @@ const Header = () => {
   const [showNotification, setShowNotification] = useState(false);
   const closeNotification = useRef(null);
   const [debouncedSearch, setDebouncedSearch] = useState("");
+  const router = useRouter();
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -61,6 +62,15 @@ const Header = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
+  // Logout
+  const handleLogout = async () => {
+    signOut();
+    setAuth({ user: null, token: "" });
+    localStorage.removeItem("@ayoob");
+    Cookies.remove("@ayoob");
+    router.push("/authentication");
+  };
 
   return (
     <nav
@@ -175,22 +185,43 @@ const Header = () => {
                 </div>
               )}
             </div>
-            <div className="relative cursor-pointer ml-4">
+            <div
+              onClick={() => router.push("/cart")}
+              className="relative cursor-pointer ml-4"
+            >
               <FaShoppingCart className="h-6 w-6 text-gray-900 hover:text-red-600 transition-all duration-300" />
               <span className="absolute -top-4 -right-3 inline-flex items-center w-5 h-5  justify-center text-xs font-semibold bg-red-700 text-white rounded-full">
                 {selectedProduct ? selectedProduct.length : 0}
               </span>
             </div>
             {/* Profile */}
-            <div className="relative">
-              <Image
-                src="/profile.png"
-                alt="Profile"
-                width={70}
-                height={70}
-                className="h-12 w-12 rounded-full"
-              />
-            </div>
+            {!auth?.user ? (
+              <div className="">
+                <button
+                  onClick={() => router.push("/authentication")}
+                  className="px-7 py-[.45rem] cursor-pointer bg-[#c6080a] hover:bg-red-800 transition-all duration-300 text-white rounded-[2rem]"
+                >
+                  Login
+                </button>
+              </div>
+            ) : (
+              <div
+                className="relative cursor-pointer"
+                onClick={() => router.push("/profile")}
+              >
+                <Image
+                  src={auth?.user?.avatar || "profile.png"}
+                  alt="Profile"
+                  width={70}
+                  height={70}
+                  className={`h-12 w-12 rounded-full ${
+                    pathName === "/profile"
+                      ? "border-red-500 border-2"
+                      : "border"
+                  }`}
+                />
+              </div>
+            )}
           </div>
           <div className="-mr-2 flex items-center sm:hidden">
             <div
@@ -205,7 +236,10 @@ const Header = () => {
                 4
               </span>
             </div>
-            <div className="relative cursor-pointer mr-4">
+            <div
+              onClick={() => router.push("/cart")}
+              className="relative cursor-pointer mr-4"
+            >
               <FaShoppingCart className="h-6 w-6 text-gray-900 hover:text-red-600 transition-all duration-300" />
               <span className="absolute -top-4 -right-3 inline-flex items-center w-5 h-5  justify-center text-xs font-semibold bg-red-700 text-white rounded-full">
                 {selectedProduct ? selectedProduct.length : 0}
@@ -244,6 +278,42 @@ const Header = () => {
       {isMenuOpen && (
         <div className="sm:hidden">
           <div className="pt-2 pb-3 space-y-1">
+            {/* Profile */}
+            {!auth?.user ? (
+              <div className=" ml-3">
+                <button
+                  onClick={() => router.push("/authentication")}
+                  className="px-7 py-[.45rem] cursor-pointer bg-[#c6080a] hover:bg-red-800 transition-all duration-300 text-white rounded-[2rem]"
+                >
+                  Login
+                </button>
+              </div>
+            ) : (
+              <div
+                className="relative cursor-pointer ml-3 flex items-center gap-1"
+                onClick={() => router.push("/profile")}
+              >
+                <Image
+                  src={auth?.user?.avatar || "profile.png"}
+                  alt="Profile"
+                  width={70}
+                  height={70}
+                  className={`h-12 w-12 rounded-full ${
+                    pathName === "/profile"
+                      ? "border-red-500 border-2"
+                      : "border"
+                  }`}
+                />
+                <div className="flex flex-col gap-0">
+                  <h3 className=" text-[16px] font-medium text-black">
+                    {auth?.user?.name}
+                  </h3>
+                  <span className="text-xs text-gray-500">
+                    {auth?.user?.email}
+                  </span>
+                </div>
+              </div>
+            )}
             <Link
               href="/top-sale"
               className={`flex items-center gap-2 ${
@@ -294,23 +364,16 @@ const Header = () => {
             >
               User Manual
             </Link>
+            {/* Logout */}
+            {auth?.user && (
+              <button
+                onClick={() => handleLogout()}
+                className={`flex items-center gap-2  text-red-700 pl-3 pr-4 py-2 text-base font-medium`}
+              >
+                Logout
+              </button>
+            )}
           </div>
-          {/* <div className="pt-4 pb-3 ">
-            <div className="flex items-center px-4">
-              <div className="relative w-full">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Search className="h-4 w-4 text-gray-400" />
-                </div>
-                <input
-                  type="text"
-                  placeholder="Search listings..."
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  className="block w-full pl-10 pr-3 py-2 border border-gray-300  rounded-md leading-5 bg-white  placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-red-500 focus:border-red-500 sm:text-sm"
-                />
-              </div>
-            </div>
-          </div> */}
         </div>
       )}
     </nav>

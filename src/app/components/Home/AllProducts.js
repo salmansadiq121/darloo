@@ -61,8 +61,6 @@ export default function AllProducts() {
     // }
 
     setFilteredProducts(filtered);
-
-    // eslint-disable-next-line
   }, [search, products]);
 
   // Function to load more products

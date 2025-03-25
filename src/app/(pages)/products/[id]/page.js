@@ -105,22 +105,24 @@ export default function ProductDetail() {
     setSelectedProduct((prevProducts) => {
       let updatedProducts = [...prevProducts];
 
-      const existingProductIndex = prevProducts.findIndex(
+      const existingProductIndex = updatedProducts.findIndex(
         (p) => p.product === product._id
       );
 
       if (existingProductIndex !== -1) {
-        let existingProduct = updatedProducts[existingProductIndex];
+        let existingProduct = { ...updatedProducts[existingProductIndex] };
 
         if (!existingProduct.colors.includes(selectedColor)) {
-          existingProduct.colors.push(selectedColor);
+          existingProduct.colors = [...existingProduct.colors, selectedColor];
         }
 
         if (!existingProduct.sizes.includes(selectedSize)) {
-          existingProduct.sizes.push(selectedSize);
+          existingProduct.sizes = [...existingProduct.sizes, selectedSize];
         }
 
         existingProduct.quantity += quantity;
+
+        updatedProducts[existingProductIndex] = existingProduct;
       } else {
         updatedProducts.push({
           product: product._id,
@@ -128,11 +130,16 @@ export default function ProductDetail() {
           price: product.price,
           colors: [selectedColor],
           sizes: [selectedSize],
+          image: product.thumbnails[0],
+          title: product.name,
+          _id: product._id,
         });
       }
 
-      // Save to localStorage
+      // Save the updated cart to localStorage
       localStorage.setItem("cart", JSON.stringify(updatedProducts));
+
+      toast.success("Product added to cart");
 
       return updatedProducts;
     });
@@ -266,6 +273,7 @@ export default function ProductDetail() {
 
   useEffect(() => {
     fetchRelatedProducts();
+    // eslint-disable-next-line
   }, [product?.category?._id]);
 
   // Loading skeleton

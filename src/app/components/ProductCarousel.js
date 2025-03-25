@@ -9,10 +9,16 @@ import Ratings from "../utils/Ratings";
 import { Diamond, Eye, Flame } from "lucide-react";
 import { FaCartPlus } from "react-icons/fa6";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { useAuth } from "../content/authContent";
+import toast from "react-hot-toast";
 
 export default function ProductCarousel({ products }) {
   const router = useRouter();
+  const { setSelectedProduct } = useAuth();
+  const [selectedColor, setSelectedColor] = useState("");
+  const [selectedSize, setSelectedSize] = useState("");
+  const [quantity, setQuantity] = useState(1);
 
   useEffect(() => {
     document.querySelector(".custom-prev").addEventListener("click", () => {
@@ -22,6 +28,53 @@ export default function ProductCarousel({ products }) {
       document.querySelector(".swiper-button-next").click();
     });
   }, []);
+
+  // Handle Add to Cart
+  const handleAddToCart = (product) => {
+    if (!product || !product._id) return;
+
+    setSelectedProduct((prevProducts) => {
+      let updatedProducts = [...prevProducts];
+
+      const existingProductIndex = updatedProducts.findIndex(
+        (p) => p.product === product._id
+      );
+
+      if (existingProductIndex !== -1) {
+        let existingProduct = { ...updatedProducts[existingProductIndex] };
+
+        if (!existingProduct.colors.includes(selectedColor)) {
+          existingProduct.colors = [...existingProduct.colors, selectedColor];
+        }
+
+        if (!existingProduct.sizes.includes(selectedSize)) {
+          existingProduct.sizes = [...existingProduct.sizes, selectedSize];
+        }
+
+        existingProduct.quantity += quantity;
+
+        updatedProducts[existingProductIndex] = existingProduct;
+      } else {
+        updatedProducts.push({
+          product: product._id,
+          quantity,
+          price: product.price,
+          colors: [selectedColor],
+          sizes: [selectedSize],
+          image: product.thumbnails[0],
+          title: product.name,
+          _id: product._id,
+        });
+      }
+
+      // Save the updated cart to localStorage
+      localStorage.setItem("cart", JSON.stringify(updatedProducts));
+
+      toast.success("Product added to cart");
+
+      return updatedProducts;
+    });
+  };
   return (
     <Swiper
       modules={[Navigation, Pagination, Autoplay]}
@@ -87,7 +140,7 @@ export default function ProductCarousel({ products }) {
               className="flex justify-between items-start mb-3"
             >
               <h3 className="text-lg font-semibold capitalize line-clamp-1">
-                {product.name}
+                {product?.name}
               </h3>
             </div>
 
@@ -100,7 +153,10 @@ export default function ProductCarousel({ products }) {
                   €{product?.estimatedPrice}
                 </div>
               </div>
-              <button className="w-[1.8rem] h-[1.8rem] cursor-pointer flex items-center justify-center rounded-full  bg-gradient-to-r from-orange-600 via-orange-500 to-amber-500 text-white hover:opacity-90 transition-opacity duration-200 ">
+              <button
+                onClick={() => handleAddToCart(product)}
+                className="w-[1.8rem] h-[1.8rem] cursor-pointer flex items-center justify-center rounded-full  bg-gradient-to-r from-orange-600 via-orange-500 to-amber-500 text-white hover:opacity-90 transition-opacity duration-200 "
+              >
                 <FaCartPlus size={16} className=" text-white" />
               </button>
             </div>

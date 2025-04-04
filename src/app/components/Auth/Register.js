@@ -13,9 +13,10 @@ import { BsGithub } from "react-icons/bs";
 import { FaFacebookF, FaGoogle } from "react-icons/fa";
 import { LuEye, LuEyeOff, LuLoaderCircle } from "react-icons/lu";
 import { MdAddPhotoAlternate } from "react-icons/md";
+import { signIn, useSession } from "next-auth/react";
 
 export default function Register({ setActive }) {
-  const { setActivationToken } = useAuth();
+  const { setActivationToken, setAuth } = useAuth();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -27,6 +28,7 @@ export default function Register({ setActive }) {
   const [countries, setCountries] = useState([]);
   const [phoneCode, setPhoneCode] = useState("+1");
   const router = useRouter();
+  const { data: sessionData } = useSession();
 
   useEffect(() => {
     setCountries(getCountries());
@@ -58,6 +60,7 @@ export default function Register({ setActive }) {
       if (data) {
         setActivationToken(data.activationToken);
         router.push("/email-verification");
+
         toast.success("Please check your email to activate your account");
         setName("");
         setEmail("");
@@ -73,6 +76,44 @@ export default function Register({ setActive }) {
     }
   };
 
+  // ------------------------Login with social media accounts----------------------
+  const handleSocialAuth = async () => {
+    if (!sessionData) return;
+
+    try {
+      const { data } = await axios.post(`${authUri}/socialAuth`, {
+        email: sessionData.user.email,
+        name: sessionData.user.name,
+        avatar: sessionData.user.image,
+      });
+
+      if (data) {
+        setAuth({ ...auth, user: data.user, token: data.token });
+        localStorage.setItem("@ayoob", JSON.stringify({ user: data.user }));
+        Cookies.set("@ayoob", data.token, {
+          expires: 1,
+          secure: true,
+          sameSite: "Strict",
+          path: "/",
+        });
+        router.push("/");
+        toast.success(data.message || "Login Successfully!");
+        setTimeout(() => {
+          setAuthShow(false);
+        }, 1000);
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error(error?.response?.data?.message || "Social login failed.");
+    }
+  };
+
+  useEffect(() => {
+    if (sessionData && !localStorage.getItem("@ayoob")) {
+      handleSocialAuth();
+    }
+    // eslint-disable-next-line
+  }, [sessionData]);
   return (
     <div className="w-full min-h-screen flex items-center justify-center relative z-10 p-0 sm:p-4">
       <div className="w-full max-w-2xl flex flex-col gap-4 bg-gray-50 border border-gray-300 rounded-sm p-4 ">
@@ -240,6 +281,7 @@ export default function Register({ setActive }) {
           <Separator className="h-px w-full bg-gray-300" />
           <div className="flex items-center justify-center gap-4 sm:gap-8 mt-3">
             <span
+              onClick={() => signIn("google")}
               style={{
                 clipPath:
                   " polygon(70.71% 100%, 100% 70.71%, 100% 29.29%, 70.71% 0%, 29.29% 0%, 0% 29.29%, 0% 70.71%, 29.29% 100%)",
@@ -249,6 +291,7 @@ export default function Register({ setActive }) {
               <FaGoogle size={25} color="white" />
             </span>
             <span
+              onClick={() => signIn("facebook")}
               style={{
                 clipPath:
                   " polygon(70.71% 100%, 100% 70.71%, 100% 29.29%, 70.71% 0%, 29.29% 0%, 0% 29.29%, 0% 70.71%, 29.29% 100%)",
@@ -258,6 +301,7 @@ export default function Register({ setActive }) {
               <FaFacebookF size={25} color="white" />
             </span>
             <span
+              onClick={() => signIn("github")}
               style={{
                 clipPath:
                   " polygon(70.71% 100%, 100% 70.71%, 100% 29.29%, 70.71% 0%, 29.29% 0%, 0% 29.29%, 0% 70.71%, 29.29% 100%)",

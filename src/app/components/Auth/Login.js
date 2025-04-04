@@ -4,13 +4,14 @@ import { Style } from "@/app/utils/CommonStyle";
 import { authUri } from "@/app/utils/ServerURI";
 import { Separator } from "@/components/ui/separator";
 import axios from "axios";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { BsGithub } from "react-icons/bs";
 import { FaFacebookF, FaGoogle } from "react-icons/fa";
 import { LuEye, LuEyeOff, LuLoaderCircle } from "react-icons/lu";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
+import { signIn, useSession } from "next-auth/react";
 
 export default function Login({ setActive }) {
   const { auth, setAuth } = useAuth();
@@ -19,6 +20,7 @@ export default function Login({ setActive }) {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const { data: sessionData } = useSession();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -53,6 +55,45 @@ export default function Login({ setActive }) {
       setLoading(false);
     }
   };
+
+  // ------------------------Login with social media accounts----------------------
+  const handleSocialAuth = async () => {
+    if (!sessionData) return;
+
+    try {
+      const { data } = await axios.post(`${authUri}/socialAuth`, {
+        email: sessionData.user.email,
+        name: sessionData.user.name,
+        avatar: sessionData.user.image,
+      });
+
+      if (data) {
+        setAuth({ ...auth, user: data.user, token: data.token });
+        localStorage.setItem("@ayoob", JSON.stringify({ user: data.user }));
+        Cookies.set("@ayoob", data.token, {
+          expires: 1,
+          secure: true,
+          sameSite: "Strict",
+          path: "/",
+        });
+        router.push("/");
+        toast.success(data.message || "Login Successfully!");
+        setTimeout(() => {
+          setAuthShow(false);
+        }, 1000);
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error(error?.response?.data?.message || "Social login failed.");
+    }
+  };
+
+  useEffect(() => {
+    if (sessionData && !localStorage.getItem("@ayoob")) {
+      handleSocialAuth();
+    }
+    // eslint-disable-next-line
+  }, [sessionData]);
 
   return (
     <div className="w-full min-h-screen flex items-center justify-center relative z-10 p-0 sm:p-4">
@@ -115,7 +156,7 @@ export default function Login({ setActive }) {
             </div>
             <button
               type="button"
-              onClick={() => router.push("/update-password")}
+              onClick={() => setActive("resetPassword")}
               className="text-red-500 cursor-pointer hover:text-red-600 transition-all duration-300 underline underline-offset-3 "
             >
               Forgot Password?
@@ -149,6 +190,7 @@ export default function Login({ setActive }) {
           <Separator className="h-px w-full bg-gray-300" />
           <div className="flex items-center justify-center gap-4 sm:gap-8 mt-3">
             <span
+              onClick={() => signIn("google")}
               style={{
                 clipPath:
                   " polygon(70.71% 100%, 100% 70.71%, 100% 29.29%, 70.71% 0%, 29.29% 0%, 0% 29.29%, 0% 70.71%, 29.29% 100%)",
@@ -158,6 +200,7 @@ export default function Login({ setActive }) {
               <FaGoogle size={25} color="white" />
             </span>
             <span
+              onClick={() => signIn("facebook")}
               style={{
                 clipPath:
                   " polygon(70.71% 100%, 100% 70.71%, 100% 29.29%, 70.71% 0%, 29.29% 0%, 0% 29.29%, 0% 70.71%, 29.29% 100%)",
@@ -167,6 +210,7 @@ export default function Login({ setActive }) {
               <FaFacebookF size={25} color="white" />
             </span>
             <span
+              onClick={() => signIn("github")}
               style={{
                 clipPath:
                   " polygon(70.71% 100%, 100% 70.71%, 100% 29.29%, 70.71% 0%, 29.29% 0%, 0% 29.29%, 0% 70.71%, 29.29% 100%)",

@@ -13,8 +13,6 @@ export default function CartItems({ products }) {
   const { selectedProduct, setSelectedProduct } = useAuth();
   const router = useRouter();
 
-  console.log("selectedProduct:", selectedProduct);
-
   // 🔹 Update Quantity
   const updateQuantity = (id, change) => {
     setSelectedProduct((prevCart) => {
@@ -80,7 +78,10 @@ export default function CartItems({ products }) {
                 key={item._id}
                 className="grid grid-cols-5 sm:grid-cols-6 items-center py-4 border-b border-gray-700  gap-2 sm:gap-4"
               >
-                <div className="col-span-2 flex items-center flex-col sm:flex-row gap-2 sm:gap-3">
+                <div
+                  onClick={() => router.push(`/products/${item._id}`)}
+                  className="col-span-2 flex items-center flex-col sm:flex-row gap-2 sm:gap-3"
+                >
                   <div className="w-[6rem]">
                     <div
                       className=" bg-gray-300/50 relative w-[5rem] h-[3rem] sm:h-[3.5rem] rounded-md overflow-hidden "

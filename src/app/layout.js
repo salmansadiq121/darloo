@@ -1,9 +1,11 @@
+"use client";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "./content/authContent";
 import { Toaster } from "react-hot-toast";
 import { metadata } from "./metaData";
 import QueryProvider from "./content/QueryProvider";
+import { SessionProvider } from "next-auth/react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -53,20 +55,22 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <QueryProvider>
-          <AuthProvider>
-            <main className=" bg-white w-full min-h-screen text-black">
-              {children}
-            </main>
-            <Toaster
-              position="bottom-center"
-              reverseOrder={false}
-              toastOptions={{
-                duration: 3000,
-              }}
-            />
-          </AuthProvider>
-        </QueryProvider>
+        <SessionProvider>
+          <QueryProvider>
+            <AuthProvider>
+              <main className=" bg-white w-full min-h-screen text-black">
+                {children}
+              </main>
+              <Toaster
+                position="bottom-center"
+                reverseOrder={false}
+                toastOptions={{
+                  duration: 3000,
+                }}
+              />
+            </AuthProvider>
+          </QueryProvider>
+        </SessionProvider>
       </body>
     </html>
   );

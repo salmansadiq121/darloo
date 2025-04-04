@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useRef, useMemo, use, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
@@ -58,6 +58,7 @@ import ProductCarousel from "@/app/components/ProductCarousel";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/app/content/authContent";
 import toast from "react-hot-toast";
+import ShareData from "@/app/utils/Share";
 
 export default function ProductDetail() {
   const { setSelectedProduct } = useAuth();
@@ -75,11 +76,21 @@ export default function ProductDetail() {
   const [zoomPosition, setZoomPosition] = useState({ x: 0, y: 0 });
   const imageRef = useRef(null);
   const [relatedProducts, setRelatedProducts] = useState([]);
+  const [show, setShow] = useState(false);
+  const [currentUrl, setCurrentUrl] = useState("");
 
-  console.log("product", product);
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setCurrentUrl(window?.location?.origin);
+    }
+  }, []);
+
+  // console.log("product", product);
 
   // Product data
-  const fetchProductDetail = async () => {
+  const fetchProductDetail = useCallback(async () => {
+    if (!productId) return;
+
     setLoading(true);
     try {
       const { data } = await axios.get(
@@ -91,12 +102,11 @@ export default function ProductDetail() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [productId]);
 
   useEffect(() => {
     fetchProductDetail();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [fetchProductDetail]);
 
   // Handle Add to Cart
   const handleAddToCart = (product) => {
@@ -172,30 +182,28 @@ export default function ProductDetail() {
   });
 
   useEffect(() => {
-    if (saleEndDate) {
-      const timer = setInterval(() => {
-        const now = new Date();
-        const difference = saleEndDate.getTime() - now.getTime();
+    if (!saleEndDate) return;
 
-        if (difference <= 0) {
-          clearInterval(timer);
-          return;
-        }
+    const timer = setInterval(() => {
+      const now = new Date();
+      const difference = saleEndDate.getTime() - now.getTime();
 
-        const days = Math.floor(difference / (1000 * 60 * 60 * 24));
-        const hours = Math.floor(
+      if (difference <= 0) {
+        clearInterval(timer);
+        return;
+      }
+
+      setTimeLeft({
+        days: Math.floor(difference / (1000 * 60 * 60 * 24)),
+        hours: Math.floor(
           (difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
-        );
-        const minutes = Math.floor(
-          (difference % (1000 * 60 * 60)) / (1000 * 60)
-        );
-        const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+        ),
+        minutes: Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60)),
+        seconds: Math.floor((difference % (1000 * 60)) / 1000),
+      });
+    }, 1000);
 
-        setTimeLeft({ days, hours, minutes, seconds });
-      }, 1000);
-
-      return () => clearInterval(timer);
-    }
+    return () => clearInterval(timer);
   }, [saleEndDate]);
 
   // Handle quantity change
@@ -275,6 +283,59 @@ export default function ProductDetail() {
     fetchRelatedProducts();
     // eslint-disable-next-line
   }, [product?.category?._id]);
+
+  const handleFavorite = (productId) => {
+    let favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+    if (favorites.includes(productId)) {
+      favorites = favorites.filter((id) => id !== productId);
+    } else {
+      favorites.push(productId);
+    }
+    localStorage.setItem("favorites", JSON.stringify(favorites));
+  };
+
+  useEffect(() => {
+    const favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+
+    if (favorites.includes(product._id)) {
+      setIsWishlisted(true);
+    }
+  }, [product]);
+
+  // Add product to recentProducts
+  useEffect(() => {
+    if (!product?._id) return; // Ensure product exists
+
+    const now = Date.now();
+    const threeDaysInMs = 3 * 24 * 60 * 60 * 1000;
+    const viewDate = new Date().toISOString(); // Store readable date
+
+    // Get existing recent products from localStorage
+    let recentProducts =
+      JSON.parse(localStorage.getItem("recentProducts")) || [];
+
+    // Filter out expired products (older than 3 days)
+    recentProducts = recentProducts.filter(
+      (item) => now - item.timestamp < threeDaysInMs
+    );
+
+    // Check if product already exists
+    const existingIndex = recentProducts.findIndex(
+      (item) => item.id === product._id
+    );
+
+    if (existingIndex === -1) {
+      // Add new product if it's not a duplicate
+      recentProducts.push({ id: product._id, timestamp: now, viewDate });
+    } else {
+      // Update the timestamp and viewDate if it already exists
+      recentProducts[existingIndex].timestamp = now;
+      recentProducts[existingIndex].viewDate = viewDate;
+    }
+
+    // Update localStorage
+    localStorage.setItem("recentProducts", JSON.stringify(recentProducts));
+  }, [product]);
 
   // Loading skeleton
   if (loading) {
@@ -380,7 +441,7 @@ export default function ProductDetail() {
 
   return (
     <MainLayout title="Product Detail - Ayoob">
-      <div className="bg-white min-h-screen relative z-10 px-4 sm:px-[2rem] md:px-[3rem]">
+      <div className="bg-white min-h-screen relative z-10 px-4 sm:px-[2rem] md:px-[3rem] ">
         {/* Breadcrumb */}
         <div className="bg-gray-50 py-3">
           <div className="container mx-auto px-4">
@@ -787,7 +848,10 @@ export default function ProductDetail() {
                         ? "bg-red-100 text-primary border-primary/20"
                         : "hover:bg-gray-100 hover:text-gray-900"
                     }`}
-                    onClick={() => setIsWishlisted(!isWishlisted)}
+                    onClick={() => {
+                      setIsWishlisted(!isWishlisted);
+                      handleFavorite(product._id);
+                    }}
                   >
                     <Heart
                       className={`h-6 w-6 ${
@@ -799,6 +863,7 @@ export default function ProductDetail() {
                   <Button
                     variant="outline"
                     size="icon"
+                    onClick={() => setShow(true)}
                     className="h-12 w-12 rounded-xl border-sky-200 cursor-pointer hover:bg-sky-100 hover:text-sky-900"
                   >
                     <Share2 className="h-6 w-6" />
@@ -1270,6 +1335,17 @@ export default function ProductDetail() {
             </motion.div>
           )}
         </AnimatePresence>
+
+        {/* Share Modal */}
+        {show && (
+          <div className="fixed top-0 left-0 w-full h-full bg-white/70 dark:bg-gray-950/70 z-50 flex items-center justify-center">
+            <ShareData
+              title={product?.name}
+              url={`${currentUrl}/products/${product?._id}`}
+              setShowShare={setShow}
+            />
+          </div>
+        )}
       </div>
     </MainLayout>
   );

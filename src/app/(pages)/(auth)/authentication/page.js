@@ -1,11 +1,21 @@
 "use client";
 import Login from "@/app/components/Auth/Login";
 import Register from "@/app/components/Auth/Register";
+import ResetPassword from "@/app/components/Auth/ResetPassword";
 import MainLayout from "@/app/components/Layout/Layout";
-import React, { useState } from "react";
+import { useRouter } from "next/navigation";
+import React, { useEffect, useState } from "react";
 
 export default function Authentication() {
   const [activeTab, setActiveTab] = useState("login");
+  const router = useRouter();
+
+  useEffect(() => {
+    if (localStorage.getItem("@ayoob")) {
+      router.push("/");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   return (
     <MainLayout title="Ayoob - Authentication">
       <div className="relative">
@@ -38,7 +48,7 @@ export default function Authentication() {
         ) : activeTab === "register" ? (
           <Register setActive={setActiveTab} />
         ) : (
-          ""
+          <ResetPassword />
         )}
       </div>
     </MainLayout>

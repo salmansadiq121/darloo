@@ -4,10 +4,14 @@ import { useAuth } from "@/app/content/authContent";
 import { Style } from "@/app/utils/CommonStyle";
 import { Separator } from "@/components/ui/separator";
 import Image from "next/image";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { MdOutlineLocationOn } from "react-icons/md";
 import { MdOutlinePayments } from "react-icons/md";
 import { BiSolidEdit } from "react-icons/bi";
+import PaymentMethodModal from "@/app/components/checkout/PaymentMethodModal";
+import toast from "react-hot-toast";
+import axios from "axios";
+import { FiLoader } from "react-icons/fi";
 
 const paymentMethods = [
   {
@@ -32,17 +36,59 @@ const paymentMethods = [
   },
 ];
 
+// const carts = {
+//   user: "6751997892669289c3e2f4ad",
+//   products: [
+//     {
+//       product: "677788a8f14cad4ebe669947",
+//       quantity: 2,
+//       price: 1300,
+//       colors: ["#000000", "#FFFFFF"],
+//       sizes: ["M", "L"],
+//     },
+//     {
+//       product: "67780226425c66b0a52f9127",
+//       quantity: 1,
+//       price: 5999,
+//       colors: ["#FFFFFF", "#0000FF"],
+//       sizes: ["XL", "L"],
+//     },
+//   ],
+//   totalAmount: "12278",
+//   shippingFee: "500",
+//   shippingAddress: {
+//     address: "123 Street, ABC Avenue",
+//     city: "New York",
+//     state: "NY",
+//     postalCode: "10001",
+//     country: "USA",
+//   },
+//   paymentMethod: "Credit Card",
+// };
+
 export default function Checkout() {
   const { auth, selectedProduct, setSelectedProduct } = useAuth();
-
-  const [shippingAddress, setShippingAddress] = useState({
-    address: "",
-    country: "",
-    state: "",
-    city: "",
-    postalCode: "",
+  const [shippingFee, setShippingFee] = useState(0);
+  const [cart, setCart] = useState({
+    user: "",
+    products: [],
+    totalAmount: "",
+    shippingFee: shippingFee,
+    shippingAddress: {
+      address: "",
+      country: "",
+      state: "",
+      city: "",
+      postalCode: "",
+    },
+    paymentMethod: "Credit Card",
   });
   const [voucherCode, setVoucherCode] = useState("");
+  const [showPayment, setShowPayment] = useState(false);
+  const [discount, setDiscount] = useState(0);
+
+  const [loading, setLoading] = useState(false);
+  const [isDisabled, setIsDisabled] = useState(false);
 
   // 🔹 Update Quantity
   const updateQuantity = (id, change) => {
@@ -66,6 +112,83 @@ export default function Checkout() {
       .reduce((acc, item) => acc + item.price * item.quantity, 0)
       .toFixed(2);
   };
+
+  // Apply Voucher
+  const applyVoucher = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    if (!voucherCode) {
+      setLoading(false);
+      return;
+    }
+    try {
+      const { data } = await axios.post(
+        `${process.env.NEXT_PUBLIC_SERVER_URI}/api/v1/coupon/apply/order`,
+        {
+          code: voucherCode,
+          cartItems: cart.products.map((item) => ({
+            productId: item.product,
+            price: item.price,
+            quantity: item.quantity,
+          })),
+          cartTotal: cart.totalAmount,
+        }
+      );
+      if (data) {
+        setDiscount(data.discount);
+        toast.success("Voucher applied successfully.");
+        setVoucherCode("");
+        setIsDisabled(true);
+      } else {
+        toast.error(response?.data?.message || "Something went wrong.");
+      }
+    } catch (error) {
+      console.error("Error applying voucher:", error);
+      toast.error(error.response?.data?.message || "Something went wrong.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Add Shipping Fee
+  const getShippingFee = async () => {
+    try {
+      const { data } = await axios.get(
+        `${process.env.NEXT_PUBLIC_SERVER_URI}/api/v1/shipping/${auth.user.addressDetails.country}`
+      );
+      if (data) {
+        setCart((prev) => ({
+          ...prev,
+          shippingFee: data.shipping.fee ?? 0,
+        }));
+        setShippingFee(data.shipping.fee ?? 0);
+      }
+    } catch (error) {
+      console.error("Error getting shipping fee:", error);
+    }
+  };
+
+  useEffect(() => {
+    getShippingFee();
+  }, [auth?.user]);
+
+  // Cart
+  useEffect(() => {
+    setCart({
+      user: auth?.user?._id,
+      products: selectedProduct,
+      totalAmount: (getTotal?.() || 0) - (discount || 0) + (shippingFee || 0),
+      shippingAddress: {
+        address: auth?.user?.addressDetails?.address || "",
+        country: auth?.user?.addressDetails?.country || "",
+        state: auth?.user?.addressDetails?.state || "",
+        city: auth?.user?.addressDetails?.city || "",
+        postalCode: auth?.user?.addressDetails?.pincode || "",
+      },
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedProduct, auth.user, discount, shippingFee]);
+
   return (
     <MainLayout title="Ayoob - Checkout">
       <div className="bg-transparent min-h-screen w-full z-10 relative px-4 sm:px-8 py-5 sm:py-6 overflow-hidden">
@@ -91,7 +214,7 @@ export default function Checkout() {
                     <input
                       type="text"
                       placeholder="Full Name"
-                      value={auth?.user?.firstName}
+                      value={auth?.user?.name}
                       required
                       readOnly
                       className=" w-full h-full px-5  py-2  text-[15px] text-gray-900 bg-transparent border border-gray-400 rounded-sm outline-none"
@@ -104,7 +227,7 @@ export default function Checkout() {
                       value={auth?.user?.email}
                       readOnly
                       required
-                      className=" w-full h-full px-5 py-2 text-[15px] text-gray-900 bg-transparent  border border-gray-400 outline-none"
+                      className=" w-full h-full px-5 py-2 text-[15px] text-gray-900 bg-transparent  border border-gray-400 outline-none rounded-sm "
                     />
                   </div>
                 </div>
@@ -113,10 +236,10 @@ export default function Checkout() {
                   <input
                     type="text"
                     placeholder="Enter your shipping address"
-                    value={shippingAddress?.address}
+                    value={auth?.user?.addressDetails?.address}
                     readOnly
                     required
-                    className=" w-full h-full px-5 py-2 text-[15px] text-gray-900 bg-transparent  border border-gray-400 outline-none"
+                    className=" w-full h-full px-5 py-2 text-[15px] text-gray-900 bg-transparent  border border-gray-400 outline-none rounded-sm "
                   />
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -124,10 +247,10 @@ export default function Checkout() {
                     <input
                       type="text"
                       placeholder="Country"
-                      value={shippingAddress?.country}
+                      value={auth?.user?.addressDetails?.country}
                       readOnly
                       required
-                      className=" w-full h-full px-5 py-2 text-[15px] text-gray-900 bg-transparent  border border-gray-400 outline-none"
+                      className=" w-full h-full px-5 py-2 text-[15px] text-gray-900 bg-transparent  border border-gray-400 outline-none rounded-sm "
                     />
                   </div>
                   <div className="w-full h-[2.8rem] ">
@@ -135,10 +258,10 @@ export default function Checkout() {
                     <input
                       type="text"
                       placeholder="State"
-                      value={shippingAddress?.state}
+                      value={auth?.user?.addressDetails?.state}
                       readOnly
                       required
-                      className=" w-full h-full px-5 py-2 text-[15px] text-gray-900 bg-transparent  border border-gray-400 outline-none"
+                      className=" w-full h-full px-5 py-2 text-[15px] text-gray-900 bg-transparent  border border-gray-400 outline-none rounded-sm "
                     />
                   </div>
                 </div>
@@ -147,10 +270,10 @@ export default function Checkout() {
                     <input
                       type="text"
                       placeholder="City"
-                      value={shippingAddress?.city}
+                      value={auth?.user?.addressDetails?.city}
                       readOnly
                       required
-                      className=" w-full h-full px-5 py-2 text-[15px] text-gray-900 bg-transparent  border border-gray-400 outline-none"
+                      className=" w-full h-full px-5 py-2 text-[15px] text-gray-900 bg-transparent  border border-gray-400 outline-none rounded-sm "
                     />
                   </div>
                   <div className="w-full h-[2.8rem] ">
@@ -159,15 +282,15 @@ export default function Checkout() {
                       <input
                         type="number"
                         placeholder="Phone Number"
-                        value={auth?.user?.phone}
+                        value={auth?.user?.number}
                         readOnly
-                        className="w-full h-[2.8rem] pl-2 pr-3 py-2 text-[15px] text-gray-900 bg-transparent  border border-gray-400 outline-none"
+                        className="w-full h-[2.8rem] pl-2 pr-3 py-2 text-[15px] text-gray-900 bg-transparent  border border-gray-400 outline-none rounded-sm "
                         required
                       />
                     </div>
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 cursor-pointer">
                   <input
                     type="checkbox"
                     className="w-4 h-4 border-2 border-red-500 accent-red-600 "
@@ -193,11 +316,11 @@ export default function Checkout() {
             </div>
           </div>
           {/* Right */}
-          <div className="col-span-5 sm:col-span-2 z-10 w-full py-[2rem] bg-transparent pb-[4rem] px-[1.5rem] rounded-lg relative cart max-h-fit min-h-[20rem] flex flex-col gap-3">
+          <div className="col-span-5 sm:col-span-2 z-[20] w-full py-[2rem] bg-transparent pb-[4rem] px-[1.5rem] rounded-lg relative cart max-h-fit min-h-[20rem] flex flex-col gap-3">
             <div className="glow-effect"></div>
 
             <h3 className="text-xl font-semibold mb-4 z-10">Your Cart</h3>
-            <div className="w-full max-h-[20rem] overflow-y-auto overflow-x-hidden scroll-smooth">
+            <div className="w-full max-h-[20rem] overflow-y-auto overflow-x-hidden scroll-smooth z-20">
               {selectedProduct?.length > 0 ? (
                 selectedProduct?.map((item) => (
                   <div
@@ -256,49 +379,66 @@ export default function Checkout() {
             </div>
             <div className="flex justify-between z-10">
               <span className="text-red-600 uppercase">Subtotal:</span>
-              <span>${getTotal()}</span>
+              <span>€{getTotal()}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-red-600 uppercase">G.S.T:</span>
-              <span>${(getTotal() * 0.1).toFixed(2)}</span>
+              <span>€{(getTotal() * 0.01).toFixed(2)}</span>
             </div>
+
             <div className="flex justify-between">
               <span className="text-red-600 uppercase">Delivery:</span>
-              <span>$10.00</span>
+              <span>€{shippingFee || 0}</span>
             </div>
-            <div className="w-full flex flex-col gap-3 z-10">
+            <div className="flex justify-between">
+              <span className="text-red-600 uppercase">Discount:</span>
+              <span>€{discount}</span>
+            </div>
+            <form
+              onSubmit={applyVoucher}
+              className="w-full flex flex-col gap-3 z-10"
+            >
               <div className="w-full h-[2.6rem] bg-white border border-gray-400 rounded-sm">
                 <input
                   type="text"
                   placeholder="Enter voucher code"
                   value={voucherCode}
+                  required
                   onChange={(e) => setVoucherCode(e.target.value)}
                   className="w-full h-full text-black px-6 bg-transparent outline-none border-none"
                 />
               </div>
               <button
-                className="w-full h-[2.8rem] bg-red-600 hover:bg-red-700 transition-all duration-300 text-white py-2 mt-2 cursor-pointer "
+                className={`w-full h-[2.8rem] flex items-center justify-center gap-2  transition-all duration-300 text-white py-2 mt-2 ${
+                  isDisabled
+                    ? "cursor-not-allowed bg-red-400"
+                    : "cursor-pointer bg-red-600 hover:bg-red-700"
+                }  `}
                 style={{
                   clipPath:
                     "polygon(4.98% 0%, 86.4% 0%, 100% 0%, 100% 70.29%, 95.08% 100%, 9.8% 100%, 0% 100%, 0% 30.23%)",
                 }}
+                disabled={isDisabled}
               >
-                Apply Voucher
+                Apply Voucher{" "}
+                {loading && (
+                  <FiLoader className="h-5 w-5 animate-spin text-white" />
+                )}
               </button>
-            </div>
+            </form>
             <div className="py-2 w-full">
               <Separator className="h-px w-full bg-gray-500" />
             </div>
             <div className="flex justify-between font-semibold text-lg">
               <span className="text-red-600 uppercase">Total:</span>
-              <span>${(parseFloat(getTotal()) + 10).toFixed(2)}</span>
+              <span>€{cart?.totalAmount}</span>
             </div>
             <div className="py-2 w-full">
               <Separator className="h-px w-full bg-gray-500" />
             </div>
             <div className="flex items-center justify-center w-full z-10">
               <button
-                className={`px-8 text-black mt-4 bg-red-600 hover:bg-red-700 transition-all duration-300 ${
+                className={`px-8 text-white mt-4 bg-red-600 hover:bg-red-700 transition-all duration-300 ${
                   selectedProduct.length === 0
                     ? "cursor-not-allowed"
                     : "cursor-pointer"
@@ -308,12 +448,23 @@ export default function Checkout() {
                   clipPath:
                     " polygon(6.71% 0%, 86.4% 0%, 100% 0%, 100% 66.1%, 94.08% 100%, 9.8% 100%, 0% 100%, 0% 42.16%)",
                 }}
+                onClick={() => setShowPayment(true)}
               >
                 Checkout
               </button>
             </div>
           </div>
         </div>
+
+        {/* -----------------Payment Method--------------- */}
+        {showPayment && (
+          <PaymentMethodModal
+            isOpen={showPayment}
+            onClose={() => setShowPayment(false)}
+            product={cart}
+            shippingFee={shippingFee}
+          />
+        )}
       </div>
     </MainLayout>
   );

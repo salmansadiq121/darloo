@@ -1,5 +1,5 @@
 "use client";
-import { Search, Menu, X, Moon, Sun } from "lucide-react";
+import { Search, Menu, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -9,6 +9,9 @@ import { FaShoppingCart } from "react-icons/fa";
 import { IoSearch } from "react-icons/io5";
 import { IoMdNotifications } from "react-icons/io";
 import { useAuth } from "@/app/content/authContent";
+import { signOut } from "next-auth/react";
+import Cookies from "js-cookie";
+import { MdSupportAgent } from "react-icons/md";
 
 const Header = () => {
   const { auth, setAuth, setSearch, selectedProduct } = useAuth();
@@ -150,7 +153,7 @@ const Header = () => {
               User Manual
             </Link>
           </div>
-          <div className="hidden sm:ml-6 sm:flex sm:items-center sm:space-x-4">
+          <div className="hidden sm:ml-6 sm:flex sm:items-center sm:space-x-3">
             <div className="relative min-w-[18rem]">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <Search className="h-4 w-4 text-gray-400" />
@@ -194,6 +197,13 @@ const Header = () => {
                 {selectedProduct ? selectedProduct.length : 0}
               </span>
             </div>
+            <div
+              onClick={() => router.push("/chat")}
+              className="relative cursor-pointer ml-4"
+            >
+              <MdSupportAgent className="h-6 w-6 text-gray-900 hover:text-red-600 transition-all duration-300" />
+            </div>
+
             {/* Profile */}
             {!auth?.user ? (
               <div className="">
@@ -207,10 +217,10 @@ const Header = () => {
             ) : (
               <div
                 className="relative cursor-pointer"
-                onClick={() => router.push("/profile")}
+                onClick={() => router.push(`/profile/${auth?.user?._id}`)}
               >
                 <Image
-                  src={auth?.user?.avatar || "profile.png"}
+                  src={auth?.user?.avatar || "/profile.png"}
                   alt="Profile"
                   width={70}
                   height={70}
@@ -291,10 +301,10 @@ const Header = () => {
             ) : (
               <div
                 className="relative cursor-pointer ml-3 flex items-center gap-1"
-                onClick={() => router.push("/profile")}
+                onClick={() => router.push(`/profile/${auth?.user?._id}`)}
               >
                 <Image
-                  src={auth?.user?.avatar || "profile.png"}
+                  src={auth?.user?.avatar || "/profile.png"}
                   alt="Profile"
                   width={70}
                   height={70}

@@ -101,7 +101,7 @@ const Header = () => {
               </h1>
             </Link>
           </div>
-          <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
+          <div className="hidden sm:ml-3 lg:flex sm:space-x-4">
             <Link
               href="/top-sale"
               className={` border-b-2 ${
@@ -153,7 +153,7 @@ const Header = () => {
               User Manual
             </Link>
           </div>
-          <div className="hidden sm:ml-6 sm:flex sm:items-center sm:space-x-3">
+          <div className="hidden sm:ml-6 lg:flex sm:items-center sm:space-x-3">
             <div className="relative min-w-[18rem]">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <Search className="h-4 w-4 text-gray-400" />
@@ -233,7 +233,7 @@ const Header = () => {
               </div>
             )}
           </div>
-          <div className="-mr-2 flex items-center sm:hidden">
+          <div className="-mr-2 flex items-center lg:hidden">
             <div
               className="relative cursor-pointer mr-5"
               onClick={() => setIsShow(!isShow)}
@@ -286,7 +286,7 @@ const Header = () => {
       )}
 
       {isMenuOpen && (
-        <div className="sm:hidden">
+        <div className="lg:hidden">
           <div className="pt-2 pb-3 space-y-1">
             {/* Profile */}
             {!auth?.user ? (

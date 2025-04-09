@@ -4,6 +4,7 @@ import Cookies from "js-cookie";
 import axios from "axios";
 import { authUri, productsURI } from "../utils/ServerURI";
 import { useQuery } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
 
 const AuthContext = createContext();
 
@@ -17,8 +18,7 @@ export const AuthProvider = ({ children }) => {
   });
   const [search, setSearch] = useState("");
   const [selectedProduct, setSelectedProduct] = useState([]);
-
-  console.log("auth:", auth);
+  const router = useRouter();
 
   //   Token Check
   axios.defaults.headers.common["Authorization"] = auth?.token;
@@ -114,7 +114,12 @@ export const AuthProvider = ({ children }) => {
     const checkTokenExpiry = () => {
       try {
         const token = Cookies.get("@ayoob");
-        if (!token) return;
+        if (!token) {
+          setAuth({ user: null, token: "" });
+          localStorage.removeItem("@ayoob");
+          Cookies.remove("@ayoob");
+          return;
+        }
 
         const parts = token.split(".");
         if (parts.length !== 3) throw new Error("Invalid token format");
@@ -124,6 +129,7 @@ export const AuthProvider = ({ children }) => {
 
         // Check token expiry
         if (decodedToken.exp * 1000 < Date.now()) {
+          router.push("/authentication");
           setAuth({ user: null, token: "" });
           localStorage.removeItem("@ayoob");
           Cookies.remove("@ayoob");

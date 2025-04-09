@@ -78,9 +78,9 @@ export default function Login({ setActive }) {
         });
         router.push("/");
         toast.success(data.message || "Login Successfully!");
-        setTimeout(() => {
-          setAuthShow(false);
-        }, 1000);
+        // setTimeout(() => {
+        //   setAuthShow(false);
+        // }, 1000);
       }
     } catch (error) {
       console.error(error);

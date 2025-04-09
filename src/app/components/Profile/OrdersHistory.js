@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+"use client";
+import React, { useEffect, useState } from "react";
 import {
   Check,
   Clock,
@@ -19,62 +20,42 @@ import {
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
+import axios from "axios";
+import { format } from "date-fns";
+import { PiPackageDuotone } from "react-icons/pi";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import Swal from "sweetalert2";
+import toast from "react-hot-toast";
+import OrderCardSkeleton from "./OrderLoadingSkelton";
+import AddReviewModal from "./ReviewModal";
 
-export default function OrdersHistory() {
-  const [orders] = useState([
-    {
-      id: "ORD-7895",
-      date: "Mar 24, 2025",
-      total: "€129.99",
-      status: "delivered",
-      items: [
-        { name: "Product A", quantity: 1, price: "€79.99" },
-        { name: "Product B", quantity: 2, price: "€25.00" },
-      ],
-    },
-    {
-      id: "ORD-6543",
-      date: "Mar 18, 2025",
-      total: "€59.99",
-      status: "shipped",
-      items: [{ name: "Product C", quantity: 1, price: "€59.99" }],
-    },
-    {
-      id: "ORD-5421",
-      date: "Mar 10, 2025",
-      total: "€149.99",
-      status: "processing",
-      items: [{ name: "Product D", quantity: 1, price: "€149.99" }],
-    },
-    {
-      id: "ORD-4321",
-      date: "Mar 5, 2025",
-      total: "€89.99",
-      status: "pending",
-      items: [{ name: "Product E", quantity: 1, price: "€89.99" }],
-    },
-    {
-      id: "ORD-3210",
-      date: "Feb 28, 2025",
-      total: "€199.99",
-      status: "cancelled",
-      items: [{ name: "Product F", quantity: 1, price: "€199.99" }],
-    },
-    {
-      id: "ORD-2109",
-      date: "Feb 20, 2025",
-      total: "€79.99",
-      status: "returned",
-      items: [{ name: "Product G", quantity: 1, price: "€79.99" }],
-    },
-    {
-      id: "ORD-1098",
-      date: "Feb 15, 2025",
-      total: "€129.99",
-      status: "review",
-      items: [{ name: "Product H", quantity: 1, price: "€129.99" }],
-    },
-  ]);
+export default function OrdersHistory({ userId }) {
+  const [orders, setOrders] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
+  const [orderId, setOrderId] = useState("");
+  const [show, setShow] = useState(false);
+  const [productId, setProductId] = useState("");
+
+  // Fetch Orders
+  const fetchOrders = async () => {
+    setIsLoading(true);
+    try {
+      const { data } = await axios.get(
+        `${process.env.NEXT_PUBLIC_SERVER_URI}/api/v1/order/user/orders/${userId}`
+      );
+      setOrders(data.orders);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchOrders();
+  }, [userId]);
 
   const getStatusIcon = (status) => {
     switch (status) {
@@ -82,6 +63,8 @@ export default function OrdersHistory() {
         return <Clock className="h-5 w-5 text-yellow-500" />;
       case "processing":
         return <RefreshCw className="h-5 w-5 text-blue-500" />;
+      case "packing":
+        return <PiPackageDuotone className="h-5 w-5 text-lime-500" />;
       case "shipped":
         return <Truck className="h-5 w-5 text-purple-500" />;
       case "delivered":
@@ -101,6 +84,7 @@ export default function OrdersHistory() {
     const statusConfig = {
       pending: { color: "bg-yellow-100 text-yellow-800 border-yellow-200" },
       processing: { color: "bg-blue-100 text-blue-800 border-blue-200" },
+      packing: { color: "bg-lime-100 text-lime-800 border-lime-200" },
       shipped: { color: "bg-purple-100 text-purple-800 border-purple-200" },
       delivered: { color: "bg-green-100 text-green-800 border-green-200" },
       cancelled: { color: "bg-red-100 text-red-800 border-red-200" },
@@ -111,173 +95,165 @@ export default function OrdersHistory() {
     return (
       <Badge
         variant="outline"
-        className={`${statusConfig[status]?.color} capitalize`}
+        className={`${statusConfig[status.toLowerCase()]?.color} capitalize`}
       >
         {status}
       </Badge>
     );
   };
 
+  // Cancel Order
+  const handleOrderCancelConfirmation = (orderId, status) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text:
+        status === "Cancelled"
+          ? "Do you want to cancel this order?"
+          : "Do you want to return this order?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText:
+        status === "Cancelled" ? "Yes, cancel order" : "Yes, return order",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        cancelOrder(orderId, status);
+      }
+    });
+  };
+  const cancelOrder = async (orderId, status) => {
+    try {
+      const { data } = await axios.put(
+        `${process.env.NEXT_PUBLIC_SERVER_URI}/api/v1/order/cancel/request/${orderId}`,
+        {
+          orderStatus: status,
+        }
+      );
+      if (data) {
+        toast.success(
+          status === "Cancelled"
+            ? "Your order cancel request has been sent."
+            : "Your order return request has been sent."
+        );
+        setOrderId("");
+        fetchOrders();
+      } else {
+        toast.error(response?.data?.message || "Something went wrong.");
+      }
+    } catch (error) {
+      console.error("Error cancelling order:", error);
+      toast.error(error.response?.data?.message || "Something went wrong.");
+    }
+  };
+
   return (
-    <Card>
+    <Card className="relative">
       <CardHeader>
         <CardTitle>Orders History</CardTitle>
         <CardDescription>View and manage your orders</CardDescription>
       </CardHeader>
       <CardContent>
         <Tabs defaultValue="all">
-          <TabsList className="grid grid-cols-4 md:grid-cols-8 mb-6">
+          <TabsList className="grid grid-cols-5 md:grid-cols-9 mb-6">
             <TabsTrigger value="all" className="text-xs md:text-sm">
               All
             </TabsTrigger>
-            <TabsTrigger value="pending" className="text-xs md:text-sm">
+            <TabsTrigger value="Pending" className="text-xs md:text-sm">
               Pending
             </TabsTrigger>
-            <TabsTrigger value="processing" className="text-xs md:text-sm">
+            <TabsTrigger value="Processing" className="text-xs md:text-sm">
               Processing
             </TabsTrigger>
-            <TabsTrigger value="shipped" className="text-xs md:text-sm">
+            <TabsTrigger value="Packing" className="text-xs md:text-sm">
+              Packing
+            </TabsTrigger>
+            <TabsTrigger value="Shipped" className="text-xs md:text-sm">
               Shipped
             </TabsTrigger>
-            <TabsTrigger value="delivered" className="text-xs md:text-sm">
+            <TabsTrigger value="Delivered" className="text-xs md:text-sm">
               Delivered
             </TabsTrigger>
-            <TabsTrigger value="cancelled" className="text-xs md:text-sm">
+            <TabsTrigger value="Cancelled" className="text-xs md:text-sm">
               Cancelled
             </TabsTrigger>
-            <TabsTrigger value="returned" className="text-xs md:text-sm">
+            <TabsTrigger value="Returned" className="text-xs md:text-sm">
               Returned
             </TabsTrigger>
-            <TabsTrigger value="review" className="text-xs md:text-sm">
+            <TabsTrigger value="Reviewed" className="text-xs md:text-sm">
               Review
             </TabsTrigger>
           </TabsList>
 
           <TabsContent value="all" className="space-y-4">
-            {orders.map((order) => (
-              <div
-                key={order.id}
-                className="flex flex-col md:flex-row items-start justify-between p-4 border rounded-lg"
-              >
-                <div className="flex items-start gap-4 mb-4 md:mb-0">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted">
-                    {getStatusIcon(order.status)}
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <h3 className="font-medium">{order.id}</h3>
-                      {getStatusBadge(order.status)}
-                    </div>
-                    <p className="text-sm text-muted-foreground">
-                      {order.date}
-                    </p>
-                    <p className="text-sm font-medium mt-1">{order.total}</p>
-                  </div>
-                </div>
-                <div className="flex flex-wrap gap-2 w-full md:w-auto">
-                  <Button variant="outline" size="sm" className="text-xs">
-                    View Details
-                  </Button>
-                  {order.status === "delivered" && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="text-xs flex items-center gap-1"
-                    >
-                      <Star className="h-3 w-3" />
-                      Review
-                    </Button>
-                  )}
-                  {order.status === "delivered" && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="text-xs flex items-center gap-1 text-orange-600"
-                    >
-                      <Package className="h-3 w-3" />
-                      Return
-                    </Button>
-                  )}
-                  {(order.status === "pending" ||
-                    order.status === "processing") && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="text-xs flex items-center gap-1 text-red-600"
-                    >
-                      <XCircle className="h-3 w-3" />
-                      Cancel
-                    </Button>
-                  )}
-                </div>
-              </div>
-            ))}
-          </TabsContent>
-
-          {[
-            "pending",
-            "processing",
-            "shipped",
-            "delivered",
-            "cancelled",
-            "returned",
-            "review",
-          ].map((status) => (
-            <TabsContent key={status} value={status} className="space-y-4">
-              {orders
-                .filter((order) => order.status === status)
-                .map((order) => (
-                  <div
-                    key={order.id}
-                    className="flex flex-col md:flex-row items-start justify-between p-4 border rounded-lg"
-                  >
+            {isLoading ? (
+              <OrderCardSkeleton />
+            ) : (
+              orders?.map((order) => (
+                <div
+                  key={order?._id}
+                  className="flex flex-col gap-4 p-4 border rounded-lg"
+                >
+                  <div className="flex flex-col md:flex-row items-start justify-between">
                     <div className="flex items-start gap-4 mb-4 md:mb-0">
                       <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted">
-                        {getStatusIcon(order.status)}
+                        {getStatusIcon(order?.orderStatus?.toLowerCase())}
                       </div>
                       <div>
                         <div className="flex items-center gap-2">
-                          <h3 className="font-medium">{order.id}</h3>
-                          {getStatusBadge(order.status)}
+                          <h3 className="font-medium">{order?._id}</h3>
+                          {getStatusBadge(order?.orderStatus)}
                         </div>
                         <p className="text-sm text-muted-foreground">
-                          {order.date}
+                          {format(order?.createdAt, "dd MM, yyyy")}
                         </p>
-                        <p className="text-sm font-medium mt-1">
-                          {order.total}
+                        <p className="text-[15px] font-medium mt-1">
+                          €{order?.totalAmount}
                         </p>
                       </div>
                     </div>
                     <div className="flex flex-wrap gap-2 w-full md:w-auto">
-                      <Button variant="outline" size="sm" className="text-xs">
+                      <Button
+                        onClick={() => {
+                          setOrderId((prev) =>
+                            prev === order?._id ? "" : order?._id
+                          );
+                        }}
+                        variant="outline"
+                        size="sm"
+                        className="text-xs cursor-pointer"
+                      >
                         View Details
                       </Button>
-                      {order.status === "delivered" && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="text-xs flex items-center gap-1"
-                        >
-                          <Star className="h-3 w-3" />
-                          Review
-                        </Button>
-                      )}
-                      {order.status === "delivered" && (
+
+                      {order?.orderStatus === "Delivered" && (
                         <Button
                           variant="outline"
                           size="sm"
                           className="text-xs flex items-center gap-1 text-orange-600"
+                          onClick={() =>
+                            handleOrderCancelConfirmation(
+                              order?._id,
+                              "Returned"
+                            )
+                          }
                         >
                           <Package className="h-3 w-3" />
                           Return
                         </Button>
                       )}
-                      {(order.status === "pending" ||
-                        order.status === "processing") && (
+                      {(order?.orderStatus === "Pending" ||
+                        order?.orderStatus === "Processing") && (
                         <Button
                           variant="outline"
                           size="sm"
                           className="text-xs flex items-center gap-1 text-red-600"
+                          onClick={() =>
+                            handleOrderCancelConfirmation(
+                              order?._id,
+                              "Cancelled"
+                            )
+                          }
                         >
                           <XCircle className="h-3 w-3" />
                           Cancel
@@ -285,11 +261,250 @@ export default function OrdersHistory() {
                       )}
                     </div>
                   </div>
+                  {/* Product details */}
+                  {orderId === order?._id && (
+                    <div className="flex flex-col gap-3 w-full overflow-hidden">
+                      {order?.products?.map((product) => (
+                        <div
+                          key={product?._id}
+                          className=" flex flex-col  sm:items-center justify-between  sm:flex-row gap-5 p-2 rounded-md bg-gray-50 hover:bg-gray-100 cursor-pointer transition-all duration-300"
+                        >
+                          <div
+                            className="flex items-center gap-2"
+                            onClick={() =>
+                              router.push(`/products/${product?.product?._id}`)
+                            }
+                          >
+                            <Image
+                              src={product?.product?.thumbnails[0]}
+                              alt={product?.product?.name}
+                              width={80}
+                              height={70}
+                              className="rounded-md h-[70px] w-[80px] object-fill"
+                            />
+                            <div>
+                              <p className="text-lg text-gray-900 font-medium line-clamp-1 w-full">
+                                {product?.product?.name}
+                              </p>
+                              <div className="flex items-center gap-8">
+                                <p className="text-[14px] text-gray-700 font-medium">
+                                  €{product?.price}
+                                </p>
+                                <p className="text-sm text-gray-500">
+                                  Qty: {product?.quantity}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                          {order?.orderStatus === "Delivered" && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => {
+                                setProductId(product?.product?._id);
+                                setShow(true);
+                              }}
+                              className="text-xs flex items-center gap-1 cursor-pointer group hover:text-red-700 hover:border-red-700 transition-all duration-300"
+                            >
+                              <Star className="h-3 w-3 group-hover:text-red-700 transition-all duration-300" />
+                              Review
+                            </Button>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))
+            )}
+            {orders?.length === 0 && (
+              <div className="w-full min-h-[40vh] flex items-center justify-center flex-col gap-2">
+                {/* <Image
+                  src="/no-order.png"
+                  alt="No Orders"
+                  width={200}
+                  height={200}
+                  className="object-contain animate-pulse"
+                /> */}
+                <video
+                  src="/no-items-13843399-11127022.mp4"
+                  autoPlay
+                  loop
+                  muted
+                />
+                <p className="text-center text-gray-400 ">
+                  You haven&apos;t placed any orders yet.
+                </p>
+              </div>
+            )}
+          </TabsContent>
+
+          {[
+            "Pending",
+            "Processing",
+            "Packing",
+            "Shipped",
+            "Delivered",
+            "Cancelled",
+            "Returned",
+            "Reviewed",
+          ].map((status) => (
+            <TabsContent key={status} value={status} className="space-y-4">
+              {orders
+                .filter((order) => {
+                  if (status === "Reviewed") {
+                    return (
+                      order?.orderStatus === "Delivered" &&
+                      order?.isReviewed !== true
+                    );
+                  }
+                  return order?.orderStatus === status;
+                })
+                .map((order) => (
+                  <>
+                    <div
+                      key={order?._id}
+                      className="flex flex-col gap-4 p-4 border rounded-lg"
+                    >
+                      <div className="flex flex-col md:flex-row items-start justify-between">
+                        <div className="flex items-start gap-4 mb-4 md:mb-0">
+                          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted">
+                            {getStatusIcon(order?.orderStatus.toLowerCase())}
+                          </div>
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <h3 className="font-medium">{order?._id}</h3>
+                              {getStatusBadge(order?.orderStatus)}
+                            </div>
+                            <p className="text-sm text-muted-foreground">
+                              {format(order?.createdAt, "dd MM, yyyy")}
+                            </p>
+                            <p className="text-sm font-medium mt-1">
+                              €{order?.totalAmount}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex flex-wrap gap-2 w-full md:w-auto">
+                          <Button
+                            onClick={() => {
+                              setOrderId((prev) =>
+                                prev === order?._id ? "" : order?._id
+                              );
+                            }}
+                            variant="outline"
+                            size="sm"
+                            className="text-xs cursor-pointer"
+                          >
+                            View Details
+                          </Button>
+
+                          {order?.orderStatus === "Delivered" && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="text-xs flex items-center gap-1 text-orange-600"
+                              onClick={() =>
+                                handleOrderCancelConfirmation(
+                                  order?._id,
+                                  "Returned"
+                                )
+                              }
+                            >
+                              <Package className="h-3 w-3" />
+                              Return
+                            </Button>
+                          )}
+                          {(order?.orderStatus === "Pending" ||
+                            order?.orderStatus === "Processing") && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="text-xs flex items-center gap-1 text-red-600"
+                              onClick={() =>
+                                handleOrderCancelConfirmation(
+                                  order?._id,
+                                  "Cancelled"
+                                )
+                              }
+                            >
+                              <XCircle className="h-3 w-3" />
+                              Cancel
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Product details */}
+                      {orderId === order?._id && (
+                        <div className="flex flex-col gap-3 w-full overflow-hidden">
+                          {order?.products?.map((product) => (
+                            <div
+                              key={product?._id}
+                              className=" flex flex-col  sm:items-center justify-between  sm:flex-row gap-5 p-2 rounded-md bg-gray-50 hover:bg-gray-100 cursor-pointer transition-all duration-300"
+                            >
+                              <div
+                                className="flex items-center gap-2"
+                                onClick={() =>
+                                  router.push(
+                                    `/products/${product?.product?._id}`
+                                  )
+                                }
+                              >
+                                <Image
+                                  src={product?.product?.thumbnails[0]}
+                                  alt={product?.product?.name}
+                                  width={80}
+                                  height={70}
+                                  className="rounded-md h-[70px] w-[80px] object-fill"
+                                />
+                                <div>
+                                  <p className="text-lg text-gray-900 font-medium line-clamp-1 w-full">
+                                    {product?.product?.name}
+                                  </p>
+                                  <div className="flex items-center gap-8">
+                                    <p className="text-[14px] text-gray-700 font-medium">
+                                      €{product?.price}
+                                    </p>
+                                    <p className="text-sm text-gray-500">
+                                      Qty: {product?.quantity}
+                                    </p>
+                                  </div>
+                                </div>
+                              </div>
+                              {order?.orderStatus === "Delivered" && (
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => {
+                                    setProductId(product?.product?._id);
+                                    setShow(true);
+                                  }}
+                                  className="text-xs flex  items-center gap-1 cursor-pointer group hover:text-red-700 hover:border-red-700 transition-all duration-300"
+                                >
+                                  <Star className="h-3 w-3 group-hover:text-red-700 transition-all duration-300" />
+                                  Review
+                                </Button>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </>
                 ))}
             </TabsContent>
           ))}
         </Tabs>
       </CardContent>
+
+      {/* Add Review Modal */}
+      {show && (
+        <AddReviewModal
+          setShow={setShow}
+          productId={productId}
+          setProductId={setProductId}
+        />
+      )}
     </Card>
   );
 }

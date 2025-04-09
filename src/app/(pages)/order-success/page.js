@@ -107,7 +107,7 @@ export default function SuccessPage() {
                   animate={{ y: 0, opacity: 1 }}
                   transition={{ delay: 0.3 }}
                 >
-                  Your action has been completed successfully. We&apos;ve
+                  Your order has been completed successfully. We&apos;ve
                   processed your request and everything is good to go.
                 </motion.p>
 

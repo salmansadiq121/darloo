@@ -12,6 +12,7 @@ import PaymentMethodModal from "@/app/components/checkout/PaymentMethodModal";
 import toast from "react-hot-toast";
 import axios from "axios";
 import { FiLoader } from "react-icons/fi";
+import { useRouter } from "next/navigation";
 
 const paymentMethods = [
   {
@@ -89,6 +90,7 @@ export default function Checkout() {
 
   const [loading, setLoading] = useState(false);
   const [isDisabled, setIsDisabled] = useState(false);
+  const router = useRouter();
 
   // 🔹 Update Quantity
   const updateQuantity = (id, change) => {
@@ -152,9 +154,12 @@ export default function Checkout() {
 
   // Add Shipping Fee
   const getShippingFee = async () => {
+    if (!auth?.user) {
+      return;
+    }
     try {
       const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_SERVER_URI}/api/v1/shipping/${auth.user.addressDetails.country}`
+        `${process.env.NEXT_PUBLIC_SERVER_URI}/api/v1/shipping/${auth?.user?.addressDetails?.country}`
       );
       if (data) {
         setCart((prev) => ({
@@ -324,7 +329,7 @@ export default function Checkout() {
               {selectedProduct?.length > 0 ? (
                 selectedProduct?.map((item) => (
                   <div
-                    key={item.id}
+                    key={item._id}
                     className="flex items-center justify-between w-full py-4 border-b border-gray-700  gap-2 sm:gap-4"
                   >
                     <div className=" flex items-center flex-row gap-2 sm:gap-3">
@@ -437,21 +442,34 @@ export default function Checkout() {
               <Separator className="h-px w-full bg-gray-500" />
             </div>
             <div className="flex items-center justify-center w-full z-10">
-              <button
-                className={`px-8 text-white mt-4 bg-red-600 hover:bg-red-700 transition-all duration-300 ${
-                  selectedProduct.length === 0
-                    ? "cursor-not-allowed"
-                    : "cursor-pointer"
-                } py-2  font-medium disabled:opacity-50`}
-                disabled={selectedProduct?.length === 0}
-                style={{
-                  clipPath:
-                    " polygon(6.71% 0%, 86.4% 0%, 100% 0%, 100% 66.1%, 94.08% 100%, 9.8% 100%, 0% 100%, 0% 42.16%)",
-                }}
-                onClick={() => setShowPayment(true)}
-              >
-                Checkout
-              </button>
+              {!auth?.user ? (
+                <button
+                  className={`px-8 text-white mt-4 bg-red-600 hover:bg-red-700 transition-all duration-300 cursor-pointer py-2  font-medium disabled:opacity-50`}
+                  style={{
+                    clipPath:
+                      " polygon(6.71% 0%, 86.4% 0%, 100% 0%, 100% 66.1%, 94.08% 100%, 9.8% 100%, 0% 100%, 0% 42.16%)",
+                  }}
+                  onClick={() => router.push("/authentication")}
+                >
+                  Login
+                </button>
+              ) : (
+                <button
+                  className={`px-8 text-white mt-4 bg-red-600 hover:bg-red-700 transition-all duration-300 ${
+                    selectedProduct.length === 0
+                      ? "cursor-not-allowed"
+                      : "cursor-pointer"
+                  } py-2  font-medium disabled:opacity-50`}
+                  disabled={selectedProduct?.length === 0}
+                  style={{
+                    clipPath:
+                      " polygon(6.71% 0%, 86.4% 0%, 100% 0%, 100% 66.1%, 94.08% 100%, 9.8% 100%, 0% 100%, 0% 42.16%)",
+                  }}
+                  onClick={() => setShowPayment(true)}
+                >
+                  Checkout
+                </button>
+              )}
             </div>
           </div>
         </div>

@@ -60,14 +60,8 @@ export default function RootLayout({ children }) {
             <AuthProvider>
               <main className=" bg-white w-full min-h-screen text-black">
                 {children}
+                <Toaster position="bottom-center" />
               </main>
-              <Toaster
-                position="bottom-center"
-                reverseOrder={false}
-                toastOptions={{
-                  duration: 3000,
-                }}
-              />
             </AuthProvider>
           </QueryProvider>
         </SessionProvider>

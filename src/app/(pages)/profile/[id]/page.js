@@ -331,7 +331,7 @@ export default function Profile() {
                 </TabsList>
 
                 <TabsContent value="orders" className="space-y-6">
-                  <OrdersHistory />
+                  <OrdersHistory userId={userId} />
                 </TabsContent>
 
                 <TabsContent value="profile">

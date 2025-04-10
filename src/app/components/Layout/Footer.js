@@ -3,8 +3,11 @@ import React from "react";
 import { Twitter, Instagram, Linkedin, Facebook, Youtube } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useAuth } from "@/app/content/authContent";
 
 const Footer = () => {
+  const { auth } = useAuth();
+
   return (
     <footer className=" bg-slate-100 border-t border-gray-200 ">
       <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -118,12 +121,12 @@ const Footer = () => {
                 </a>
               </li>
               <li>
-                <a
-                  href="#"
+                <Link
+                  href="/faqs"
                   className=" text-gray-800 hover:text-red-600 transition-colors duration-200 text-sm"
                 >
                   FAQs
-                </a>
+                </Link>
               </li>
               <li>
                 <a
@@ -142,12 +145,12 @@ const Footer = () => {
                 </a>
               </li>
               <li>
-                <a
-                  href="#"
+                <Link
+                  href={`/profile/${auth?.user?._id}?tab=support`}
                   className=" text-gray-800 hover:text-red-600 transition-colors duration-200 text-sm"
                 >
                   Contact Us
-                </a>
+                </Link>
               </li>
             </ul>
           </div>

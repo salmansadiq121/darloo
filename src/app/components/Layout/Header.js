@@ -217,7 +217,9 @@ const Header = () => {
             ) : (
               <div
                 className="relative cursor-pointer"
-                onClick={() => router.push(`/profile/${auth?.user?._id}`)}
+                onClick={() =>
+                  router.push(`/profile/${auth?.user?._id}?tab=profile`)
+                }
               >
                 <Image
                   src={auth?.user?.avatar || "/profile.png"}
@@ -301,7 +303,9 @@ const Header = () => {
             ) : (
               <div
                 className="relative cursor-pointer ml-3 flex items-center gap-1"
-                onClick={() => router.push(`/profile/${auth?.user?._id}`)}
+                onClick={() =>
+                  router.push(`/profile/${auth?.user?._id}?tab=profile`)
+                }
               >
                 <Image
                   src={auth?.user?.avatar || "/profile.png"}

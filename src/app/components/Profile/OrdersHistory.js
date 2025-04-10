@@ -155,32 +155,56 @@ export default function OrdersHistory({ userId }) {
       </CardHeader>
       <CardContent>
         <Tabs defaultValue="all">
-          <TabsList className="grid grid-cols-5 md:grid-cols-9 mb-6">
-            <TabsTrigger value="all" className="text-xs md:text-sm">
+          <TabsList className="relative flex items-center justify-start gap-4 w-full   mb-6 overflow-x-auto shidden">
+            <TabsTrigger value="all" className="text-xs md:text-sm min-w-fit">
               All
             </TabsTrigger>
-            <TabsTrigger value="Pending" className="text-xs md:text-sm">
+            <TabsTrigger
+              value="Pending"
+              className="text-xs md:text-sm min-w-fit px-2"
+            >
               Pending
             </TabsTrigger>
-            <TabsTrigger value="Processing" className="text-xs md:text-sm">
+            <TabsTrigger
+              value="Processing"
+              className="text-xs md:text-sm min-w-fit px-2"
+            >
               Processing
             </TabsTrigger>
-            <TabsTrigger value="Packing" className="text-xs md:text-sm">
+            <TabsTrigger
+              value="Packing"
+              className="text-xs md:text-sm min-w-fit px-2"
+            >
               Packing
             </TabsTrigger>
-            <TabsTrigger value="Shipped" className="text-xs md:text-sm">
+            <TabsTrigger
+              value="Shipped"
+              className="text-xs md:text-sm min-w-fit px-2"
+            >
               Shipped
             </TabsTrigger>
-            <TabsTrigger value="Delivered" className="text-xs md:text-sm">
+            <TabsTrigger
+              value="Delivered"
+              className="text-xs md:text-sm min-w-fit px-2"
+            >
               Delivered
             </TabsTrigger>
-            <TabsTrigger value="Cancelled" className="text-xs md:text-sm">
+            <TabsTrigger
+              value="Cancelled"
+              className="text-xs md:text-sm min-w-fit px-2"
+            >
               Cancelled
             </TabsTrigger>
-            <TabsTrigger value="Returned" className="text-xs md:text-sm">
+            <TabsTrigger
+              value="Returned"
+              className="text-xs md:text-sm min-w-fit px-2"
+            >
               Returned
             </TabsTrigger>
-            <TabsTrigger value="Reviewed" className="text-xs md:text-sm">
+            <TabsTrigger
+              value="Reviewed"
+              className="text-xs md:text-sm min-w-fit px-2"
+            >
               Review
             </TabsTrigger>
           </TabsList>
@@ -200,7 +224,7 @@ export default function OrdersHistory({ userId }) {
                         {getStatusIcon(order?.orderStatus?.toLowerCase())}
                       </div>
                       <div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-start sm:items-center flex-col-reverse sm:flex-row  gap-2">
                           <h3 className="font-medium">{order?._id}</h3>
                           {getStatusBadge(order?.orderStatus)}
                         </div>
@@ -372,7 +396,7 @@ export default function OrdersHistory({ userId }) {
                             {getStatusIcon(order?.orderStatus.toLowerCase())}
                           </div>
                           <div>
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-start sm:items-center flex-col-reverse sm:flex-row  gap-2">
                               <h3 className="font-medium">{order?._id}</h3>
                               {getStatusBadge(order?.orderStatus)}
                             </div>

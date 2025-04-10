@@ -12,15 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import axios from "axios";
 import { format } from "date-fns";
 import { useRouter } from "next/navigation";
-
-// {
-//   id: "WELCOME20",
-//   discount: "20% off",
-//   description: "Welcome discount for new customers",
-//   expiry: "April 30, 2025",
-//   minPurchase: "€50",
-//   isUsed: false,
-// },
+import Image from "next/image";
 
 export default function CouponsSection() {
   const [coupons, setCoupons] = useState([]);
@@ -28,7 +20,7 @@ export default function CouponsSection() {
   const fetchAllCoupons = async () => {
     try {
       const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_SERVER_URI}/api/v1/coupon/all`
+        `${process.env.NEXT_PUBLIC_SERVER_URI}/api/v1/coupon/active`
       );
       if (data) {
         setCoupons(data?.coupons);
@@ -75,10 +67,10 @@ export default function CouponsSection() {
     };
 
     for (const product of productIds) {
-      for (const [category, keywords] of Object.entries(categoryKeywords)) {
+      for (const [category, keywords] of Object?.entries(categoryKeywords)) {
         if (
-          keywords.some((keyword) =>
-            product.name.toLowerCase().includes(keyword)
+          keywords?.some((keyword) =>
+            product?.name?.toLowerCase()?.includes(keyword)
           )
         ) {
           return categoryDescriptions[category];
@@ -86,7 +78,7 @@ export default function CouponsSection() {
       }
     }
 
-    return categoryDescriptions.default;
+    return categoryDescriptions?.default;
   };
 
   return (
@@ -99,11 +91,11 @@ export default function CouponsSection() {
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          {coupons.map((coupon) => (
+          {coupons?.map((coupon) => (
             <div
-              key={coupon.id}
+              key={coupon?.id}
               className={`border rounded-lg overflow-hidden ${
-                coupon.isUsed ? "opacity-60" : ""
+                coupon?.isUsed ? "opacity-60" : ""
               }`}
             >
               <div className="flex flex-col md:flex-row">
@@ -119,14 +111,15 @@ export default function CouponsSection() {
                 <div className="p-6 flex-1 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                   <div>
                     <h3 className="font-medium">
-                      {coupon.description ||
+                      {coupon?.description ||
                         getDefaultCouponDescription(coupon?.productIds)}
                     </h3>
                     <div className="flex items-center mt-2">
                       <p className="text-sm text-gray-500 mr-2">
                         Code:{" "}
                         <span className="font-mono font-bold">
-                          {coupon?.code.slice(0, 4)}****{coupon?.code.slice(-4)}
+                          {coupon?.code?.slice(0, 4)}****
+                          {coupon?.code.slice(-4)}
                         </span>
                       </p>
                       <Button
@@ -134,7 +127,7 @@ export default function CouponsSection() {
                         size="sm"
                         className="h-6 px-2 text-xs text-[#C6080A] cursor-pointer"
                         onClick={() => copyToClipboard(coupon?.code)}
-                        disabled={!coupon.isActive}
+                        disabled={!coupon?.isActive}
                       >
                         Copy
                       </Button>
@@ -162,6 +155,22 @@ export default function CouponsSection() {
               </div>
             </div>
           ))}
+
+          {/*  */}
+          {coupons.length === 0 && (
+            <div className="w-full min-h-[40vh] flex items-center justify-center flex-col gap-2">
+              <Image
+                src="/coupon.png"
+                alt="No Coupons"
+                width={200}
+                height={200}
+                className="object-contain animate-pulse"
+              />
+              <p className="text-center text-gray-500 text-sm">
+                No discount coupons available at the moment.
+              </p>
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>

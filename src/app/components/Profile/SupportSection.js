@@ -11,6 +11,10 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import axios from "axios";
+import { ImSpinner2 } from "react-icons/im";
+import toast from "react-hot-toast";
+import { Separator } from "@/components/ui/separator";
 
 export default function SupportSection() {
   const [formData, setFormData] = useState({
@@ -18,6 +22,7 @@ export default function SupportSection() {
     message: "",
     orderNumber: "",
   });
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -27,18 +32,34 @@ export default function SupportSection() {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Support request submitted:", formData);
-    // Here you would typically send the data to your API
-    alert(
-      "Your support request has been submitted. We'll get back to you soon!"
-    );
-    setFormData({
-      subject: "",
-      message: "",
-      orderNumber: "",
-    });
+    setLoading(true);
+    try {
+      const { data } = await axios.post(
+        `${process.env.NEXT_PUBLIC_SERVER_URI}/api/v1/contact/add`,
+        {
+          subject: formData.subject,
+          message: formData.message,
+          orderId: formData.orderNumber,
+        }
+      );
+      if (data) {
+        toast.success(
+          "Your support request has been submitted. We'll get back to you soon!"
+        );
+        setFormData({
+          subject: "",
+          message: "",
+          orderNumber: "",
+        });
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error(error.response?.data?.message || "Something went wrong.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -64,7 +85,7 @@ export default function SupportSection() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="orderNumber">Order Number (Optional)</Label>
+                <Label htmlFor="orderNumber">Order ID (Optional)</Label>
                 <Input
                   id="orderNumber"
                   name="orderNumber"
@@ -87,11 +108,56 @@ export default function SupportSection() {
               </div>
               <Button
                 type="submit"
-                className="w-full bg-[#C6080A] hover:bg-[#a50709]"
+                className="w-full bg-[#C6080A] hover:bg-[#a50709] flex items-center gap-1 cursor-pointer"
               >
-                Submit Request
+                Submit Request{" "}
+                {loading && <ImSpinner2 className="h-5 w-5 animate-spin" />}
               </Button>
             </form>
+            {/*  */}
+            <Separator className="my-6" />
+            <h3 className="text-lg font-medium mb-4 mt-8">
+              Select Message Template
+            </h3>
+            <div className="flex flex-col gap-4">
+              {[
+                {
+                  title: "Order Status Inquiry",
+                  subject: "Order Status Update Request",
+                  message:
+                    "Hello, I placed an order on [Order Date], and I’d like to check the status.\nOrder ID: [#12345]\nCould you please provide an update? Thanks in advance.",
+                },
+                {
+                  title: "Product Availability",
+                  subject: "Inquiry About Product Availability",
+                  message:
+                    "Hi, I came across a product on your website that I’m interested in, but I’d like to know if it will be restocked soon. Could you please let me know about its availability?\nThank you!",
+                },
+                {
+                  title: "Return or Exchange",
+                  subject: "Request to Return/Exchange My Order",
+                  message:
+                    "Hello, I’d like to request a return/exchange for the item(s) I purchased.\nOrder ID: [#12345]\nThe reason for return/exchange is: [too small, not as expected, etc.]\nPlease let me know how to proceed.",
+                },
+              ].map((template, index) => (
+                <button
+                  key={index}
+                  className="bg-white text-black rounded-xl cursor-pointer px-4 py-3 text-left hover:bg-red-100 border-2 border-red-700 transition-all duration-200 shadow-md"
+                  onClick={() =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      subject: template.subject,
+                      message: template.message,
+                    }))
+                  }
+                >
+                  <h4 className="text-md font-semibold">{template.title}</h4>
+                  <p className="text-sm text-black/90 mt-1 line-clamp-2">
+                    {template.message}
+                  </p>
+                </button>
+              ))}
+            </div>
           </div>
 
           <div>

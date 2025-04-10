@@ -58,17 +58,23 @@ export default function PaypalCheckout({ setpayment, carts, shippingFee }) {
         <div className="py-3 px-7">
           <div className="order-summary">
             <h2 className="text-lg font-semibold">Order Summary</h2>
-            <ul>
+            <ul className="flex flex-col gap-3">
               {carts.products.map((product, index) => (
-                <li key={index}>
+                <li key={index} className="flex items-center gap-2">
+                  <span className="w-[.7rem] h-[.7rem] rounded-full bg-red-700"></span>
                   {product?.title} x {product?.quantity} = $
                   {product?.price * product?.quantity}
                 </li>
               ))}
-              <li>Shipping Fee: ${carts.shippingFee}</li>
+              <div className="flex items-center gap-2">
+                <span className="w-[.7rem] h-[.7rem] rounded-full bg-red-700"></span>
+                <li>
+                  Shipping Fee: <strong>${shippingFee}</strong>
+                </li>
+              </div>
               <Separator className="h-px bg-gray-200 my-2" />
               <li className=" w-full flex justify-end">
-                <strong>Total: ${carts.totalAmount}</strong>
+                <strong>Total: ${carts.totalAmount || 0}</strong>
               </li>
             </ul>
           </div>

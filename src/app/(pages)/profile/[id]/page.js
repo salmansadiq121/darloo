@@ -3,7 +3,7 @@ import MainLayout from "@/app/components/Layout/Layout";
 import { useAuth } from "@/app/content/authContent";
 import { authUri } from "@/app/utils/ServerURI";
 import axios from "axios";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { RiLogoutCircleRFill } from "react-icons/ri";
 import {
@@ -58,6 +58,11 @@ export default function Profile() {
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("profile");
   const router = useRouter();
+  const tab = useSearchParams().get("tab");
+
+  useEffect(() => {
+    setActiveTab(tab);
+  }, [tab]);
 
   // Get User Details
   const getUserDetails = async () => {

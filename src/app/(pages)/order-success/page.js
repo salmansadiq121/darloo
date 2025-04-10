@@ -13,20 +13,20 @@ export default function SuccessPage() {
   const [count, setCount] = useState(10);
   const router = useRouter();
 
-  //   useEffect(() => {
-  //     const timer = setInterval(() => {
-  //       setCount((prev) => {
-  //         if (prev <= 1) {
-  //           clearInterval(timer);
-  //           router.push(`/profile/${auth.user._id}`);
-  //           return 0;
-  //         }
-  //         return prev - 1;
-  //       });
-  //     }, 1000);
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCount((prev) => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          router.push(`/profile/${auth.user._id}?tab=orders`);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
 
-  //     return () => clearInterval(timer);
-  //   }, []);
+    return () => clearInterval(timer);
+  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-200 flex flex-col items-center justify-center p-4">

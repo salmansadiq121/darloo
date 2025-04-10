@@ -11,9 +11,13 @@ import {
 import { productsURI } from "@/app/utils/ServerURI";
 import axios from "axios";
 import Image from "next/image";
+import { useAuth } from "@/app/content/authContent";
+import toast from "react-hot-toast";
 
 export default function RecentlyViewedSection() {
   const [recentlyViewed, setRecentlyViewed] = useState([]);
+  const { setSelectedProduct } = useAuth();
+  const [quantity, setQuantity] = useState(1);
 
   console.log("recentProducts", recentlyViewed);
 
@@ -41,6 +45,43 @@ export default function RecentlyViewedSection() {
     fetchRecentlyViewed();
   }, []);
 
+  // Handle Add to Cart
+  const handleAddToCart = (product) => {
+    if (!product || !product._id) return;
+
+    setSelectedProduct((prevProducts) => {
+      let updatedProducts = [...prevProducts];
+
+      const existingProductIndex = updatedProducts.findIndex(
+        (p) => p.product === product._id
+      );
+
+      if (existingProductIndex !== -1) {
+        let existingProduct = { ...updatedProducts[existingProductIndex] };
+
+        existingProduct.quantity += quantity;
+
+        updatedProducts[existingProductIndex] = existingProduct;
+      } else {
+        updatedProducts.push({
+          product: product._id,
+          quantity,
+          price: product.price,
+          image: product.thumbnails[0],
+          title: product.name,
+          _id: product._id,
+        });
+      }
+
+      // Save the updated cart to localStorage
+      localStorage.setItem("cart", JSON.stringify(updatedProducts));
+
+      toast.success("Product added to cart");
+
+      return updatedProducts;
+    });
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -49,9 +90,9 @@ export default function RecentlyViewedSection() {
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          {recentlyViewed.map((item) => (
+          {recentlyViewed?.map((item) => (
             <div
-              key={item.id}
+              key={item?._id}
               className="flex items-start space-x-4 p-4 border rounded-lg"
             >
               <div className="h-20 w-20 flex-shrink-0">
@@ -81,12 +122,17 @@ export default function RecentlyViewedSection() {
                 </div>
               </div>
               <div className="flex flex-col gap-2">
-                <Button variant="outline" size="sm" className="text-xs">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="text-xs cursor-pointer"
+                >
                   View
                 </Button>
                 <Button
                   size="sm"
-                  className="text-xs bg-[#C6080A] hover:bg-[#a50709]"
+                  className="text-xs bg-[#C6080A] hover:bg-[#a50709] cursor-pointer"
+                  onClick={() => handleAddToCart(item)}
                 >
                   Add to Cart
                 </Button>

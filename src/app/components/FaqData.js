@@ -1,7 +1,8 @@
 "use client";
+import axios from "axios";
 import React, { useEffect, useState } from "react";
 
-export default function Faqs() {
+export default function FAQData() {
   const [faqs, setFaqs] = useState([]);
   const [loading, setLoading] = useState(false);
   // /api/v1/faq/all

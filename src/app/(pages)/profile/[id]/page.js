@@ -49,6 +49,7 @@ import CouponsSection from "@/app/components/Profile/CouponsSection";
 import ReferEarnSection from "@/app/components/Profile/ReferEarnSection";
 import AffiliateSection from "@/app/components/Profile/AffiliateSection";
 import SupportSection from "@/app/components/Profile/SupportSection";
+import ChatSection from "@/app/components/Profile/ChatSection";
 
 export default function Profile() {
   const { auth, setAuth } = useAuth();
@@ -254,7 +255,7 @@ export default function Profile() {
                       },
                       {
                         icon: <MessageSquare className="h-5 w-5" />,
-                        label: "Messages",
+                        label: "Chat with Support",
                         badge: 3,
                         value: "chat",
                       },
@@ -269,11 +270,7 @@ export default function Profile() {
                         variant="ghost"
                         className="justify-start h-12 px-4 rounded-none relative"
                         onClick={() => {
-                          if (item.value === "chat") {
-                            router.push("/chat");
-                          } else {
-                            item.value && setActiveTab(item.value);
-                          }
+                          item.value && setActiveTab(item.value);
                         }}
                       >
                         <div className="flex items-center w-full">
@@ -330,8 +327,8 @@ export default function Profile() {
                   <TabsTrigger value="favorites" className={"cursor-pointer"}>
                     Favorites
                   </TabsTrigger>
-                  <TabsTrigger value="activity" className={"cursor-pointer"}>
-                    Activity
+                  <TabsTrigger value="chat" className={"cursor-pointer"}>
+                    Chat
                   </TabsTrigger>
                 </TabsList>
 
@@ -568,6 +565,10 @@ export default function Profile() {
 
                 <TabsContent value="affiliate">
                   <AffiliateSection />
+                </TabsContent>
+
+                <TabsContent value="chat">
+                  <ChatSection user={userDetails} />
                 </TabsContent>
 
                 <TabsContent value="support">

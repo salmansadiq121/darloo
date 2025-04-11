@@ -113,12 +113,12 @@ const Footer = () => {
             <h3 className="text-black font-medium text-[17px] mb-4">Support</h3>
             <ul className="space-y-2">
               <li>
-                <a
-                  href="#"
+                <Link
+                  href={`/profile/${auth?.user?._id}?tab=chat`}
                   className=" text-gray-800 hover:text-red-600 transition-colors duration-200 text-sm"
                 >
                   Help Center
-                </a>
+                </Link>
               </li>
               <li>
                 <Link

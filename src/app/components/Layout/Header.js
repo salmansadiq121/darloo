@@ -198,7 +198,9 @@ const Header = () => {
               </span>
             </div>
             <div
-              onClick={() => router.push("/chat")}
+              onClick={() =>
+                router.push(`/profile/${auth?.user?._id}?tab=chat`)
+              }
               className="relative cursor-pointer ml-4"
             >
               <MdSupportAgent className="h-6 w-6 text-gray-900 hover:text-red-600 transition-all duration-300" />
@@ -256,6 +258,14 @@ const Header = () => {
               <span className="absolute -top-4 -right-3 inline-flex items-center w-5 h-5  justify-center text-xs font-semibold bg-red-700 text-white rounded-full">
                 {selectedProduct ? selectedProduct.length : 0}
               </span>
+            </div>
+            <div
+              onClick={() =>
+                router.push(`/profile/${auth?.user?._id}?tab=chat`)
+              }
+              className="relative cursor-pointer ml-4"
+            >
+              <MdSupportAgent className="h-6 w-6 text-gray-900 hover:text-red-600 transition-all duration-300" />
             </div>
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}

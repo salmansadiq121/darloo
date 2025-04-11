@@ -6,6 +6,7 @@ import { Toaster } from "react-hot-toast";
 import { metadata } from "./metaData";
 import QueryProvider from "./content/QueryProvider";
 import { SessionProvider } from "next-auth/react";
+import SocketHandler from "./content/SocketHandler";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -60,7 +61,9 @@ export default function RootLayout({ children }) {
             <AuthProvider>
               <main className=" bg-white w-full min-h-screen text-black">
                 {children}
+
                 <Toaster position="bottom-center" />
+                <SocketHandler />
               </main>
             </AuthProvider>
           </QueryProvider>

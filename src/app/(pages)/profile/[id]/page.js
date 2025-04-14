@@ -7,6 +7,7 @@ import { useParams, useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { RiLogoutCircleRFill } from "react-icons/ri";
 import {
+  Bell,
   ChevronRight,
   CreditCard,
   Gift,
@@ -50,6 +51,7 @@ import ReferEarnSection from "@/app/components/Profile/ReferEarnSection";
 import AffiliateSection from "@/app/components/Profile/AffiliateSection";
 import SupportSection from "@/app/components/Profile/SupportSection";
 import ChatSection from "@/app/components/Profile/ChatSection";
+import NotificationSection from "@/app/components/Profile/NotificationSection";
 
 export default function Profile() {
   const { auth, setAuth } = useAuth();
@@ -114,11 +116,11 @@ export default function Profile() {
   }
   return (
     <MainLayout title="Ayoob - Profile">
-      <div className="min-h-screen bg-gray-50/30 relative z-10">
+      <div className="min-h-screen bg-gray-50/30 relative z-10 ">
         <main className="container mx-auto py-8 px-2 md:px-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             {/* Profile Summary */}
-            <Card className="md:col-span-3">
+            <Card className="md:col-span-4">
               <CardContent className="px-4 sm:p-6">
                 <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
                   <Avatar className="h-24 w-24 border-4 border-[#C6080A]">
@@ -239,6 +241,12 @@ export default function Profile() {
                         value: "recently-viewed",
                       },
                       {
+                        icon: <Bell className="h-5 w-5" />,
+                        label: "Notifications",
+                        value: "notifications",
+                        // badge: notificationCount,
+                      },
+                      {
                         icon: <Percent className="h-5 w-5" />,
                         label: "Coupons",
                         value: "coupons",
@@ -256,7 +264,7 @@ export default function Profile() {
                       {
                         icon: <MessageSquare className="h-5 w-5" />,
                         label: "Chat with Support",
-                        badge: 3,
+                        // badge: 3,
                         value: "chat",
                       },
                       {
@@ -268,7 +276,7 @@ export default function Profile() {
                       <Button
                         key={index}
                         variant="ghost"
-                        className="justify-start h-12 px-4 rounded-none relative"
+                        className="justify-start h-12 px-4 rounded-none relative cursor-pointer"
                         onClick={() => {
                           item.value && setActiveTab(item.value);
                         }}
@@ -315,7 +323,7 @@ export default function Profile() {
             </div>
 
             {/* Main Content */}
-            <div className="md:col-span-2">
+            <div className="md:col-span-3">
               <Tabs value={activeTab} onValueChange={setActiveTab}>
                 <TabsList className="grid grid-cols-4 mb-6">
                   <TabsTrigger value="profile" className={"cursor-pointer"}>
@@ -573,6 +581,9 @@ export default function Profile() {
 
                 <TabsContent value="support">
                   <SupportSection />
+                </TabsContent>
+                <TabsContent value="notifications">
+                  <NotificationSection user={userDetails} />
                 </TabsContent>
               </Tabs>
             </div>

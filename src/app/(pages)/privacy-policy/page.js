@@ -1,3 +1,4 @@
+"use client";
 import MainLayout from "@/app/components/Layout/Layout";
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";

@@ -1,5 +1,5 @@
 "use client";
-import { Search, Menu, X } from "lucide-react";
+import { Search, Menu, X, Check } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -11,7 +11,9 @@ import { IoMdNotifications } from "react-icons/io";
 import { useAuth } from "@/app/content/authContent";
 import { signOut } from "next-auth/react";
 import Cookies from "js-cookie";
-import { MdSupportAgent } from "react-icons/md";
+import { MdOutlineClosedCaptionDisabled, MdSupportAgent } from "react-icons/md";
+import axios from "axios";
+import { formatDistanceToNow } from "date-fns";
 
 const Header = () => {
   const { auth, setAuth, setSearch, selectedProduct } = useAuth();
@@ -23,7 +25,29 @@ const Header = () => {
   const closeNotification = useRef(null);
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const router = useRouter();
+  const [notifications, setNotifications] = useState([]);
 
+  // Handle Notifications
+  const fetchNotifications = async () => {
+    try {
+      const { data } = await axios.get(
+        `${process.env.NEXT_PUBLIC_SERVER_URI}/api/v1/notification/all/user/${auth?.user?._id}`
+      );
+      console.log("datanotifications", data);
+      if (data) {
+        setNotifications(data.notifications.reverse());
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchNotifications();
+    // eslint-disable-next-line
+  }, [auth.user]);
+
+  // Handle Search
   useEffect(() => {
     const handler = setTimeout(() => {
       setSearch(debouncedSearch);
@@ -175,15 +199,54 @@ const Header = () => {
                 onClick={() => setShowNotification(!showNotification)}
               />
               <span className="absolute -top-4 -right-3 inline-flex items-center w-5 h-5  justify-center text-xs font-semibold text-red-700 bg-red-100 rounded-full">
-                5
+                {notifications?.length}
               </span>
               {showNotification && (
-                <div className="absolute top-5 right-3 text-xs font-semibold rounded-md shadow-md bg-gray-100 w-[18rem] min-h-[15rem] overflow-hidden ">
+                <div className="absolute top-8 right-3 text-xs font-semibold rounded-md shadow-md bg-gray-100 w-[18rem] min-h-[15rem] overflow-hidden ">
                   <div className="w-full py-2 bg-red-600 text-white flex items-center justify-between px-2">
                     <h3 className="text-lg font-medium text-white flex items-center gap-1">
                       <IoMdNotifications className="h-6 w-6 text-white animate-pulse " />
                       Notifications
                     </h3>
+                  </div>
+                  <div className="flex flex-col gap-3 px-3 py-2">
+                    {notifications?.map((notification) => (
+                      <div
+                        key={notification._id}
+                        onClick={() =>
+                          router.push(
+                            `/profile/${auth?.user?._id}?tab=notifications`
+                          )
+                        }
+                        className="flex flex-col gap-2 py-[.4rem] px-3 rounded-md hover:bg-gray-100 border hover:border-red-500 group "
+                      >
+                        <div className="flex flex-col gap-2 rounded-sm group-hover:text-red-600  cursor-pointer transition-all duration-300">
+                          <span className="text-sm font-medium">
+                            {notification?.subject}
+                          </span>
+                          <p className="text-xs text-gray-500">
+                            {notification?.message}
+                          </p>
+                        </div>
+                        <div className="flex items-center justify-end gap-2 ">
+                          <span className="text-[10px]">
+                            {notification?.createdAt
+                              ? formatDistanceToNow(
+                                  new Date(notification?.createdAt),
+                                  {
+                                    addSuffix: true,
+                                  }
+                                )
+                              : "Just now"}
+                          </span>
+                          {notification?.read ? (
+                            <Check className="h-3 w-3" />
+                          ) : (
+                            <Check className="h-3 w-3" />
+                          )}
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
               )}
@@ -244,11 +307,66 @@ const Header = () => {
             >
               <IoSearch className="h-6 w-6 text-gray-900" />
             </div>
-            <div className="relative cursor-pointer mr-5">
-              <IoMdNotificationsOutline className="h-6 w-6 text-gray-900 hover:text-red-600 transition-all duration-300" />
+            <div
+              ref={closeNotification}
+              className="relative cursor-pointer ml-4"
+            >
+              <IoMdNotificationsOutline
+                className="h-6 w-6 text-gray-900 hover:text-red-600 transition-all duration-300 "
+                onClick={() => setShowNotification(!showNotification)}
+              />
               <span className="absolute -top-4 -right-3 inline-flex items-center w-5 h-5  justify-center text-xs font-semibold text-red-700 bg-red-100 rounded-full">
-                4
+                {notifications?.length}
               </span>
+              {showNotification && (
+                <div className="absolute top-8 right-3 text-xs font-semibold rounded-md shadow-md bg-gray-100 w-[18rem] min-h-[15rem] overflow-hidden ">
+                  <div className="w-full py-2 bg-red-600 text-white flex items-center justify-between px-2">
+                    <h3 className="text-lg font-medium text-white flex items-center gap-1">
+                      <IoMdNotifications className="h-6 w-6 text-white animate-pulse " />
+                      Notifications
+                    </h3>
+                  </div>
+                  <div className="flex flex-col gap-3 px-3 py-2">
+                    {notifications?.map((notification) => (
+                      <div
+                        key={notification._id}
+                        onClick={() =>
+                          router.push(
+                            `/profile/${auth?.user?._id}?tab=notifications`
+                          )
+                        }
+                        className="flex flex-col gap-2 py-[.4rem] px-3 rounded-md hover:bg-gray-100 border"
+                      >
+                        <div className="flex flex-col gap-2 rounded-sm hover:text-red-600 border py-1 px-2 cursor-pointer hover:border-red-500 transition-all duration-300">
+                          <span className="text-sm font-medium">
+                            {notification?.subject}
+                          </span>
+                          <p className="text-xs text-gray-500">
+                            {notification?.message}
+                          </p>
+                        </div>
+                        <div className="flex items-center justify-end gap-2 ">
+                          <span className="text-[10px]">
+                            {notification?.createdAt
+                              ? formatDistanceToNow(
+                                  new Date(notification?.createdAt),
+                                  {
+                                    addSuffix: true,
+                                  }
+                                )
+                              : "Just now"}
+                          </span>
+                          {notification?.read ? (
+                            <Check className="h-3 w-3" />
+                          ) : (
+                            <Check className="h-3 w-3" />
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
             <div
               onClick={() => router.push("/cart")}

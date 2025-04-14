@@ -28,36 +28,36 @@ const Footer = () => {
               delivery.
             </p>
             <div className="flex space-x-3">
-              <a
+              <Link
                 href="#"
                 className="dark:  text-gray-800 hover:text-red-600 transition-colors duration-200"
               >
                 <Twitter size={18} />
-              </a>
-              <a
+              </Link>
+              <Link
                 href="#"
                 className=" text-gray-800 hover:text-red-600 transition-colors duration-200"
               >
                 <Instagram size={18} />
-              </a>
-              <a
+              </Link>
+              <Link
                 href="#"
                 className=" text-gray-800 hover:text-red-600 transition-colors duration-200"
               >
                 <Linkedin size={18} />
-              </a>
-              <a
+              </Link>
+              <Link
                 href="#"
                 className=" text-gray-800 hover:text-red-600 transition-colors duration-200"
               >
                 <Facebook size={18} />
-              </a>
-              <a
+              </Link>
+              <Link
                 href="#"
                 className=" text-gray-800 hover:text-red-600 transition-colors duration-200"
               >
                 <Youtube size={18} />
-              </a>
+              </Link>
             </div>
           </div>
 
@@ -66,44 +66,46 @@ const Footer = () => {
             <h3 className="text-black font-medium text-[17px] mb-4">Company</h3>
             <ul className="space-y-2">
               <li>
-                <a
-                  href="#"
+                <Link
+                  href="top-sale"
                   className=" text-gray-800 hover:text-red-600 transition-colors duration-200 text-sm"
                 >
-                  About Us
-                </a>
+                  Top Sale
+                </Link>
               </li>
-              <li>
+
+              {/* <li>
                 <a
-                  href="#"
+                  href="blogs"
                   className=" text-gray-800 hover:text-red-600 transition-colors duration-200 text-sm"
                 >
                   Blog
                 </a>
-              </li>
+              </li> */}
+
               <li>
-                <a
-                  href="#"
+                <Link
+                  href="/popular"
                   className=" text-gray-800 hover:text-red-600 transition-colors duration-200 text-sm"
                 >
-                  Careers
-                </a>
+                  Popular Products
+                </Link>
               </li>
               <li>
-                <a
-                  href="#"
+                <Link
+                  href="/categories"
                   className=" text-gray-800 hover:text-red-600 transition-colors duration-200 text-sm"
                 >
-                  Press
-                </a>
+                  Categories
+                </Link>
               </li>
               <li>
-                <a
-                  href="#"
+                <Link
+                  href="/about-us"
                   className=" text-gray-800 hover:text-red-600 transition-colors duration-200 text-sm"
                 >
-                  Partners
-                </a>
+                  About Us
+                </Link>
               </li>
             </ul>
           </div>
@@ -129,20 +131,28 @@ const Footer = () => {
                 </Link>
               </li>
               <li>
-                <a
-                  href="#"
+                <Link
+                  href="refund-policy"
                   className=" text-gray-800 hover:text-red-600 transition-colors duration-200 text-sm"
                 >
                   Escrow & Refund Policy
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  href="#"
+                <Link
+                  href="privacy-policy"
+                  className=" text-gray-800 hover:text-red-600 transition-colors duration-200 text-sm"
+                >
+                  Privacy Policy
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/account-security"
                   className=" text-gray-800 hover:text-red-600 transition-colors duration-200 text-sm"
                 >
                   Account Security
-                </a>
+                </Link>
               </li>
               <li>
                 <Link

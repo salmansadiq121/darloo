@@ -38,8 +38,12 @@ import {
 import React, { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { format, formatDistanceToNow } from "date-fns";
+import { TbFileDownload } from "react-icons/tb";
 
 import socketIO from "socket.io-client";
+import { fileType } from "@/app/utils/UploadChatFile";
+import Image from "next/image";
+import MessageLoader from "../Skeltons/MessageLoader";
 const ENDPOINT = process.env.NEXT_PUBLIC_SOCKET_SERVER_URI || "";
 const socketId = socketIO(ENDPOINT, { transports: ["websocket"] });
 
@@ -54,8 +58,24 @@ export default function ChatSection({ user }) {
   const initialMessagesLoad = useRef(true);
   const [selectedChat, setSelectedChat] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [typing, setTyping] = useState(false);
 
-  console.log(selectedChat);
+  // Socket.io
+  useEffect(() => {
+    socketId.on("typing", (data) => {
+      setIsTyping(true);
+    });
+
+    socketId.on("stopTyping", (data) => {
+      setIsTyping(false);
+    });
+
+    // Cleanup on component unmount
+    return () => {
+      socketId.off("typing");
+      socketId.off("stopTyping");
+    };
+  }, [socketId]);
 
   const defaultMessage = {
     _id: "fake-id-1",
@@ -181,7 +201,6 @@ export default function ChatSection({ user }) {
     );
 
     if (data) {
-      fetchMessages();
       socketId.emit("NewMessageAdded", {
         content: messageContent,
         contentType: "text",
@@ -189,26 +208,94 @@ export default function ChatSection({ user }) {
         messageId: data._id,
       });
       setMessages((prev) => [...prev, data.message]);
+      // fetchMessages();
       setNewMessage("");
     }
 
-    setIsTyping(true);
+    // setIsTyping(true);
 
     // Simulate admin typing and response
-    setTimeout(() => {
-      const adminResponse = generateAdminResponse(messageContent);
-      setIsTyping(false);
-      setMessages((prev) => [
-        ...prev,
+    // setTimeout(() => {
+    //   const adminResponse = generateAdminResponse(messageContent);
+    //   setIsTyping(false);
+    //   setMessages((prev) => [
+    //     ...prev,
+    //     {
+    //       id: prev.length + 1,
+    //       content: adminResponse,
+    //       sender: "admin",
+    //       timestamp: new Date().toISOString(),
+    //       read: false,
+    //     },
+    //   ]);
+    // }, 1500 + Math.random() * 1500);
+  };
+
+  // Fetch Realtime Chat Messages
+  useEffect(() => {
+    const handleFetchMessages = (data) => {
+      fetchMessages(data.chatId);
+    };
+
+    socketId.on("fetchMessages", handleFetchMessages);
+
+    return () => {
+      socketId.off("fetchMessages", handleFetchMessages);
+    };
+    // eslint-disable-next-line
+  }, [socketId]);
+
+  // -------------------Handle Upload Files--------------->
+
+  const handleSendfiles = async (content, mediaType) => {
+    setLoading(true);
+    try {
+      const { data } = await axios.post(
+        `${process.env.NEXT_PUBLIC_SERVER_URI}/api/v1/messages/send`,
         {
-          id: prev.length + 1,
-          content: adminResponse,
-          sender: "admin",
-          timestamp: new Date().toISOString(),
-          read: false,
-        },
-      ]);
-    }, 1500 + Math.random() * 1500);
+          content: content,
+          contentType: mediaType,
+          chatId: selectedChat._id,
+        }
+      );
+
+      if (data) {
+        socketId.emit("NewMessageAdded", {
+          content: content,
+          contentType: mediaType,
+          chatId: selectedChat._id,
+          messageId: data._id,
+        });
+        setNewMessage("");
+        setLoading(false);
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error(error?.response?.data?.message);
+      setLoading(false);
+    }
+  };
+
+  //<------------------ Handle Typing----------->
+
+  const typingHandler = (e) => {
+    setNewMessage(e.target.value);
+
+    // Typing Indicator login
+    if (!typing) {
+      setTyping(true);
+      socketId.emit("typing", selectedChat._id);
+    }
+    let lastTypingTime = new Date().getTime();
+    var timerLenght = 1500;
+    setTimeout(() => {
+      var timeNow = new Date().getTime();
+      var timeDiff = timeNow - lastTypingTime;
+      if (timeDiff >= timerLenght && typing) {
+        socketId.emit("stopTyping", selectedChat._id);
+        setTyping(false);
+      }
+    }, timerLenght);
   };
 
   const generateAdminResponse = (message) => {
@@ -246,11 +333,6 @@ export default function ChatSection({ user }) {
     }
   };
 
-  const formatMessageTime = (timestamp) => {
-    const date = new Date(timestamp);
-    return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-  };
-
   const formatMessageDate = (timestamp) => {
     const date = new Date(timestamp);
     const today = new Date();
@@ -275,6 +357,18 @@ export default function ChatSection({ user }) {
     groups[date]?.push(message);
     return groups;
   }, {});
+
+  // AutoScroll
+  useEffect(() => {
+    const messageContainer = document.getElementById("message-Container");
+
+    if (messageContainer) {
+      messageContainer.scrollTo({
+        top: messageContainer.scrollHeight,
+        behavior: "smooth",
+      });
+    }
+  }, [messages]);
 
   return (
     <Card className="flex flex-col h-[660px] sm:h-[817px]">
@@ -301,7 +395,8 @@ export default function ChatSection({ user }) {
           </Avatar>
           <div>
             <CardTitle className="text-base">
-              {selectedChat?.users[1]?.name}
+              {/* {selectedChat?.users[1]?.name } */}
+              Support
             </CardTitle>
             <CardDescription className="text-xs flex items-center">
               <span className="h-2 w-2 rounded-full bg-green-500 mr-1.5"></span>
@@ -397,92 +492,151 @@ export default function ChatSection({ user }) {
       </div>
 
       {/* Chat Messages */}
-      <ScrollArea className="flex-1 p-4 max-h-[385px]  sm:max-h-[530px]">
-        {Object.entries(groupedMessages)?.map(([date, dateMessages]) => (
-          <div key={date}>
-            <div className="flex justify-center my-4">
-              <span className="text-xs bg-gray-100 text-gray-500 px-2 py-1 rounded-full">
-                {date}
-              </span>
-            </div>
-            {dateMessages?.map((message) => (
-              <div
-                key={message._id}
-                className={`flex mb-4 ${
-                  message?.sender?._id === user?._id
-                    ? "justify-end"
-                    : "justify-start"
-                }`}
-              >
-                {message?.sender?._id !== user?._id && (
-                  <Avatar className="h-8 w-8 mr-2 mt-1">
-                    <AvatarImage
-                      src={message?.sender?.avatar}
-                      alt={message?.sender?.name}
-                      className="rounded-full"
-                    />
-                    <AvatarFallback className="bg-[#C6080A] text-white text-xs rounded-full">
-                      {message?.sender?.name
-                        ?.split(" ")
-                        ?.map((n) => n[0])
-                        ?.join("")}
-                    </AvatarFallback>
-                  </Avatar>
-                )}
+      <ScrollArea
+        id="message-Container"
+        className="flex-1 p-4 max-h-[385px]  sm:max-h-[530px]"
+      >
+        {messageLoad ? (
+          <MessageLoader />
+        ) : (
+          Object?.entries(groupedMessages)?.map(([date, dateMessages]) => (
+            <div key={date}>
+              <div className="flex justify-center my-4">
+                <span className="text-xs bg-gray-100 text-gray-500 px-2 py-1 rounded-full">
+                  {date}
+                </span>
+              </div>
+              {dateMessages?.map((message) => (
                 <div
-                  className={`max-w-[80%] rounded-2xl px-4 py-2 ${
+                  key={message._id}
+                  className={`flex mb-4 ${
                     message?.sender?._id === user?._id
-                      ? "bg-[#C6080A] text-white rounded-tr-none"
-                      : "bg-gray-100 text-gray-800 rounded-tl-none"
+                      ? "justify-end"
+                      : "justify-start"
                   }`}
                 >
-                  <p className="text-sm">{message?.content}</p>
+                  {message?.sender?._id !== user?._id && (
+                    <Avatar className="h-8 w-8 mr-2 mt-1">
+                      <AvatarImage
+                        src={message?.sender?.avatar}
+                        alt={message?.sender?.name}
+                        className="rounded-full"
+                      />
+                      <AvatarFallback className="bg-[#C6080A] text-white text-xs rounded-full">
+                        {message?.sender?.name
+                          ?.split(" ")
+                          ?.map((n) => n[0])
+                          ?.join("")}
+                      </AvatarFallback>
+                    </Avatar>
+                  )}
                   <div
-                    className={`flex items-center justify-end mt-1 space-x-1 ${
+                    className={`max-w-[80%] rounded-2xl px-4 py-2 ${
                       message?.sender?._id === user?._id
-                        ? "text-white/70"
-                        : "text-gray-500"
+                        ? "bg-[#C6080A] text-white rounded-tr-none"
+                        : "bg-gray-100 text-gray-800 rounded-tl-none"
                     }`}
                   >
-                    <span className="text-[10px]">
-                      {message?.createdAt
-                        ? formatDistanceToNow(new Date(message?.createdAt), {
-                            addSuffix: true,
-                          })
-                        : "Just now"}
-                    </span>
-                    {selectedChat?.users[1]?._id === user?._id && (
-                      <span>
-                        {message?.read ? (
-                          <Check className="h-3 w-3 text-blue-400" />
-                        ) : (
-                          <Check className="h-3 w-3" />
-                        )}
-                      </span>
+                    {message?.contentType === "text" ? (
+                      <p className="text-sm">{message?.content}</p>
+                    ) : message?.contentType === "like" ? (
+                      <div className="text-4xl">{message?.content}</div>
+                    ) : message?.contentType === "Image" ? (
+                      <a
+                        href={message?.content}
+                        download
+                        target="_blank"
+                        className="relative mt-4 w-[11rem] h-[14rem] overflow-hidden cursor-pointer rounded-lg shadow-lg"
+                      >
+                        <Image
+                          src={
+                            message?.content ||
+                            "/placeholder.svg?height=140&width=140"
+                          }
+                          alt="Sent image"
+                          width={140}
+                          height={140}
+                          className="rounded-md w-[11rem] h-[10rem] object-fill overflow-hidden cursor-pointer"
+                        />
+                      </a>
+                    ) : message?.contentType === "Video" ? (
+                      <div className="relative mt-4 border  w-[15rem] h-fit max-h-[10rem] overflow-hidden rounded-lg shadow-lg">
+                        <video controls className="w-full h-fit rounded-lg">
+                          <source src={message?.content} type="video/mp4" />
+                          Your browser does not support the video tag.
+                        </video>
+                      </div>
+                    ) : message?.contentType === "Audio" ? (
+                      <div className="flex items-center mt-4 w-[14rem] h-[3rem] p-1  rounded-lg">
+                        <audio
+                          controls
+                          className="w-full h-full bg-transparent rounded-lg"
+                        >
+                          <source src={message?.content} type="audio/mpeg" />
+                          Your browser does not support the audio element.
+                        </audio>
+                      </div>
+                    ) : (
+                      <div className="mt-4">
+                        <a
+                          href={message?.content}
+                          download
+                          target="_blank"
+                          className="flex items-center gap-2 py-[.5rem] px-2 bg-gradient-to-r from-sky-500 to-sky-400 text-white rounded-md shadow-md"
+                        >
+                          <TbFileDownload className="h-5 w-5 text-white" />
+                          <span className=" text-[14px]">Download File</span>
+                        </a>
+                      </div>
                     )}
+
+                    <div
+                      className={`flex items-center justify-end mt-1 space-x-1 ${
+                        message?.sender?._id === user?._id
+                          ? "text-white/70"
+                          : "text-gray-500"
+                      }`}
+                    >
+                      <span className="text-[10px]">
+                        {message?.createdAt
+                          ? formatDistanceToNow(new Date(message?.createdAt), {
+                              addSuffix: true,
+                            })
+                          : "Just now"}
+                      </span>
+                      {selectedChat?.users[1]?._id === user?._id && (
+                        <span>
+                          {message?.read ? (
+                            <Check className="h-3 w-3 text-blue-400" />
+                          ) : (
+                            <Check className="h-3 w-3" />
+                          )}
+                        </span>
+                      )}
+                    </div>
                   </div>
+                  {message?.sender?._id === user?._id && (
+                    <Avatar className="h-8 w-8 ml-2 mt-1 rounded-full">
+                      <AvatarImage
+                        src={
+                          user?.avatar || "/placeholder.svg?height=32&width=32"
+                        }
+                        alt={user?.name}
+                        className="rounded-full"
+                      />
+                      <AvatarFallback className="text-xs bg-blue-500 text-white">
+                        {user?.name
+                          .split(" ")
+                          .map((n) => n[0])
+                          .join("")}
+                      </AvatarFallback>
+                    </Avatar>
+                  )}
                 </div>
-                {message?.sender?._id === user?._id && (
-                  <Avatar className="h-8 w-8 ml-2 mt-1 rounded-full">
-                    <AvatarImage
-                      src={
-                        user?.avatar || "/placeholder.svg?height=32&width=32"
-                      }
-                      alt={user?.name}
-                      className="rounded-full"
-                    />
-                    <AvatarFallback className="text-xs bg-blue-500 text-white">
-                      {user?.name
-                        .split(" ")
-                        .map((n) => n[0])
-                        .join("")}
-                    </AvatarFallback>
-                  </Avatar>
-                )}
-              </div>
-            ))}
-          </div>
-        ))}
+              ))}
+            </div>
+          ))
+        )}
 
         {isTyping && (
           <div className="flex mb-4 justify-start">
@@ -569,32 +723,83 @@ export default function ChatSection({ user }) {
               <Button
                 variant="ghost"
                 size="icon"
-                className="rounded-full h-9 w-9 flex-shrink-0"
+                className="rounded-full h-9 w-9 flex-shrink-0 cursor-pointer"
               >
                 <Paperclip className="h-5 w-5 text-gray-500" />
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-56" side="top">
-              <div className="flex flex-col space-y-1">
-                <Button variant="ghost" className="justify-start">
+              <div
+                className={`flex flex-col space-y-1 ${
+                  loading && "cursor-not-allowed opacity-70"
+                } `}
+              >
+                <label
+                  htmlFor="images"
+                  variant="ghost"
+                  className="justify-start flex items-center gap-2 cursor-pointer py-[.4rem] px-3 rounded-md hover:bg-gray-100 border"
+                >
                   <ImageIcon className="mr-2 h-4 w-4" />
                   <span>Image</span>
-                </Button>
-                <Button variant="ghost" className="justify-start">
+                  <input
+                    type="file"
+                    id="images"
+                    accept="image/*"
+                    onChange={(e) => {
+                      fileType(e.target.files[0], handleSendfiles, setLoading);
+                    }}
+                    className="hidden"
+                  />
+                </label>
+                <label
+                  htmlFor="doucments"
+                  variant="ghost"
+                  className="justify-start flex items-center gap-2 cursor-pointer py-[.4rem] px-3 rounded-md hover:bg-gray-100 border"
+                >
                   <File className="mr-2 h-4 w-4" />
                   <span>Document</span>
-                </Button>
-                <Button variant="ghost" className="justify-start">
+                  <input
+                    type="file"
+                    id="doucments"
+                    accept=".pdf, .doc, .docx, .ppt, .pptx, .xls, .xlsx, .txt, .zip"
+                    onChange={(e) => {
+                      fileType(e.target.files[0], handleSendfiles, setLoading);
+                    }}
+                    className="hidden"
+                  />
+                </label>
+                {/* <label
+                  htmlFor="audio"
+                  variant="ghost"
+                  className="justify-start flex items-center gap-2 cursor-pointer py-[.4rem] px-3 rounded-md hover:bg-gray-100 border"
+                >
                   <Mic className="mr-2 h-4 w-4" />
                   <span>Audio</span>
-                </Button>
+                </label> */}
+                <label
+                  htmlFor="videos"
+                  variant="ghost"
+                  className="justify-start flex items-center gap-2 cursor-pointer py-[.4rem] px-3 rounded-md hover:bg-gray-100 border"
+                >
+                  <Video className="mr-2 h-4 w-4" />
+                  <span>Video</span>
+                  <input
+                    type="file"
+                    id="videos"
+                    accept="video/*"
+                    onChange={(e) => {
+                      fileType(e.target.files[0], handleSendfiles, setLoading);
+                    }}
+                    className="hidden"
+                  />
+                </label>
               </div>
             </PopoverContent>
           </Popover>
 
           <Input
             value={newMessage}
-            onChange={(e) => setNewMessage(e.target.value)}
+            onChange={typingHandler}
             placeholder="Type a message..."
             className="flex-1 rounded-full border-gray-300 focus-visible:ring-[#C6080A]"
           />

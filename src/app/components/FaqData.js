@@ -301,151 +301,150 @@ export default function FAQData() {
       )
     : true;
   return (
-    <MainLayout title="Frequently Asked Questions - Ayoob">
-      <div className="min-h-screen bg-gray-50">
-        <div className="container mx-auto py-12 px-4 md:px-6">
-          {/* Search */}
-          <div className="max-w-2xl mx-auto mb-10">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-              <Input
-                type="text"
-                placeholder="Search for answers..."
-                className="pl-10 py-6 text-lg"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
-            <p className="text-sm text-gray-500 mt-2">
-              {searchQuery
-                ? `Showing results for "${searchQuery}"`
-                : `Browse through our ${totalQuestions} frequently asked questions`}
-            </p>
+    <div className="min-h-screen bg-gray-50">
+      <div className="container mx-auto py-12 px-4 md:px-6">
+        {/* Search */}
+        <div className="max-w-2xl mx-auto mb-10">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            <Input
+              type="text"
+              placeholder="Search for answers..."
+              className="pl-10 py-6 text-lg"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
           </div>
+          <p className="text-sm text-gray-500 mt-2">
+            {searchQuery
+              ? `Showing results for "${searchQuery}"`
+              : `Browse through our ${totalQuestions} frequently asked questions`}
+          </p>
+        </div>
 
-          {/* FAQ Categories */}
-          <Tabs defaultValue="general" className="max-w-4xl mx-auto">
-            <TabsList className="grid grid-cols-3 md:grid-cols-6 mb-8">
-              {faqCategories?.map((category) => (
-                <TabsTrigger
-                  key={category.id}
-                  value={category.id}
-                  className="flex items-center gap-2"
-                >
-                  {category?.icon}
-                  <span className="hidden sm:inline">{category?.label}</span>
-                </TabsTrigger>
-              ))}
-            </TabsList>
+        {/* FAQ Categories */}
+        <Tabs defaultValue="general" className="max-w-4xl mx-auto">
+          <TabsList className="grid grid-cols-3 md:grid-cols-6 mb-8">
+            {faqCategories?.map((category) => (
+              <TabsTrigger
+                key={category.id}
+                value={category.id}
+                className="flex items-center gap-2"
+              >
+                {category?.icon}
+                <span className="hidden sm:inline">{category?.label}</span>
+              </TabsTrigger>
+            ))}
+          </TabsList>
 
-            {!hasSearchResults && (
-              <div className="text-center py-12">
-                <h3 className="text-xl font-bold mb-2">No results found</h3>
-                <p className="text-gray-600 mb-6">
-                  We couldn&apos;t find any questions matching &quot;
-                  {searchQuery}&quot;. Try using different keywords or browse
-                  through our categories.
-                </p>
-                <Button
-                  variant="outline"
-                  onClick={() => setSearchQuery("")}
-                  className="bg-[#C6080A] text-white hover:bg-[#a50709] border-none"
-                >
-                  Clear Search
-                </Button>
-              </div>
-            )}
-
-            {faqCategories?.map((category) => {
-              const filteredQuestions = filterQuestions(category?.questions);
-
-              return (
-                <TabsContent key={category?.id} value={category?.id}>
-                  <Card>
-                    <CardContent className="pt-6">
-                      <h2 className="text-2xl font-bold mb-6">
-                        {category?.label} Questions
-                      </h2>
-
-                      {filteredQuestions?.length > 0 ? (
-                        <Accordion
-                          type="single"
-                          collapsible
-                          className="space-y-4"
-                        >
-                          {filteredQuestions.map((faq) => (
-                            <AccordionItem
-                              key={faq.id}
-                              value={faq.id}
-                              className="border rounded-lg px-4"
-                            >
-                              <AccordionTrigger className="text-left font-medium py-4">
-                                {faq?.question}
-                              </AccordionTrigger>
-                              <AccordionContent className="pb-4 text-gray-700">
-                                {faq?.answer}
-                              </AccordionContent>
-                            </AccordionItem>
-                          ))}
-                        </Accordion>
-                      ) : searchQuery ? (
-                        <p className="text-gray-500 py-4">
-                          No questions found in this category matching &quot;
-                          {searchQuery}&quot;
-                        </p>
-                      ) : (
-                        <p className="text-gray-500 py-4">
-                          No questions available in this category
-                        </p>
-                      )}
-                    </CardContent>
-                  </Card>
-                </TabsContent>
-              );
-            })}
-          </Tabs>
-
-          {/* Still Need Help Section */}
-          <div className="max-w-4xl mx-auto mt-16">
-            <div className="bg-gradient-to-r from-[#C6080A] to-[#ff4b4e] rounded-lg p-8 text-white text-center">
-              <h2 className="text-2xl md:text-3xl font-bold mb-4">
-                Still Need Help?
-              </h2>
-              <p className="mb-6 max-w-2xl mx-auto">
-                Can&apos;t find the answer you&apos;re looking for? Our customer
-                service team is here to help you with any questions or concerns.
+          {!hasSearchResults && (
+            <div className="text-center py-12">
+              <h3 className="text-xl font-bold mb-2">No results found</h3>
+              <p className="text-gray-600 mb-6">
+                We couldn&apos;t find any questions matching &quot;
+                {searchQuery}&quot;. Try using different keywords or browse
+                through our categories.
               </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link
-                  href={
-                    auth.user
-                      ? `/profile/${auth?.user?._id}?tab=support`
-                      : "/authentication"
-                  }
-                  className={`bg-white text-[#C6080A] px-6 py-3 rounded-md font-medium hover:bg-gray-100 transition-colors ${
-                    auth.user ? "cursor-pointer" : "cursor-not-allowed"
-                  }`}
-                >
-                  Contact Support
-                </Link>
-                <Link
-                  href={
-                    auth.user
-                      ? `/profile/${auth?.user?._id}?tab=chat`
-                      : "/authentication"
-                  }
-                  className={`bg-transparent border border-white px-6 py-3 rounded-md font-medium hover:bg-white/10 transition-colors ${
-                    auth.user ? "cursor-pointer" : "cursor-not-allowed"
-                  }`}
-                >
-                  Start Live Chat
-                </Link>
-              </div>
+              <Button
+                variant="outline"
+                onClick={() => setSearchQuery("")}
+                className="bg-[#C6080A] text-white hover:bg-[#a50709] border-none"
+              >
+                Clear Search
+              </Button>
+            </div>
+          )}
+
+          {faqCategories?.map((category) => {
+            const filteredQuestions = filterQuestions(category?.questions);
+
+            return (
+              <TabsContent key={category?.id} value={category?.id}>
+                <Card>
+                  <CardContent className="pt-6">
+                    <h2 className="text-2xl font-bold mb-6">
+                      {category?.label} Questions
+                    </h2>
+
+                    {filteredQuestions?.length > 0 ? (
+                      <Accordion
+                        type="single"
+                        collapsible
+                        className="space-y-4"
+                      >
+                        {filteredQuestions.map((faq) => (
+                          <AccordionItem
+                            key={faq.id}
+                            value={faq.id}
+                            className="border rounded-lg px-4"
+                          >
+                            <AccordionTrigger className="text-left font-medium py-4">
+                              {faq?.question}
+                            </AccordionTrigger>
+                            <AccordionContent className="pb-4 text-gray-700">
+                              {faq?.answer}
+                            </AccordionContent>
+                          </AccordionItem>
+                        ))}
+                      </Accordion>
+                    ) : searchQuery ? (
+                      <p className="text-gray-500 py-4">
+                        No questions found in this category matching &quot;
+                        {searchQuery}&quot;
+                      </p>
+                    ) : (
+                      <p className="text-gray-500 py-4">
+                        No questions available in this category
+                      </p>
+                    )}
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            );
+          })}
+        </Tabs>
+
+        {/* Still Need Help Section */}
+        <div className="max-w-4xl mx-auto mt-16">
+          <div className="bg-gradient-to-r from-[#C6080A] to-[#ff4b4e] rounded-lg p-8 text-white text-center">
+            <h2 className="text-2xl md:text-3xl font-bold mb-4">
+              Still Need Help?
+            </h2>
+            <p className="mb-6 max-w-2xl mx-auto">
+              Can&apos;t find the answer you&apos;re looking for? Our customer
+              service team is here to help you with any questions or concerns.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link
+                href={
+                  auth.user
+                    ? `/profile/${auth?.user?._id}?tab=support`
+                    : "/authentication"
+                }
+                className={`bg-white text-[#C6080A] px-6 py-3 rounded-md font-medium hover:bg-gray-100 transition-colors ${
+                  auth.user ? "cursor-pointer" : "cursor-not-allowed"
+                }`}
+              >
+                Contact Support
+              </Link>
+              <Link
+                href={
+                  auth.user
+                    ? `/profile/${auth?.user?._id}?tab=chat`
+                    : "/authentication"
+                }
+                className={`bg-transparent border border-white px-6 py-3 rounded-md font-medium hover:bg-white/10 transition-colors ${
+                  auth.user ? "cursor-pointer" : "cursor-not-allowed"
+                }`}
+              >
+                Start Live Chat
+              </Link>
             </div>
           </div>
+        </div>
 
-          {/* FAQ Submission */}
-          {/* <div className="max-w-2xl mx-auto mt-16 text-center">
+        {/* FAQ Submission */}
+        {/* <div className="max-w-2xl mx-auto mt-16 text-center">
             <h2 className="text-2xl font-bold mb-2">Have a Question?</h2>
             <p className="text-gray-600 mb-6">
               If you can&apos;t find your question in our FAQ, you can submit it
@@ -455,8 +454,7 @@ export default function FAQData() {
               Submit a Question
             </Button>
           </div> */}
-        </div>
       </div>
-    </MainLayout>
+    </div>
   );
 }

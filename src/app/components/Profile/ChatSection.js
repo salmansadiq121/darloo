@@ -115,9 +115,9 @@ export default function ChatSection({ user }) {
     lastSeen: "Just now",
   };
 
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
+  // useEffect(() => {
+  //   scrollToBottom();
+  // }, [messages]);
 
   useEffect(() => {
     if (selectedQuickQuestion) {
@@ -349,14 +349,16 @@ export default function ChatSection({ user }) {
   };
 
   // Group messages by date
-  const groupedMessages = messages?.reduce((groups, message) => {
-    const date = formatMessageDate(message?.createdAt);
-    if (!groups[date]) {
-      groups[date] = [];
-    }
-    groups[date]?.push(message);
-    return groups;
-  }, {});
+  const groupedMessages = messages
+    ?.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
+    ?.reduce((groups, message) => {
+      const date = formatMessageDate(message?.createdAt);
+      if (!groups[date]) {
+        groups[date] = [];
+      }
+      groups[date]?.push(message);
+      return groups;
+    }, {});
 
   // AutoScroll
   useEffect(() => {

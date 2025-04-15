@@ -2,305 +2,300 @@
 import MainLayout from "@/app/components/Layout/Layout";
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Shield, Lock, Eye, FileText, Database, Bell } from "lucide-react";
+import {
+  ShieldCheck,
+  Lock,
+  Smartphone,
+  AlertTriangle,
+  Eye,
+  KeyRound,
+  CreditCard,
+  UserCheck,
+} from "lucide-react";
 
 export default function PrivacyPolicy() {
   return (
     <MainLayout title="Privacy Policy - Ayoob">
       <div className="min-h-screen bg-gray-50">
         <div className="container mx-auto py-12 px-4 md:px-6">
-          {/* Last Updated */}
-          <div className="mb-8 text-right">
-            <p className="text-gray-500">Last Updated: April 14, 2025</p>
+          {/* Introduction */}
+          <div className="max-w-3xl mx-auto mb-12 text-center">
+            <ShieldCheck className="h-16 w-16 text-[#C6080A] mx-auto mb-4" />
+            <h2 className="text-2xl md:text-3xl font-bold mb-4">
+              Your Security Is Our Priority
+            </h2>
+            <p className="text-gray-700">
+              At Ayoob E-commerce, we implement industry-leading security
+              measures to protect your personal information and ensure safe
+              transactions. This page outlines the steps we take to secure your
+              account and provides guidance on how you can enhance your
+              security.
+            </p>
           </div>
 
-          {/* Introduction */}
-          <Card className="mb-8">
-            <CardContent className="pt-6">
-              <div className="flex items-start gap-4">
-                <div className="p-2 bg-red-50 rounded-full">
-                  <Shield className="h-6 w-6 text-[#C6080A]" />
-                </div>
-                <div>
-                  <h2 className="text-xl font-bold mb-3">Introduction</h2>
-                  <p className="text-gray-700 mb-4">
-                    At Ayoob E-commerce (&quot;we&quot;, &quot;our&quot;, or
-                    &quot;us&quot;), we respect your privacy and are committed
-                    to protecting your personal data. This privacy policy will
-                    inform you about how we look after your personal data when
-                    you visit our website and tell you about your privacy rights
-                    and how the law protects you.
-                  </p>
-                  <p className="text-gray-700">
-                    This privacy policy applies to all information collected
-                    through our website, mobile application, and any related
-                    services, sales, marketing, or events (collectively, the
-                    &quot;Services&quot;).
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          {/* Security Features */}
+          <div className="mb-12">
+            <h2 className="text-2xl font-bold mb-6 text-center">
+              Our Security Features
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <Card>
+                <CardContent className="pt-6">
+                  <div className="flex items-start gap-4">
+                    <div className="p-2 bg-red-50 rounded-full">
+                      <Lock className="h-6 w-6 text-[#C6080A]" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-bold mb-2">
+                        Secure Authentication
+                      </h3>
+                      <p className="text-gray-700">
+                        We use advanced authentication protocols to verify your
+                        identity when you log in. Our system supports strong
+                        password requirements and multi-factor authentication
+                        for enhanced security.
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
 
-          {/* Information We Collect */}
-          <Card className="mb-8">
-            <CardContent className="pt-6">
-              <div className="flex items-start gap-4">
-                <div className="p-2 bg-red-50 rounded-full">
-                  <Database className="h-6 w-6 text-[#C6080A]" />
-                </div>
-                <div>
-                  <h2 className="text-xl font-bold mb-3">
-                    Information We Collect
-                  </h2>
-                  <p className="text-gray-700 mb-4">
-                    We collect several types of information from and about users
-                    of our Services, including:
-                  </p>
-                  <ul className="list-disc pl-6 space-y-2 text-gray-700 mb-4">
-                    <li>
-                      <span className="font-medium">Personal Identifiers:</span>{" "}
-                      Name, email address, postal address, phone number, and
-                      other similar identifiers.
-                    </li>
-                    <li>
-                      <span className="font-medium">Account Information:</span>{" "}
-                      Username, password, purchase history, and account
-                      preferences.
-                    </li>
-                    <li>
-                      <span className="font-medium">
-                        Financial Information:
-                      </span>{" "}
-                      Credit card numbers, bank account details, and billing
-                      addresses.
-                    </li>
-                    <li>
-                      <span className="font-medium">Technical Data:</span> IP
-                      address, browser type and version, time zone setting,
-                      browser plug-in types and versions, operating system and
-                      platform, and other technology on the devices you use to
-                      access our Services.
-                    </li>
-                    <li>
-                      <span className="font-medium">Usage Data:</span>{" "}
-                      Information about how you use our website, products, and
-                      services.
-                    </li>
-                  </ul>
-                  <p className="text-gray-700">
-                    We collect this information when you register on our site,
-                    place an order, subscribe to our newsletter, respond to a
-                    survey, fill out a form, or otherwise interact with our
-                    Services.
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+              <Card>
+                <CardContent className="pt-6">
+                  <div className="flex items-start gap-4">
+                    <div className="p-2 bg-red-50 rounded-full">
+                      <CreditCard className="h-6 w-6 text-[#C6080A]" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-bold mb-2">
+                        Secure Payments
+                      </h3>
+                      <p className="text-gray-700">
+                        All payment information is encrypted using
+                        industry-standard SSL/TLS encryption. We comply with PCI
+                        DSS standards to ensure secure credit card processing,
+                        and we never store your full credit card details on our
+                        servers.
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
 
-          {/* How We Use Your Information */}
-          <Card className="mb-8">
-            <CardContent className="pt-6">
-              <div className="flex items-start gap-4">
-                <div className="p-2 bg-red-50 rounded-full">
-                  <Eye className="h-6 w-6 text-[#C6080A]" />
-                </div>
-                <div>
-                  <h2 className="text-xl font-bold mb-3">
-                    How We Use Your Information
-                  </h2>
-                  <p className="text-gray-700 mb-4">
-                    We use the information we collect about you for various
-                    purposes, including:
-                  </p>
-                  <ul className="list-disc pl-6 space-y-2 text-gray-700 mb-4">
-                    <li>To provide and maintain our Services</li>
-                    <li>To process and fulfill your orders</li>
-                    <li>To manage your account and provide customer support</li>
-                    <li>
-                      To send you order confirmations, updates, and security
-                      alerts
-                    </li>
-                    <li>
-                      To respond to your comments, questions, and requests
-                    </li>
-                    <li>
-                      To personalize your experience and deliver content and
-                      product offerings relevant to your interests
-                    </li>
-                    <li>To improve our website, products, and services</li>
-                    <li>
-                      To administer promotions, contests, surveys, or other site
-                      features
-                    </li>
-                    <li>To protect our Services, users, and the public</li>
-                    <li>To comply with legal obligations</li>
-                  </ul>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+              <Card>
+                <CardContent className="pt-6">
+                  <div className="flex items-start gap-4">
+                    <div className="p-2 bg-red-50 rounded-full">
+                      <Eye className="h-6 w-6 text-[#C6080A]" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-bold mb-2">
+                        Data Protection
+                      </h3>
+                      <p className="text-gray-700">
+                        Your personal data is protected using advanced
+                        encryption techniques. We regularly update our security
+                        systems and conduct security audits to identify and
+                        address potential vulnerabilities.
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
 
-          {/* Information Sharing */}
-          <Card className="mb-8">
-            <CardContent className="pt-6">
-              <div className="flex items-start gap-4">
-                <div className="p-2 bg-red-50 rounded-full">
-                  <FileText className="h-6 w-6 text-[#C6080A]" />
-                </div>
-                <div>
-                  <h2 className="text-xl font-bold mb-3">
-                    Information Sharing and Disclosure
-                  </h2>
-                  <p className="text-gray-700 mb-4">
-                    We may share your personal information in the following
-                    situations:
-                  </p>
-                  <ul className="list-disc pl-6 space-y-2 text-gray-700 mb-4">
-                    <li>
-                      <span className="font-medium">Service Providers:</span> We
-                      may share your information with third-party vendors,
-                      service providers, contractors, or agents who perform
-                      services for us.
-                    </li>
-                    <li>
-                      <span className="font-medium">Business Transfers:</span>{" "}
-                      We may share or transfer your information in connection
-                      with, or during negotiations of, any merger, sale of
-                      company assets, financing, or acquisition of all or a
-                      portion of our business.
-                    </li>
-                    <li>
-                      <span className="font-medium">Legal Requirements:</span>{" "}
-                      We may disclose your information where required to do so
-                      by law or in response to valid requests by public
-                      authorities.
-                    </li>
-                    <li>
-                      <span className="font-medium">With Your Consent:</span> We
-                      may disclose your personal information for any other
-                      purpose with your consent.
-                    </li>
-                  </ul>
-                  <p className="text-gray-700">
-                    We do not sell, trade, or otherwise transfer your personally
-                    identifiable information to outside parties without your
-                    consent, except as described above.
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+              <Card>
+                <CardContent className="pt-6">
+                  <div className="flex items-start gap-4">
+                    <div className="p-2 bg-red-50 rounded-full">
+                      <AlertTriangle className="h-6 w-6 text-[#C6080A]" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-bold mb-2">
+                        Fraud Detection
+                      </h3>
+                      <p className="text-gray-700">
+                        Our advanced fraud detection system monitors
+                        transactions in real-time to identify suspicious
+                        activities. If we detect unusual activity on your
+                        account, we&apos;ll alert you immediately and take steps
+                        to secure your account.
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
 
-          {/* Data Security */}
-          <Card className="mb-8">
-            <CardContent className="pt-6">
-              <div className="flex items-start gap-4">
-                <div className="p-2 bg-red-50 rounded-full">
-                  <Lock className="h-6 w-6 text-[#C6080A]" />
-                </div>
-                <div>
-                  <h2 className="text-xl font-bold mb-3">Data Security</h2>
-                  <p className="text-gray-700 mb-4">
-                    We have implemented appropriate technical and organizational
-                    security measures designed to protect the security of any
-                    personal information we process. However, despite our
-                    safeguards and efforts to secure your information, no
-                    electronic transmission over the Internet or information
-                    storage technology can be guaranteed to be 100% secure.
-                  </p>
-                  <p className="text-gray-700">
-                    We regularly monitor our systems for possible
-                    vulnerabilities and attacks and regularly review our
-                    information collection, storage, and processing practices to
-                    update our physical, technical, and organizational security
-                    measures.
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          {/* Security Best Practices */}
+          <div className="mb-12">
+            <h2 className="text-2xl font-bold mb-6 text-center">
+              Security Best Practices
+            </h2>
+            <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+              <h3 className="text-xl font-bold mb-4">Protect Your Account</h3>
+              <ul className="space-y-4">
+                <li className="flex items-start gap-3">
+                  <div className="p-1 bg-red-50 rounded-full mt-0.5">
+                    <KeyRound className="h-4 w-4 text-[#C6080A]" />
+                  </div>
+                  <div>
+                    <p className="font-medium">Create a Strong Password</p>
+                    <p className="text-gray-700">
+                      Use a unique password that includes a mix of uppercase and
+                      lowercase letters, numbers, and special characters. Avoid
+                      using easily guessable information like birthdays or
+                      names.
+                    </p>
+                  </div>
+                </li>
+                <li className="flex items-start gap-3">
+                  <div className="p-1 bg-red-50 rounded-full mt-0.5">
+                    <Smartphone className="h-4 w-4 text-[#C6080A]" />
+                  </div>
+                  <div>
+                    <p className="font-medium">
+                      Enable Two-Factor Authentication (2FA)
+                    </p>
+                    <p className="text-gray-700">
+                      Add an extra layer of security by enabling 2FA in your
+                      account settings. This requires a verification code in
+                      addition to your password when logging in from a new
+                      device.
+                    </p>
+                  </div>
+                </li>
+                <li className="flex items-start gap-3">
+                  <div className="p-1 bg-red-50 rounded-full mt-0.5">
+                    <UserCheck className="h-4 w-4 text-[#C6080A]" />
+                  </div>
+                  <div>
+                    <p className="font-medium">
+                      Regularly Review Your Account Activity
+                    </p>
+                    <p className="text-gray-700">
+                      Check your order history and account activity regularly.
+                      If you notice any unauthorized transactions or suspicious
+                      activity, report it immediately.
+                    </p>
+                  </div>
+                </li>
+              </ul>
+            </div>
 
-          {/* Your Rights */}
-          <Card className="mb-8">
-            <CardContent className="pt-6">
-              <div className="flex items-start gap-4">
-                <div className="p-2 bg-red-50 rounded-full">
-                  <Bell className="h-6 w-6 text-[#C6080A]" />
-                </div>
-                <div>
-                  <h2 className="text-xl font-bold mb-3">
-                    Your Privacy Rights
-                  </h2>
-                  <p className="text-gray-700 mb-4">
-                    Depending on your location, you may have certain rights
-                    regarding your personal information, including:
-                  </p>
-                  <ul className="list-disc pl-6 space-y-2 text-gray-700 mb-4">
-                    <li>
-                      The right to access personal information we hold about you
-                    </li>
-                    <li>
-                      The right to request correction of inaccurate personal
-                      information
-                    </li>
-                    <li>
-                      The right to request deletion of your personal information
-                    </li>
-                    <li>
-                      The right to object to processing of your personal
-                      information
-                    </li>
-                    <li>The right to data portability</li>
-                    <li>The right to withdraw consent</li>
-                  </ul>
-                  <p className="text-gray-700">
-                    To exercise these rights, please contact us using the
-                    contact information provided below. We will respond to your
-                    request within a reasonable timeframe.
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+            <div className="bg-white rounded-lg shadow-sm p-6">
+              <h3 className="text-xl font-bold mb-4">Safe Shopping Tips</h3>
+              <ul className="space-y-4">
+                <li className="flex items-start gap-3">
+                  <div className="p-1 bg-red-50 rounded-full mt-0.5">
+                    <Lock className="h-4 w-4 text-[#C6080A]" />
+                  </div>
+                  <div>
+                    <p className="font-medium">Shop on Secure Connections</p>
+                    <p className="text-gray-700">
+                      Always ensure you&apos;re on a secure connection (look for
+                      &quot;https://&quot; in the URL) when shopping online.
+                      Avoid making purchases or accessing your account on public
+                      Wi-Fi networks.
+                    </p>
+                  </div>
+                </li>
+                <li className="flex items-start gap-3">
+                  <div className="p-1 bg-red-50 rounded-full mt-0.5">
+                    <AlertTriangle className="h-4 w-4 text-[#C6080A]" />
+                  </div>
+                  <div>
+                    <p className="font-medium">Be Wary of Phishing Attempts</p>
+                    <p className="text-gray-700">
+                      We will never ask for sensitive information via email or
+                      text message. If you receive suspicious communications
+                      claiming to be from Ayoob E-commerce, do not click on any
+                      links or provide any information.
+                    </p>
+                  </div>
+                </li>
+                <li className="flex items-start gap-3">
+                  <div className="p-1 bg-red-50 rounded-full mt-0.5">
+                    <CreditCard className="h-4 w-4 text-[#C6080A]" />
+                  </div>
+                  <div>
+                    <p className="font-medium">Monitor Your Payment Methods</p>
+                    <p className="text-gray-700">
+                      Regularly check your credit card and bank statements for
+                      unauthorized charges. Set up alerts with your financial
+                      institutions to be notified of unusual activity.
+                    </p>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
 
-          {/* Contact Information */}
-          <Card className="mb-8">
-            <CardContent className="pt-6">
-              <h2 className="text-xl font-bold mb-3">Contact Us</h2>
-              <p className="text-gray-700 mb-4">
-                If you have any questions about this privacy policy or our
-                privacy practices, please contact us at:
-              </p>
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <p className="font-medium">Ayoob E-commerce</p>
-                <p>Email: privacy@ayoobecommerce.com</p>
-                <p>Phone: +1 (555) 123-4567</p>
-                <p>Address: 123 Commerce Street, Business City, Country</p>
-              </div>
-            </CardContent>
-          </Card>
+          {/* Security Alerts */}
+          <div className="mb-12">
+            <h2 className="text-2xl font-bold mb-6 text-center">
+              Current Security Alerts
+            </h2>
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-start gap-4">
+                  <div className="p-2 bg-red-50 rounded-full">
+                    <AlertTriangle className="h-6 w-6 text-[#C6080A]" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-bold mb-2">
+                      Phishing Alert: April 2025
+                    </h3>
+                    <p className="text-gray-700 mb-4">
+                      We&apos;ve detected phishing emails claiming to be from
+                      Ayoob E-commerce asking customers to update their payment
+                      information due to &quot;security concerns.&quot; These
+                      emails are NOT from us. We will never ask you to provide
+                      sensitive information via email or direct you to external
+                      websites to update your account details.
+                    </p>
+                    <div className="bg-red-50 border-l-4 border-red-500 p-4">
+                      <p className="text-red-800">
+                        <span className="font-bold">
+                          How to identify phishing attempts:
+                        </span>
+                      </p>
+                      <ul className="list-disc pl-6 space-y-1 text-red-800 mt-2">
+                        <li>Check the sender&apos;s email address carefully</li>
+                        <li>
+                          Look for grammatical errors or unusual formatting
+                        </li>
+                        <li>
+                          Hover over links before clicking to see the actual URL
+                        </li>
+                        <li>Be suspicious of urgent requests or threats</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
 
-          {/* Changes to Privacy Policy */}
-          <Card>
-            <CardContent className="pt-6">
-              <h2 className="text-xl font-bold mb-3">
-                Changes to This Privacy Policy
+          {/* Report Security Issues */}
+          <div className="bg-gradient-to-r from-[#C6080A] to-[#ff4b4e] rounded-lg p-8 text-white">
+            <div className="max-w-3xl mx-auto text-center">
+              <h2 className="text-2xl font-bold mb-4">
+                Report Security Issues
               </h2>
-              <p className="text-gray-700 mb-4">
-                We may update our privacy policy from time to time. We will
-                notify you of any changes by posting the new privacy policy on
-                this page and updating the &quot;Last Updated&quot; date at the
-                top of this page.
+              <p className="mb-6">
+                If you suspect your account has been compromised or want to
+                report a security concern, please contact our security team
+                immediately.
               </p>
-              <p className="text-gray-700">
-                You are advised to review this privacy policy periodically for
-                any changes. Changes to this privacy policy are effective when
-                they are posted on this page.
-              </p>
-            </CardContent>
-          </Card>
+              <div className="inline-block bg-white text-[#C6080A] rounded-lg p-4">
+                <p className="font-bold">Security Contact Information:</p>
+                <p>Email: security@ayoobecommerce.com</p>
+                <p>Phone: +1 (555) 987-6543</p>
+                <p>Available 24/7 for security emergencies</p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </MainLayout>

@@ -124,7 +124,7 @@ const Footer = () => {
               </li>
               <li>
                 <Link
-                  href="/faqs"
+                  href="/faq"
                   className=" text-gray-800 hover:text-red-600 transition-colors duration-200 text-sm"
                 >
                   FAQs

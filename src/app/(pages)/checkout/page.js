@@ -164,9 +164,9 @@ export default function Checkout() {
       if (data) {
         setCart((prev) => ({
           ...prev,
-          shippingFee: data.shipping.fee ?? 0,
+          shippingFee: data?.shipping?.fee ?? 0,
         }));
-        setShippingFee(data.shipping.fee ?? 0);
+        setShippingFee(data?.shipping?.fee ?? 0);
       }
     } catch (error) {
       console.error("Error getting shipping fee:", error);

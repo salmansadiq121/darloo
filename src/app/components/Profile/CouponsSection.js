@@ -46,7 +46,7 @@ export default function CouponsSection() {
   };
 
   const getDefaultCouponDescription = (productIds) => {
-    if (!productIds || productIds.length === 0)
+    if (!productIds || productIds?.length === 0)
       return "Exclusive discounts on your purchase!";
 
     const categoryDescriptions = {
@@ -157,7 +157,7 @@ export default function CouponsSection() {
           ))}
 
           {/*  */}
-          {coupons.length === 0 && (
+          {coupons?.length === 0 && (
             <div className="w-full min-h-[40vh] flex items-center justify-center flex-col gap-2">
               <Image
                 src="/coupon.png"

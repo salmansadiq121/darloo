@@ -73,8 +73,8 @@ export default function FAQPage() {
       setFaqs(data.faqs);
 
       // Extract unique categories from FAQs
-      const uniqueCategories = Array.from(
-        new Set(data.faqs.map((faq) => faq.category))
+      const uniqueCategories = Array?.from(
+        new Set(data?.faqs?.map((faq) => faq.category))
       );
       setCategories(["all", ...uniqueCategories]);
     } catch (error) {
@@ -89,7 +89,7 @@ export default function FAQPage() {
   }, []);
 
   // Filter FAQs based on search query and active category
-  const filteredFaqs = faqs.filter((faq) => {
+  const filteredFaqs = faqs?.filter((faq) => {
     const matchesSearch =
       searchQuery === "" ||
       faq.question.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -111,10 +111,10 @@ export default function FAQPage() {
   }, {});
 
   // Count total FAQs
-  const totalFaqs = faqs.length;
+  const totalFaqs = faqs?.length;
 
   // Check if any results match the search query
-  const hasSearchResults = filteredFaqs.length > 0;
+  const hasSearchResults = filteredFaqs?.length > 0;
 
   return (
     <div className="min-h-screen relative z-10">
@@ -166,7 +166,7 @@ export default function FAQPage() {
                     )}
                     <span className="hidden sm:inline">
                       {categoryConfig[category]?.label ||
-                        category.charAt(0).toUpperCase() + category.slice(1)}
+                        category?.charAt(0)?.toUpperCase() + category?.slice(1)}
                     </span>
                   </TabsTrigger>
                 ))}
@@ -196,17 +196,17 @@ export default function FAQPage() {
                   <h2 className="text-2xl font-bold mb-6">All Questions</h2>
                   {hasSearchResults ? (
                     <Accordion type="single" collapsible className="space-y-4">
-                      {filteredFaqs.map((faq) => (
+                      {filteredFaqs?.map((faq) => (
                         <AccordionItem
-                          key={faq._id}
-                          value={faq._id}
+                          key={faq?._id}
+                          value={faq?._id}
                           className="border rounded-lg px-4"
                         >
                           <AccordionTrigger className="text-left font-medium py-4">
-                            {faq.question}
+                            {faq?.question}
                           </AccordionTrigger>
                           <AccordionContent className="pb-4 text-gray-700">
-                            {faq.answer}
+                            {faq?.answer}
                           </AccordionContent>
                         </AccordionItem>
                       ))}
@@ -219,8 +219,8 @@ export default function FAQPage() {
             </TabsContent>
 
             {categories
-              .filter((cat) => cat !== "all")
-              .map((category) => {
+              ?.filter((cat) => cat !== "all")
+              ?.map((category) => {
                 const categoryFaqs = faqsByCategory[category] || [];
 
                 return (
@@ -229,12 +229,12 @@ export default function FAQPage() {
                       <CardContent className="pt-6">
                         <h2 className="text-2xl font-bold mb-6">
                           {categoryConfig[category]?.label ||
-                            category.charAt(0).toUpperCase() +
-                              category.slice(1)}{" "}
+                            category?.charAt(0).toUpperCase() +
+                              category?.slice(1)}{" "}
                           Questions
                         </h2>
 
-                        {categoryFaqs.length > 0 ? (
+                        {categoryFaqs?.length > 0 ? (
                           <Accordion
                             type="single"
                             collapsible

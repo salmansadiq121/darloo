@@ -14,6 +14,8 @@ import Cookies from "js-cookie";
 import { MdOutlineClosedCaptionDisabled, MdSupportAgent } from "react-icons/md";
 import axios from "axios";
 import { formatDistanceToNow } from "date-fns";
+import ProductSearch from "./SearchProduct";
+import MobileProductSearch from "./MobileSearch";
 
 const Header = () => {
   const { auth, setAuth, setSearch, selectedProduct } = useAuth();
@@ -26,6 +28,8 @@ const Header = () => {
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const router = useRouter();
   const [notifications, setNotifications] = useState([]);
+
+  // ${process.env.NEXT_PUBLIC_SERVER_URI}/api/v1/products/search/:name
 
   // Handle Notifications
   const fetchNotifications = async () => {
@@ -178,7 +182,7 @@ const Header = () => {
             </Link>
           </div>
           <div className="hidden sm:ml-6 lg:flex sm:items-center sm:space-x-3">
-            <div className="relative min-w-[18rem]">
+            {/* <div className="relative min-w-[18rem]">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <Search className="h-4 w-4 text-gray-400" />
               </div>
@@ -189,7 +193,8 @@ const Header = () => {
                 onChange={(e) => setDebouncedSearch(e.target.value)}
                 className="block w-full pl-10 pr-3 py-2 border  border-gray-300 rounded-md leading-5  bg-gray-50 placeholder-gray-600 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-red-500 focus:border-red-500 sm:text-sm"
               />
-            </div>
+            </div> */}
+            <ProductSearch />
             <div
               ref={closeNotification}
               className="relative cursor-pointer ml-4"
@@ -301,89 +306,88 @@ const Header = () => {
             )}
           </div>
           <div className="-mr-2 flex items-center lg:hidden">
-            <div
-              className="relative cursor-pointer mr-5"
-              onClick={() => setIsShow(!isShow)}
-            >
-              <IoSearch className="h-6 w-6 text-gray-900" />
-            </div>
-            <div
-              ref={closeNotification}
-              className="relative cursor-pointer ml-4"
-            >
-              <IoMdNotificationsOutline
-                className="h-6 w-6 text-gray-900 hover:text-red-600 transition-all duration-300 "
-                onClick={() => setShowNotification(!showNotification)}
-              />
-              <span className="absolute -top-4 -right-3 inline-flex items-center w-5 h-5  justify-center text-xs font-semibold text-red-700 bg-red-100 rounded-full">
-                {notifications?.length}
-              </span>
-              {showNotification && (
-                <div className="absolute top-8 right-3 text-xs font-semibold rounded-md shadow-md bg-gray-100 w-[18rem] min-h-[15rem] overflow-hidden ">
-                  <div className="w-full py-2 bg-red-600 text-white flex items-center justify-between px-2">
-                    <h3 className="text-lg font-medium text-white flex items-center gap-1">
-                      <IoMdNotifications className="h-6 w-6 text-white animate-pulse " />
-                      Notifications
-                    </h3>
-                  </div>
-                  <div className="flex flex-col gap-3 px-3 py-2">
-                    {notifications?.map((notification) => (
-                      <div
-                        key={notification._id}
-                        onClick={() =>
-                          router.push(
-                            `/profile/${auth?.user?._id}?tab=notifications`
-                          )
-                        }
-                        className="flex flex-col gap-2 py-[.4rem] px-3 rounded-md hover:bg-gray-100 border"
-                      >
-                        <div className="flex flex-col gap-2 rounded-sm hover:text-red-600 border py-1 px-2 cursor-pointer hover:border-red-500 transition-all duration-300">
-                          <span className="text-sm font-medium">
-                            {notification?.subject}
-                          </span>
-                          <p className="text-xs text-gray-500">
-                            {notification?.message}
-                          </p>
+            <div className="flex items-center gap-4">
+              <div
+                className="relative cursor-pointer"
+                onClick={() => setIsShow(!isShow)}
+              >
+                <IoSearch className="h-6 w-6 text-gray-900" />
+              </div>
+              <div ref={closeNotification} className="relative cursor-pointer ">
+                <IoMdNotificationsOutline
+                  className="h-6 w-6 text-gray-900 hover:text-red-600 transition-all duration-300 "
+                  onClick={() => setShowNotification(!showNotification)}
+                />
+                <span className="absolute -top-4 -right-3 inline-flex items-center w-5 h-5  justify-center text-xs font-semibold text-red-700 bg-red-100 rounded-full">
+                  {notifications?.length}
+                </span>
+                {showNotification && (
+                  <div className="absolute top-11 -right-15 sm:right-3 z-[999] text-xs font-semibold rounded-md shadow-md bg-gray-100 w-[18rem] min-h-[15rem] overflow-hidden ">
+                    <div className="w-full py-2 bg-red-600 text-white flex items-center justify-between px-2">
+                      <h3 className="text-lg font-medium text-white flex items-center gap-1">
+                        <IoMdNotifications className="h-6 w-6 text-white animate-pulse " />
+                        Notifications
+                      </h3>
+                    </div>
+                    <div className="flex flex-col gap-3 px-3 py-2">
+                      {notifications?.map((notification) => (
+                        <div
+                          key={notification._id}
+                          onClick={() =>
+                            router.push(
+                              `/profile/${auth?.user?._id}?tab=notifications`
+                            )
+                          }
+                          className="flex flex-col gap-2 py-[.4rem] px-3 rounded-md hover:bg-gray-100 border"
+                        >
+                          <div className="flex flex-col gap-2 rounded-sm hover:text-red-600 border py-1 px-2 cursor-pointer hover:border-red-500 transition-all duration-300">
+                            <span className="text-sm font-medium">
+                              {notification?.subject}
+                            </span>
+                            <p className="text-xs text-gray-500">
+                              {notification?.message}
+                            </p>
+                          </div>
+                          <div className="flex items-center justify-end gap-2 ">
+                            <span className="text-[10px]">
+                              {notification?.createdAt
+                                ? formatDistanceToNow(
+                                    new Date(notification?.createdAt),
+                                    {
+                                      addSuffix: true,
+                                    }
+                                  )
+                                : "Just now"}
+                            </span>
+                            {notification?.read ? (
+                              <Check className="h-3 w-3" />
+                            ) : (
+                              <Check className="h-3 w-3" />
+                            )}
+                          </div>
                         </div>
-                        <div className="flex items-center justify-end gap-2 ">
-                          <span className="text-[10px]">
-                            {notification?.createdAt
-                              ? formatDistanceToNow(
-                                  new Date(notification?.createdAt),
-                                  {
-                                    addSuffix: true,
-                                  }
-                                )
-                              : "Just now"}
-                          </span>
-                          {notification?.read ? (
-                            <Check className="h-3 w-3" />
-                          ) : (
-                            <Check className="h-3 w-3" />
-                          )}
-                        </div>
-                      </div>
-                    ))}
+                      ))}
+                    </div>
                   </div>
-                </div>
-              )}
-            </div>
-            <div
-              onClick={() => router.push("/cart")}
-              className="relative cursor-pointer mr-4"
-            >
-              <FaShoppingCart className="h-6 w-6 text-gray-900 hover:text-red-600 transition-all duration-300" />
-              <span className="absolute -top-4 -right-3 inline-flex items-center w-5 h-5  justify-center text-xs font-semibold bg-red-700 text-white rounded-full">
-                {selectedProduct ? selectedProduct.length : 0}
-              </span>
-            </div>
-            <div
-              onClick={() =>
-                router.push(`/profile/${auth?.user?._id}?tab=chat`)
-              }
-              className="relative cursor-pointer ml-4"
-            >
-              <MdSupportAgent className="h-6 w-6 text-gray-900 hover:text-red-600 transition-all duration-300" />
+                )}
+              </div>
+              <div
+                onClick={() => router.push("/cart")}
+                className="relative cursor-pointer "
+              >
+                <FaShoppingCart className="h-6 w-6 text-gray-900 hover:text-red-600 transition-all duration-300" />
+                <span className="absolute -top-4 -right-3 inline-flex items-center w-5 h-5  justify-center text-xs font-semibold bg-red-700 text-white rounded-full">
+                  {selectedProduct ? selectedProduct.length : 0}
+                </span>
+              </div>
+              <div
+                onClick={() =>
+                  router.push(`/profile/${auth?.user?._id}?tab=chat`)
+                }
+                className="relative cursor-pointer"
+              >
+                <MdSupportAgent className="h-6 w-6 text-gray-900 hover:text-red-600 transition-all duration-300" />
+              </div>
             </div>
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -400,20 +404,7 @@ const Header = () => {
         </div>
       </div>
 
-      {isShow && (
-        <div className="relative w-full">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <Search className="h-4 w-4 text-gray-400" />
-          </div>
-          <input
-            type="text"
-            placeholder="Search listings..."
-            value={debouncedSearch}
-            onChange={(e) => setDebouncedSearch(e.target.value)}
-            className="block w-full pl-10 pr-3 py-2 border border-gray-300  leading-5 bg-white  placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-red-500 focus:border-red-500 sm:text-sm"
-          />
-        </div>
-      )}
+      {isShow && <MobileProductSearch isShow={isShow} />}
 
       {isMenuOpen && (
         <div className="lg:hidden">

@@ -242,36 +242,38 @@ const Footer = () => {
             </div>
           </div>
 
-          <div className="mt-6 flex flex-wrap justify-center md:justify-start space-x-4">
-            <Image
-              src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg"
-              alt="Visa"
-              width={100}
-              height={50}
-              className="h-8 bg-white rounded px-2"
-            />
-            <Image
-              src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg"
-              alt="Mastercard"
-              width={100}
-              height={50}
-              className="h-8 bg-white rounded px-2"
-            />
-            <Image
-              src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg"
-              alt="PayPal"
-              width={100}
-              height={50}
-              className="h-8 bg-white rounded px-2"
-            />
-            <Image
-              src="https://upload.wikimedia.org/wikipedia/commons/4/46/Bitcoin.svg"
-              alt="Bitcoin"
-              width={50}
-              height={50}
-              className="h-8 bg-white rounded px-2"
-            />
-            <div className="dark:bg-[#1E293B] bg-slate-300/80 px-3 py-1 rounded flex items-center">
+          <div className="mt-6 flex items-center flex-col justify-center  space-x-4 gap-4">
+            <div className="flex items-center justify-center gap-3">
+              <Image
+                src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg"
+                alt="Visa"
+                width={80}
+                height={50}
+                className="h-8 bg-white rounded px-2"
+              />
+              <Image
+                src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg"
+                alt="Mastercard"
+                width={80}
+                height={50}
+                className="h-8 bg-white rounded px-2"
+              />
+              <Image
+                src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg"
+                alt="PayPal"
+                width={80}
+                height={50}
+                className="h-8 bg-white rounded px-2"
+              />
+              <Image
+                src="https://upload.wikimedia.org/wikipedia/commons/4/46/Bitcoin.svg"
+                alt="Bitcoin"
+                width={50}
+                height={50}
+                className="h-8 bg-white rounded px-2"
+              />
+            </div>
+            <div className="dark:bg-[#1E293B] w-fit bg-slate-300/80 px-3 py-1 rounded flex items-center">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="16"

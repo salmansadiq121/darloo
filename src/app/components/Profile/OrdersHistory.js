@@ -29,6 +29,7 @@ import Swal from "sweetalert2";
 import toast from "react-hot-toast";
 import OrderCardSkeleton from "./OrderLoadingSkelton";
 import AddReviewModal from "./ReviewModal";
+import { Separator } from "@/components/ui/separator";
 
 export default function OrdersHistory({ userId }) {
   const [orders, setOrders] = useState([]);
@@ -156,54 +157,57 @@ export default function OrdersHistory({ userId }) {
       <CardContent>
         <Tabs defaultValue="all">
           <TabsList className="relative flex items-center justify-start gap-4 w-full   mb-6 overflow-x-auto shidden">
-            <TabsTrigger value="all" className="text-xs md:text-sm min-w-fit">
+            <TabsTrigger
+              value="all"
+              className="text-xs md:text-sm min-w-fit cursor-pointer"
+            >
               All
             </TabsTrigger>
             <TabsTrigger
               value="Pending"
-              className="text-xs md:text-sm min-w-fit px-2"
+              className="text-xs md:text-sm min-w-fit px-2 cursor-pointer"
             >
               Pending
             </TabsTrigger>
             <TabsTrigger
               value="Processing"
-              className="text-xs md:text-sm min-w-fit px-2"
+              className="text-xs md:text-sm min-w-fit px-2 cursor-pointer"
             >
               Processing
             </TabsTrigger>
             <TabsTrigger
               value="Packing"
-              className="text-xs md:text-sm min-w-fit px-2"
+              className="text-xs md:text-sm min-w-fit px-2 cursor-pointer"
             >
               Packing
             </TabsTrigger>
             <TabsTrigger
               value="Shipped"
-              className="text-xs md:text-sm min-w-fit px-2"
+              className="text-xs md:text-sm min-w-fit px-2 cursor-pointer"
             >
               Shipped
             </TabsTrigger>
             <TabsTrigger
               value="Delivered"
-              className="text-xs md:text-sm min-w-fit px-2"
+              className="text-xs md:text-sm min-w-fit px-2 cursor-pointer"
             >
               Delivered
             </TabsTrigger>
             <TabsTrigger
               value="Cancelled"
-              className="text-xs md:text-sm min-w-fit px-2"
+              className="text-xs md:text-sm min-w-fit px-2 cursor-pointer"
             >
               Cancelled
             </TabsTrigger>
             <TabsTrigger
               value="Returned"
-              className="text-xs md:text-sm min-w-fit px-2"
+              className="text-xs md:text-sm min-w-fit px-2 cursor-pointer"
             >
               Returned
             </TabsTrigger>
             <TabsTrigger
               value="Reviewed"
-              className="text-xs md:text-sm min-w-fit px-2"
+              className="text-xs md:text-sm min-w-fit px-2 cursor-pointer"
             >
               Review
             </TabsTrigger>
@@ -213,9 +217,9 @@ export default function OrdersHistory({ userId }) {
             {isLoading ? (
               <OrderCardSkeleton />
             ) : (
-              orders?.map((order) => (
+              orders?.map((order, i) => (
                 <div
-                  key={order?._id}
+                  key={i}
                   className="flex flex-col gap-4 p-4 border rounded-lg"
                 >
                   <div className="flex flex-col md:flex-row items-start justify-between">
@@ -336,6 +340,86 @@ export default function OrdersHistory({ userId }) {
                           )}
                         </div>
                       ))}
+                      {order?.comments.length > 0 && (
+                        <div className="flex flex-col ">
+                          <Separator className="h-px w-full bg-gray-500" />
+                          <div className="">
+                            <h3 className="text-lg font-medium text-gray-800 pb-4">
+                              Comments
+                            </h3>
+                            <div className="flex flex-col gap-4">
+                              {order?.comments?.map((comment, index) => (
+                                <div
+                                  key={index}
+                                  className="flex flex-col gap-2 border-b border-gray-100 pb-3"
+                                >
+                                  <div className="flex items-start gap-3">
+                                    <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-600">
+                                      <Image
+                                        src={
+                                          comment?.user?.avatar ||
+                                          "/placeholder.svg"
+                                        }
+                                        width={40}
+                                        height={40}
+                                        alt="Comment attachment"
+                                        className="object-fill w-full h-full"
+                                      />
+                                    </div>
+                                    <div className="flex-1">
+                                      <div className="flex items-center justify-between">
+                                        <h4 className="text-sm font-medium text-gray-800">
+                                          {comment.user?.name || "Admin"}
+                                        </h4>
+                                        <span className="text-xs text-gray-500">
+                                          {comment?.createdAt
+                                            ? format(
+                                                new Date(comment?.createdAt),
+                                                "MMM dd, yyyy • h:mm a"
+                                              )
+                                            : "N/A"}
+                                        </span>
+                                      </div>
+                                      <p className="text-sm text-gray-600 mt-1">
+                                        {comment?.question}
+                                      </p>
+
+                                      {comment?.image && (
+                                        <div className="mt-2 group">
+                                          <div className="relative group cursor-pointer overflow-hidden w-fit">
+                                            <div className="w-full max-w-[200px] h-auto rounded-md overflow-hidden border border-gray-200">
+                                              <Image
+                                                src={
+                                                  comment?.image ||
+                                                  "/placeholder.svg"
+                                                }
+                                                width={200}
+                                                height={150}
+                                                alt="Comment attachment"
+                                                className="object-cover w-full h-full"
+                                              />
+                                            </div>
+                                            <a
+                                              href={comment?.image}
+                                              target="_blank"
+                                              rel="noopener noreferrer"
+                                              className="absolute z-20 inset-0 rounded-lg bg-opacity-[0] group-hover:bg-opacity-[.3] transition-all duration-300 flex items-center justify-center"
+                                            >
+                                              <span className="text-white opacity-0 group-hover:opacity-100 transition-opacity">
+                                                View
+                                              </span>
+                                            </a>
+                                          </div>
+                                        </div>
+                                      )}
+                                    </div>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>

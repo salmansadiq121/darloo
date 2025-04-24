@@ -209,7 +209,12 @@ export default function Checkout() {
                   <MdOutlineLocationOn size={25} color="red" />
                   Shipping Information
                 </p>
-                <span className="p-1 rounded-full bg-red-100 flex items-center justify-center cursor-pointer">
+                <span
+                  onClick={() =>
+                    router.push(`profile/${auth.user._id}?tab=profile`)
+                  }
+                  className="p-1 rounded-full bg-red-100 flex items-center justify-center cursor-pointer"
+                >
                   <BiSolidEdit className="h-5 w-5 text-red-500 hover:text-red-700 transition-all duration-300" />
                 </span>
               </div>

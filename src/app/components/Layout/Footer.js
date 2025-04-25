@@ -116,7 +116,11 @@ const Footer = () => {
             <ul className="space-y-2">
               <li>
                 <Link
-                  href={`/profile/${auth?.user?._id}?tab=chat`}
+                  href={
+                    auth?.user
+                      ? `/profile/${auth?.user?._id}?tab=chat`
+                      : "/authentication"
+                  }
                   className=" text-gray-800 hover:text-red-600 transition-colors duration-200 text-sm"
                 >
                   Help Center
@@ -132,7 +136,7 @@ const Footer = () => {
               </li>
               <li>
                 <Link
-                  href="refund-policy"
+                  href="/refund-policy"
                   className=" text-gray-800 hover:text-red-600 transition-colors duration-200 text-sm"
                 >
                   Escrow & Refund Policy
@@ -140,7 +144,7 @@ const Footer = () => {
               </li>
               <li>
                 <Link
-                  href="privacy-policy"
+                  href="/privacy-policy"
                   className=" text-gray-800 hover:text-red-600 transition-colors duration-200 text-sm"
                 >
                   Privacy Policy
@@ -156,7 +160,7 @@ const Footer = () => {
               </li>
               <li>
                 <Link
-                  href={`/profile/${auth?.user?._id}?tab=support`}
+                  href={`/contact`}
                   className=" text-gray-800 hover:text-red-600 transition-colors duration-200 text-sm"
                 >
                   Contact Us

@@ -51,7 +51,7 @@ import {
 } from "@/components/ui/tooltip";
 import { Progress } from "@/components/ui/progress";
 
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import MainLayout from "@/app/components/Layout/Layout";
 import axios from "axios";
 import ProductCarousel from "@/app/components/ProductCarousel";
@@ -61,7 +61,7 @@ import toast from "react-hot-toast";
 import ShareData from "@/app/utils/Share";
 
 export default function ProductDetail() {
-  const { setSelectedProduct } = useAuth();
+  const { setSelectedProduct, setOneClickBuyProduct } = useAuth();
   const { id: productId } = useParams();
   const [product, setProduct] = useState({});
   const [loading, setLoading] = useState(true);
@@ -78,6 +78,7 @@ export default function ProductDetail() {
   const [relatedProducts, setRelatedProducts] = useState([]);
   const [show, setShow] = useState(false);
   const [currentUrl, setCurrentUrl] = useState("");
+  const router = useRouter();
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -153,6 +154,24 @@ export default function ProductDetail() {
 
       return updatedProducts;
     });
+  };
+
+  // One Click Buy Now
+  const handleOneClickBuy = async (product) => {
+    const productData = {
+      product: product._id,
+      quantity,
+      price: product.price,
+      colors: [selectedColor],
+      sizes: [selectedSize],
+      image: product.thumbnails[0],
+      title: product.name,
+      _id: product._id,
+    };
+
+    localStorage.setItem("oneClickBuyProduct", JSON.stringify(productData));
+    setOneClickBuyProduct(productData);
+    router.push("/oneclick/checkout");
   };
 
   // Calculate average rating
@@ -302,13 +321,13 @@ export default function ProductDetail() {
     }
   }, [product]);
 
-  // Add product to recentProducts
+  // Add product to recent View Products
   useEffect(() => {
-    if (!product?._id) return; // Ensure product exists
+    if (!product?._id) return;
 
     const now = Date.now();
     const threeDaysInMs = 3 * 24 * 60 * 60 * 1000;
-    const viewDate = new Date().toISOString(); // Store readable date
+    const viewDate = new Date().toISOString();
 
     // Get existing recent products from localStorage
     let recentProducts =
@@ -836,6 +855,10 @@ export default function ProductDetail() {
                       "polygon(12% 0, 100% 0, 100% 73%, 90% 100%, 0 100%, 0 25%)",
                     willChange: "clip-path",
                   }}
+                  onClick={() => {
+                    handleOneClickBuy(product);
+                    setShowStickyBar(false);
+                  }}
                 >
                   Buy Now
                 </Button>
@@ -1293,14 +1316,16 @@ export default function ProductDetail() {
           </Tabs>
 
           {/*-------------------Related Products---------------------- */}
-          <div className="mt-16">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">
-              You May Also Like
-            </h2>
-            <div className="w-full">
-              <ProductCarousel products={relatedProducts} />
+          {relatedProducts && relatedProducts.length > 0 && (
+            <div className="mt-16">
+              <h2 className="text-2xl font-bold text-gray-900 mb-6">
+                You May Also Like
+              </h2>
+              <div className="w-full">
+                <ProductCarousel products={relatedProducts} />
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
         {/* Sticky Add to Cart Bar (Mobile) */}

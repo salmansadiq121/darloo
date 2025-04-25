@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useContext, createContext } from "react";
+import { useState, useEffect, useContext, createContext, useMemo } from "react";
 import Cookies from "js-cookie";
 import axios from "axios";
 import { authUri, productsURI } from "../utils/ServerURI";
@@ -19,6 +19,7 @@ export const AuthProvider = ({ children }) => {
   const [search, setSearch] = useState("");
   const [selectedProduct, setSelectedProduct] = useState([]);
   const router = useRouter();
+  const [oneClickBuyProduct, setOneClickBuyProduct] = useState(null);
 
   //   Token Check
   axios.defaults.headers.common["Authorization"] = auth?.token;
@@ -57,6 +58,14 @@ export const AuthProvider = ({ children }) => {
     const savedCart = localStorage.getItem("cart");
     if (savedCart) {
       setSelectedProduct(JSON.parse(savedCart));
+    }
+  }, []);
+
+  // Get One Click Buy Product
+  useEffect(() => {
+    const savedProduct = localStorage.getItem("oneClickBuyProduct");
+    if (savedProduct) {
+      setOneClickBuyProduct(JSON.parse(savedProduct));
     }
   }, []);
 
@@ -162,6 +171,8 @@ export const AuthProvider = ({ children }) => {
         isFetching,
         selectedProduct,
         setSelectedProduct,
+        oneClickBuyProduct,
+        setOneClickBuyProduct,
       }}
     >
       {children}

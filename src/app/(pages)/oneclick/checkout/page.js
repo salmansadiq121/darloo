@@ -68,8 +68,7 @@ const paymentMethods = [
 // };
 
 export default function Checkout() {
-  const { auth, selectedProduct, setSelectedProduct, oneClickBuyProduct } =
-    useAuth();
+  const { auth, oneClickBuyProduct, setOneClickBuyProduct } = useAuth();
   const [shippingFee, setShippingFee] = useState(0);
   const [cart, setCart] = useState({
     user: "",
@@ -95,25 +94,20 @@ export default function Checkout() {
 
   // 🔹 Update Quantity
   const updateQuantity = (id, change) => {
-    console.log("selectedProduct:", id, change);
-    setSelectedProduct((prevCart) => {
-      const updatedCart = prevCart.map((item) =>
-        item._id === id
-          ? { ...item, quantity: Math.max(1, item.quantity + change) }
-          : item
-      );
+    if (!oneClickBuyProduct) return;
+    if (oneClickBuyProduct._id !== id) return;
 
-      localStorage.setItem("cart", JSON.stringify(updatedCart));
+    const updatedQuantity = Math.max(1, oneClickBuyProduct.quantity + change);
 
-      return updatedCart;
+    setOneClickBuyProduct({
+      ...oneClickBuyProduct,
+      quantity: updatedQuantity,
     });
   };
-
   // 🔹 Get Total Price
   const getTotal = () => {
-    return selectedProduct
-      .reduce((acc, item) => acc + item.price * item.quantity, 0)
-      .toFixed(2);
+    if (!oneClickBuyProduct) return 0;
+    return (oneClickBuyProduct.price * oneClickBuyProduct.quantity).toFixed(2);
   };
 
   // Apply Voucher
@@ -180,10 +174,16 @@ export default function Checkout() {
 
   // Cart
   useEffect(() => {
+    if (!auth?.user || !oneClickBuyProduct) return;
+
+    const productTotal = oneClickBuyProduct.price * oneClickBuyProduct.quantity;
+    const totalAmount = (productTotal - discount + shippingFee).toFixed(2);
+
     setCart({
       user: auth?.user?._id,
-      products: selectedProduct,
-      totalAmount: (getTotal?.() || 0) - (discount || 0) + (shippingFee || 0),
+      products: [oneClickBuyProduct],
+      totalAmount,
+      shippingFee,
       shippingAddress: {
         address: auth?.user?.addressDetails?.address || "",
         country: auth?.user?.addressDetails?.country || "",
@@ -191,9 +191,9 @@ export default function Checkout() {
         city: auth?.user?.addressDetails?.city || "",
         postalCode: auth?.user?.addressDetails?.pincode || "",
       },
+      paymentMethod: "Credit Card",
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedProduct, auth.user, discount, shippingFee]);
+  }, [oneClickBuyProduct, auth?.user, discount, shippingFee]);
 
   return (
     <MainLayout title="Ayoob - Checkout">
@@ -225,7 +225,7 @@ export default function Checkout() {
                     <input
                       type="text"
                       placeholder="Full Name"
-                      value={auth?.user?.name}
+                      value={auth?.user?.name || ""}
                       required
                       readOnly
                       className=" w-full h-full px-5  py-2  text-[15px] text-gray-900 bg-transparent border border-gray-400 rounded-sm outline-none"
@@ -235,7 +235,7 @@ export default function Checkout() {
                     <input
                       type="email"
                       placeholder="Enter your email address"
-                      value={auth?.user?.email}
+                      value={auth?.user?.email || ""}
                       readOnly
                       required
                       className=" w-full h-full px-5 py-2 text-[15px] text-gray-900 bg-transparent  border border-gray-400 outline-none rounded-sm "
@@ -247,7 +247,7 @@ export default function Checkout() {
                   <input
                     type="text"
                     placeholder="Enter your shipping address"
-                    value={auth?.user?.addressDetails?.address}
+                    value={auth?.user?.addressDetails?.address || ""}
                     readOnly
                     required
                     className=" w-full h-full px-5 py-2 text-[15px] text-gray-900 bg-transparent  border border-gray-400 outline-none rounded-sm "
@@ -258,7 +258,7 @@ export default function Checkout() {
                     <input
                       type="text"
                       placeholder="Country"
-                      value={auth?.user?.addressDetails?.country}
+                      value={auth?.user?.addressDetails?.country || ""}
                       readOnly
                       required
                       className=" w-full h-full px-5 py-2 text-[15px] text-gray-900 bg-transparent  border border-gray-400 outline-none rounded-sm "
@@ -269,7 +269,7 @@ export default function Checkout() {
                     <input
                       type="text"
                       placeholder="State"
-                      value={auth?.user?.addressDetails?.state}
+                      value={auth?.user?.addressDetails?.state || ""}
                       readOnly
                       required
                       className=" w-full h-full px-5 py-2 text-[15px] text-gray-900 bg-transparent  border border-gray-400 outline-none rounded-sm "
@@ -281,7 +281,7 @@ export default function Checkout() {
                     <input
                       type="text"
                       placeholder="City"
-                      value={auth?.user?.addressDetails?.city}
+                      value={auth?.user?.addressDetails?.city || ""}
                       readOnly
                       required
                       className=" w-full h-full px-5 py-2 text-[15px] text-gray-900 bg-transparent  border border-gray-400 outline-none rounded-sm "
@@ -293,7 +293,7 @@ export default function Checkout() {
                       <input
                         type="number"
                         placeholder="Phone Number"
-                        value={auth?.user?.number}
+                        value={auth?.user?.number || ""}
                         readOnly
                         className="w-full h-[2.8rem] pl-2 pr-3 py-2 text-[15px] text-gray-900 bg-transparent  border border-gray-400 outline-none rounded-sm "
                         required
@@ -332,59 +332,62 @@ export default function Checkout() {
 
             <h3 className="text-xl font-semibold mb-4 z-10">Your Cart</h3>
 
-            <div className="w-full max-h-[20rem] overflow-y-auto overflow-x-hidden scroll-smooth z-20">
-              {selectedProduct?.length > 0 ? (
-                selectedProduct?.map((item) => (
-                  <div
-                    key={item._id}
-                    className="flex items-center justify-between w-full py-4 border-b border-gray-700  gap-2 sm:gap-4"
-                  >
-                    <div className=" flex items-center flex-row gap-2 sm:gap-3">
-                      <div className=" bg-gray-300/50 relative  rounded-lg">
-                        <Image
-                          src={item?.image}
-                          alt={item?.title}
-                          width={40}
-                          height={40}
-                          className=" text-8 w-[6rem] h-[4rem]  rounded-lg object-fill"
-                        />
-                      </div>
-                      <div className="flex flex-col gap-1">
-                        <span className=" text-[15px] sm:text-[17px] font-medium truncate w-[9rem] sm:w-[15rem]">
-                          {item?.title}
-                        </span>
-                        <div
-                          className="flex items-center max-w-[9rem] min-w-[9rem]  border-2 border-red-500 rounded-sm"
-                          style={{ padding: "0rem" }}
-                        >
-                          <button
-                            onClick={() => updateQuantity(item._id, -1)}
-                            className="px-3 py-1 rounded-md text-gray-900 text-xl w-full h-full flex items-center justify-center cursor-pointer"
-                          >
-                            -
-                          </button>
-                          <span className=" text-[14px] sm:text-[16px] font-medium bg-red-500 w-full h-[2.4rem] flex items-center justify-center px-2 ">
-                            {item?.quantity}
-                          </span>
-                          <button
-                            onClick={() => updateQuantity(item._id, 1)}
-                            className=" px-3 py-1 rounded-md text-gray-900 text-xl w-full h-full flex items-center justify-center cursor-pointer"
-                          >
-                            +
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-
-                    <span className=" text-[15px] sm:text-lg ">
-                      ${(item.price * item?.quantity).toFixed(2)}
-                    </span>
+            {oneClickBuyProduct ? (
+              <div
+                key={oneClickBuyProduct._id}
+                className="flex items-center justify-between w-full py-4 border-b border-gray-700  gap-2 sm:gap-4"
+              >
+                <div className=" flex items-center flex-row gap-2 sm:gap-3">
+                  <div className=" bg-gray-300/50 relative  rounded-lg">
+                    <Image
+                      src={oneClickBuyProduct?.image}
+                      alt={oneClickBuyProduct?.title}
+                      width={40}
+                      height={40}
+                      className=" text-8 w-[6rem] h-[4rem]  rounded-lg object-fill"
+                    />
                   </div>
-                ))
-              ) : (
-                <p className="text-center text-gray-400">Your cart is empty.</p>
-              )}
-            </div>
+                  <div className="flex flex-col gap-1">
+                    <span className=" text-[15px] sm:text-[17px] font-medium truncate w-[9rem] sm:w-[15rem]">
+                      {oneClickBuyProduct?.title}
+                    </span>
+                    <div
+                      className="flex items-center max-w-[9rem] min-w-[9rem]  border-2 border-red-500 rounded-sm"
+                      style={{ padding: "0rem" }}
+                    >
+                      <button
+                        onClick={() =>
+                          updateQuantity(oneClickBuyProduct._id, -1)
+                        }
+                        className="px-3 py-1 rounded-md text-gray-900 text-xl w-full h-full flex items-center justify-center cursor-pointer"
+                      >
+                        -
+                      </button>
+                      <span className=" text-[14px] sm:text-[16px] font-medium bg-red-500 w-full h-[2.4rem] flex items-center justify-center px-2 ">
+                        {oneClickBuyProduct?.quantity}
+                      </span>
+                      <button
+                        onClick={() =>
+                          updateQuantity(oneClickBuyProduct._id, 1)
+                        }
+                        className=" px-3 py-1 rounded-md text-gray-900 text-xl w-full h-full flex items-center justify-center cursor-pointer"
+                      >
+                        +
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <span className=" text-[15px] sm:text-lg ">
+                  €
+                  {(
+                    oneClickBuyProduct.price * oneClickBuyProduct?.quantity
+                  ).toFixed(2)}
+                </span>
+              </div>
+            ) : (
+              <p className="text-center text-gray-400">Your cart is empty.</p>
+            )}
 
             <div className="py-2 w-full">
               <Separator className="h-px w-full bg-gray-500" />
@@ -463,11 +466,11 @@ export default function Checkout() {
               ) : (
                 <button
                   className={`px-8 text-white mt-4 bg-red-600 hover:bg-red-700 transition-all duration-300 ${
-                    selectedProduct.length === 0
+                    oneClickBuyProduct.length === 0
                       ? "cursor-not-allowed"
                       : "cursor-pointer"
                   } py-2  font-medium disabled:opacity-50`}
-                  disabled={selectedProduct?.length === 0}
+                  disabled={oneClickBuyProduct?.length === 0}
                   style={{
                     clipPath:
                       " polygon(6.71% 0%, 86.4% 0%, 100% 0%, 100% 66.1%, 94.08% 100%, 9.8% 100%, 0% 100%, 0% 42.16%)",

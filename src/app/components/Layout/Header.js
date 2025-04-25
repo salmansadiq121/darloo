@@ -47,7 +47,9 @@ const Header = () => {
   };
 
   useEffect(() => {
-    fetchNotifications();
+    if (auth?.user) {
+      fetchNotifications();
+    }
     // eslint-disable-next-line
   }, [auth.user]);
 
@@ -171,14 +173,14 @@ const Header = () => {
               Accessories
             </Link>
             <Link
-              href="/user-manual"
+              href={"/contact"}
               className={` border-b-2 ${
-                pathName === "/user-manual"
+                pathName === `/contact`
                   ? "border-red-500 text-red-600 bg-gradient-to-b from-white via-red-500/10 to-red-500/30 "
                   : "border-transparent text-gray-950"
               }  inline-flex items-center px-1 pt-1 text-sm font-medium`}
             >
-              User Manual
+              Help
             </Link>
           </div>
           <div className="hidden sm:ml-6 lg:flex sm:items-center sm:space-x-3">
@@ -488,14 +490,14 @@ const Header = () => {
               Accessories
             </Link>
             <Link
-              href="/user-manual"
+              href={"/contact"}
               className={`flex items-center gap-2 ${
-                pathName === `/user-manual`
+                pathName === `/contact`
                   ? "border-l-4 border-red-500 text-red-700 bg-gray-800"
                   : "text-gray-950  "
               }   pl-3 pr-4 py-2 text-base font-medium`}
             >
-              User Manual
+              Help
             </Link>
             {/* Logout */}
             {auth?.user && (

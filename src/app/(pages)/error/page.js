@@ -116,7 +116,7 @@ export default function ErrorPage() {
         >
           <p className="text-sm text-gray-500">
             Need help?{" "}
-            <Link href="#" className="text-blue-400 hover:underline">
+            <Link href="/contact" className="text-blue-400 hover:underline">
               Contact Support
             </Link>
           </p>

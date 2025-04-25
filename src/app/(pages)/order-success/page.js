@@ -18,7 +18,7 @@ export default function SuccessPage() {
       setCount((prev) => {
         if (prev <= 1) {
           clearInterval(timer);
-          router.push(`/profile/${auth.user._id}?tab=orders`);
+          router.push(`/profile/${auth?.user?._id}?tab=orders`);
           return 0;
         }
         localStorage.removeItem("oneClickBuyProduct");
@@ -119,7 +119,10 @@ export default function SuccessPage() {
                   animate={{ y: 0, opacity: 1 }}
                   transition={{ delay: 0.4 }}
                 >
-                  <Link href={`/profile/${auth.user._id}?tab=orders`} passHref>
+                  <Link
+                    href={`/profile/${auth?.user?._id}?tab=orders`}
+                    passHref
+                  >
                     <Button className="w-full bg-gradient-to-r h-[2.8rem] cursor-pointer from-red-600 to-red-800 hover:from-red-700 hover:to-red-900 text-white border-none">
                       <ArrowLeft size={16} className="mr-2" />
                       Return to Dashboard

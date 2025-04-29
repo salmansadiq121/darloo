@@ -9,7 +9,7 @@ import { useAuth } from "@/app/content/authContent";
 export default function AboutUsPage() {
   const { auth } = useAuth();
   return (
-    <MainLayout title="About Us - Ayoob">
+    <MainLayout title="About Us - Zorante">
       <div className="min-h-screen bg-gray-50 z-10 relative">
         <div className="container mx-auto py-12 px-4 md:px-6">
           {/* Our Story */}

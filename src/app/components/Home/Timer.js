@@ -88,7 +88,7 @@ export default function Timer() {
                 </div>
               ))}
           </div>
-          <span className="text-white text-sm mt-[1rem] text-[14px] sm:text-[16px] sm:mt-[3rem] uppercase text-center">
+          <span className="text-black text-sm mt-[1rem] text-[14px] sm:text-[16px] sm:mt-[3rem] uppercase text-center">
             {unit}
           </span>
         </div>

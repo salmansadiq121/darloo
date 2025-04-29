@@ -28,7 +28,7 @@ export default function Popular() {
   }, []);
 
   return (
-    <MainLayout title="Ayoob - Popular Products">
+    <MainLayout title="Zorante - Popular Products">
       <div className="py-5 bg-transparent text-black z-10 w-full min-h-[50vh] flex flex-col gap-5 relative px-4 sm:px-[3rem] ">
         <h1
           className={`${Style.h1} text-start text-black flex items-center gap-2 min-w-fit`}

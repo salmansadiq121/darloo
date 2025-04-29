@@ -16,6 +16,20 @@ html {
   display: none;
 }
 
+.marquee {
+  animation: marquee 15s linear infinite;
+  white-space: nowrap;
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
 *::-webkit-scrollbar-thumb {
   width: 0.1rem;
   background: orangered;

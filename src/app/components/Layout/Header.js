@@ -16,6 +16,7 @@ import axios from "axios";
 import { formatDistanceToNow } from "date-fns";
 import ProductSearch from "./SearchProduct";
 import MobileProductSearch from "./MobileSearch";
+import PromoBannerPage from "./HeaderTop";
 
 const Header = () => {
   const { auth, setAuth, setSearch, selectedProduct } = useAuth();
@@ -107,12 +108,13 @@ const Header = () => {
 
   return (
     <nav
-      className={`sticky  top-0 z-50 bg-gray-50 backdrop-blur-md shadow-sm text-black transition-all duration-300  ${
+      className={`relative z-50 bg-gray-50 backdrop-blur-md shadow-sm text-black transition-all duration-300  ${
         scrolled ? "border-b-2 border-red-600" : "border-b border-gray-300"
       }`}
     >
+      <PromoBannerPage />
       <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 relative">
-        <div className="flex justify-between h-[4.5rem]">
+        <div className="flex justify-between h-[4.1rem]">
           <div className="flex items-center">
             <Link
               href="/"
@@ -127,7 +129,7 @@ const Header = () => {
                 loading="lazy"
               /> */}
               <h1 className="text-2xl sm:text-4xl font-extrabold  font-serif text-[#c6080a] uppercase  relative shadow-custom">
-                Ayoob
+                Zorante
               </h1>
             </Link>
           </div>

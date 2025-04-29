@@ -36,7 +36,7 @@ export default function Categories() {
   };
 
   return (
-    <MainLayout title="Ayoob - Categories">
+    <MainLayout title="Zorante - Categories">
       <div className="relative w-full py-2 mt-5 z-10 flex flex-col gap-4 px-4 sm:px-[3rem] min-h-[100vh]">
         <h1 className={`${Style.h1} text-start`}>Explore Popular Categories</h1>
         <div className="w-full flex items-center gap-5 overflow-y-auto shidden">

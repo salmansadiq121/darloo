@@ -196,7 +196,7 @@ export default function Checkout() {
   }, [selectedProduct, auth.user, discount, shippingFee]);
 
   return (
-    <MainLayout title="Ayoob - Checkout">
+    <MainLayout title="Zorante - Checkout">
       <div className="bg-transparent min-h-screen w-full z-10 relative px-4 sm:px-8 py-5 sm:py-6 overflow-hidden">
         <div className="grid grid-cols-5 gap-5 sm:gap-[2rem] w-full">
           {/* Left */}
@@ -307,7 +307,7 @@ export default function Checkout() {
                     className="w-4 h-4 border-2 border-red-500 accent-red-600 "
                   />
                   <span className="text-sm text-gray-500">
-                    Same as shipping address
+                    Same as billing address
                   </span>
                 </div>
               </form>

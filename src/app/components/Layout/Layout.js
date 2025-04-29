@@ -1,6 +1,7 @@
 import { Helmet } from "react-helmet";
 import Header from "./Header";
 import Footer from "./Footer";
+import { useEffect, useState } from "react";
 
 export default function MainLayout({
   children,
@@ -17,6 +18,26 @@ export default function MainLayout({
   twitterDescription,
   twitterImage,
 }) {
+  const [showHeader, setShowHeader] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+
+      if (currentScrollY > 200 && currentScrollY > lastScrollY + 10) {
+        setShowHeader(false);
+      } else if (currentScrollY < lastScrollY - 10) {
+        setShowHeader(true);
+      }
+
+      setLastScrollY(currentScrollY);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [lastScrollY]);
+
   return (
     <div className="min-h-screen flex flex-col relative">
       <Helmet>
@@ -34,7 +55,11 @@ export default function MainLayout({
         <meta name="twitter:image" content={twitterImage} />
         <title>{title}</title>
       </Helmet>
-      <div className="sticky top-0 left-0 w-full z-[99999]  bg-white text-black shadow-md">
+      <div
+        className={`sticky top-0 left-0 w-full z-[99999] bg-white text-black shadow-md transition-transform duration-300 ${
+          showHeader ? "translate-y-0" : "-translate-y-full"
+        }`}
+      >
         <Header />
       </div>
       <main className="flex-grow overflow-hidden bg-whitw text-black relative ">
@@ -73,20 +98,20 @@ export default function MainLayout({
 }
 
 MainLayout.defaultProps = {
-  title: "Ayoob – Online Shopping for Electronics, Fashion & More",
+  title: "Zorante – Online Shopping for Electronics, Fashion & More",
   description:
-    "Shop online at Ayoob for the latest fashion, electronics, home appliances, beauty products, and more. Enjoy great discounts, secure payment options, and fast delivery across Pakistan.",
+    "Shop online at Zorante for the latest fashion, electronics, home appliances, beauty products, and more. Enjoy great discounts, secure payment options, and fast delivery across Pakistan.",
   keywords:
-    "Ayoob shopping, online store Pakistan, buy electronics online, fashion shopping, home appliances, beauty products, best e-commerce Pakistan, mobile phones, fast delivery shopping, best online deals",
-  author: "Ayoob",
-  ogTitle: "Ayoob – Your Trusted Online Shopping Destination",
+    "Zorante shopping, online store Pakistan, buy electronics online, fashion shopping, home appliances, beauty products, best e-commerce Pakistan, mobile phones, fast delivery shopping, best online deals",
+  author: "Zorante",
+  ogTitle: "Zorante – Your Trusted Online Shopping Destination",
   ogDescription:
-    "Ayoob brings you a seamless online shopping experience with a wide range of products, great discounts, and fast nationwide delivery.",
-  ogImage: "/assets/ayoob-preview.jpg",
-  ogUrl: "https://www.ayoob.com",
+    "Zorante brings you a seamless online shopping experience with a wide range of products, great discounts, and fast nationwide delivery.",
+  ogImage: "/assets/zorante-preview.jpg",
+  ogUrl: "https://www.zorante.com",
   twitterCard: "summary_large_image",
-  twitterTitle: "Ayoob – Shop Electronics, Fashion & More Online",
+  twitterTitle: "Zorante – Shop Electronics, Fashion & More Online",
   twitterDescription:
-    "Find the best deals on fashion, electronics, home essentials, and more at Ayoob. Secure payments & fast delivery across Pakistan.",
-  twitterImage: "/assets/ayoob-preview.jpg",
+    "Find the best deals on fashion, electronics, home essentials, and more at Zorante. Secure payments & fast delivery across Pakistan.",
+  twitterImage: "/assets/zorante-preview.jpg",
 };

@@ -85,6 +85,10 @@ const config = {
           "0%": { backgroundPosition: "-200% 0" },
           "100%": { backgroundPosition: "200% 0" },
         },
+        marquee: {
+          "0%": { transform: "translateX(0%)" },
+          "100%": { transform: "translateX(-100%)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -93,6 +97,7 @@ const config = {
         slideUp: "slideUp 0.5s ease-out",
         pulse: "pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
         shimmer: "shimmer 2s linear infinite",
+        marquee: "marquee 30s linear infinite",
       },
     },
   },

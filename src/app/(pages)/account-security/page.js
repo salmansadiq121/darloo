@@ -14,7 +14,7 @@ import {
 export default function AccountSecurity() {
   return (
     <MainLayout
-      title="Account Security - Ayoob"
+      title="Account Security - Zorante"
       description={"Our guidelines for returns, exchanges, and refunds"}
     >
       <div className="min-h-screen bg-transparent relative z-10">

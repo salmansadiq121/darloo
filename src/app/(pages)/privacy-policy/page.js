@@ -15,7 +15,7 @@ import {
 
 export default function PrivacyPolicy() {
   return (
-    <MainLayout title="Privacy Policy - Ayoob">
+    <MainLayout title="Privacy Policy - Zorante">
       <div className="min-h-screen bg-gray-50">
         <div className="container mx-auto py-12 px-4 md:px-6">
           {/* Introduction */}

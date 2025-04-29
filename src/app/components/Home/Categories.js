@@ -47,7 +47,7 @@ export default function Categories({ categoriesData, isLoading }) {
   };
 
   return (
-    <div className="w-full py-2 mt-5 z-10 flex flex-col gap-4">
+    <div className="w-full py-2 mt-[14rem] sm:mt-5 z-10 flex flex-col gap-4 relative">
       <h1 className={`${Style.h1} text-start`}>Explore Popular Categories</h1>
       <div className="w-full flex items-center gap-5 overflow-y-auto shidden">
         <div className="flex gap-5 whitespace-nowrap animate-marquee group1 hover:animate-none">

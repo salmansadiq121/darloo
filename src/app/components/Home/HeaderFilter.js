@@ -15,7 +15,7 @@ export default function HeaderFilter({ categoriesData, isLoading }) {
     router.push(`/products?category=${encodeURIComponent(category)}`);
   };
   return (
-    <div className={`w-full h-full py-4 bg-transparent  z-10 `}>
+    <div className={`w-full h-full pt-4 pb-2 bg-transparent  z-10 `}>
       <div className="flex items-center gap-4 sm:gap-5 overflow-x-auto overflow-y-hidden shidden">
         {isLoading
           ? Array.from({ length: 10 }).map((_, index) => (

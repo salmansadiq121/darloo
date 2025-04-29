@@ -33,10 +33,10 @@ export default function SalesProducts() {
   return (
     <div className="flex flex-col gap-4 z-10 py-4">
       <div
-        className="w-full h-full py-4 px-2 sm:px-4 shadow1 bg-gray-950/50 min-h-[15rem] flex flex-col gap-4 border-2 border-red-500 "
+        className="w-full h-full py-4 px-2 sm:px-4 shadow1 bg-red-100 min-h-[15rem] flex flex-col gap-4 border-2 border-red-500 "
         style={{ borderRadius: "1rem" }}
       >
-        <h1 className={`${Style.h1} text-start text-white`}>
+        <h1 className={`${Style.h1} text-start text-black`}>
           Top Trending Sale
         </h1>
         <div className="w-full min-h-[10vh] flex items-center justify-center ">

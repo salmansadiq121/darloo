@@ -68,7 +68,7 @@ export default function Verification() {
   };
 
   return (
-    <MainLayout title="Ayoob - Email Verification">
+    <MainLayout title="Zorante - Email Verification">
       <div className="w-full min-h-screen flex items-center justify-center relative z-10 p-0 sm:p-4">
         <div className="w-full max-w-2xl flex flex-col gap-4 bg-gray-50 border border-gray-300 rounded-sm p-4 ">
           <div className="flex flex-col gap-3 items-center justify-center w-full">

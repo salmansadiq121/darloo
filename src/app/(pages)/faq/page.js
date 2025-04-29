@@ -5,7 +5,7 @@ import React from "react";
 
 export default function Faqs() {
   return (
-    <MainLayout title={"Ayoob - FAQ's"}>
+    <MainLayout title={"Zorante - FAQ's"}>
       <div className="w-full min-h-[70vh] py-4 px-4">
         <FAQData />
       </div>

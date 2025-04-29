@@ -196,7 +196,7 @@ export default function Checkout() {
   }, [oneClickBuyProduct, auth?.user, discount, shippingFee]);
 
   return (
-    <MainLayout title="Ayoob - Checkout">
+    <MainLayout title="Zorante - Checkout">
       <div className="bg-transparent min-h-screen w-full z-10 relative px-4 sm:px-8 py-5 sm:py-6 overflow-hidden">
         <div className="grid grid-cols-5 gap-5 sm:gap-[2rem] w-full">
           {/* Left */}

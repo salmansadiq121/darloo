@@ -13,7 +13,7 @@ import {
 
 export default function RefundPolicy() {
   return (
-    <MainLayout title="Refund Policy - Ayoob">
+    <MainLayout title="Refund Policy - Zorante">
       <div className="min-h-screen bg-gray-50 z-10 relative">
         <div className="container mx-auto py-12 px-4 md:px-6">
           {/* Last Updated */}

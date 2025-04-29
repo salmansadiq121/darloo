@@ -16,10 +16,12 @@ const Footer = () => {
           <div>
             <div className="flex items-center mb-4">
               <div className="h-8 w-8 rounded-full bg-gradient-to-r from-[#c6080a] to-[#ac0205] flex items-center justify-center">
-                <span className="text-white font-bold font-serif ">Ay</span>
+                <span className="text-white font-bold font-serif text-xl ">
+                  Z
+                </span>
               </div>
               <span className="ml-2 text-2xl font-bold font-serif bg-clip-text text-transparent bg-gradient-to-r from-[#c6080a] to-[#ac0205]">
-                Ayoob
+                Zorante
               </span>
             </div>
             <p className=" text-gray-800 text-sm mb-4">
@@ -223,7 +225,7 @@ const Footer = () => {
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="mb-4 md:mb-0">
               <p className=" text-gray-800 text-sm">
-                © 2025 Ayoob. All rights reserved.
+                © 2025 Zorante. All rights reserved.
               </p>
             </div>
 

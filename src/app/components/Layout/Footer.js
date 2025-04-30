@@ -1,12 +1,49 @@
 "use client";
-import React from "react";
-import { Twitter, Instagram, Linkedin, Facebook, Youtube } from "lucide-react";
+import React, { useState } from "react";
+import {
+  Twitter,
+  Instagram,
+  Linkedin,
+  Facebook,
+  Youtube,
+  Loader2,
+} from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useAuth } from "@/app/content/authContent";
+import { authUri } from "@/app/utils/ServerURI";
+import toast from "react-hot-toast";
+import axios from "axios";
 
 const Footer = () => {
   const { auth } = useAuth();
+  const [email, setEmail] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    try {
+      const { data } = await axios.post(`${authUri}/subscription`, {
+        email,
+      });
+      if (data) {
+        setIsLoading(false);
+        setEmail("");
+        toast.success(
+          "Thank you for subscribing!. We will send you a confirmation email."
+        );
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error(
+        error?.response?.data?.message ||
+          "Something went wrong. Please try again later."
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <footer className=" bg-slate-100 border-t border-gray-200 ">
@@ -231,17 +268,22 @@ const Footer = () => {
 
             <div className="flex items-center space-x-4">
               <div className="flex items-center">
-                <form className="flex">
+                <form className="flex" onSubmit={handleSubmit}>
                   <input
                     type="email"
                     placeholder="Enter your email address"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     className="px-4 py-2 rounded-l-lg bg-white border border-gray-400 focus:border-red-500  text-sm focus:outline-none focus:ring-2 focus:ring-red-600 min-w-[200px]"
                   />
                   <button
                     type={"submit"}
-                    className="px-4 py-2 rounded-r-lg bg-red-500 text-white text-sm font-medium hover:bg-red-600 transition-colors duration-200"
+                    className="px-4 py-2 rounded-r-lg bg-red-500 text-white text-sm font-medium hover:bg-red-600 transition-colors duration-200 flex items-center gap-1"
                   >
-                    Subscribe
+                    Subscribe{" "}
+                    {isLoading && (
+                      <Loader2 className="animate-spin text-white" size={18} />
+                    )}
                   </button>
                 </form>
               </div>

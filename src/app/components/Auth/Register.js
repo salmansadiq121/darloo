@@ -255,13 +255,13 @@ export default function Register({ setActive }) {
           </div>
           <div className="col-span-2 flex items-center justify-center w-full">
             <button
-              className={`min-w-fit  px-10 bg-red-600 hover:bg-red-700 transition-all duration-300 text-white py-[.7rem] mt-2  flex items-center justify-center gap-2 ${
+              className={`min-w-fit rounded px-10 bg-red-600 hover:bg-red-700 transition-all duration-300 text-white py-[.7rem] mt-2  flex items-center justify-center gap-2 ${
                 loading ? "animate-pulse cursor-not-allowed" : "cursor-pointer"
               } `}
-              style={{
-                clipPath:
-                  "polygon(7.56% 0%, 86.4% 0%, 100% 0%, 100% 66.93%, 93.88% 100%, 9.8% 100%, 0% 100%, 0% 43.07%)",
-              }}
+              // style={{
+              //   clipPath:
+              //     "polygon(7.56% 0%, 86.4% 0%, 100% 0%, 100% 66.93%, 93.88% 100%, 9.8% 100%, 0% 100%, 0% 43.07%)",
+              // }}
               disabled={loading}
             >
               Register with us{" "}
@@ -302,10 +302,10 @@ export default function Register({ setActive }) {
             </span>
             <span
               onClick={() => signIn("github")}
-              // style={{
-              //   clipPath:
-              //     " polygon(70.71% 100%, 100% 70.71%, 100% 29.29%, 70.71% 0%, 29.29% 0%, 0% 29.29%, 0% 70.71%, 29.29% 100%)",
-              // }}
+              style={{
+                clipPath:
+                  " polygon(70.71% 100%, 100% 70.71%, 100% 29.29%, 70.71% 0%, 29.29% 0%, 0% 29.29%, 0% 70.71%, 29.29% 100%)",
+              }}
               className="w-[4rem] h-[4rem] rounded flex items-center justify-center bg-red-600/70 hover:bg-red-700/70 transition-all duration-300 cursor-pointer"
             >
               <BsGithub size={25} color="white" />

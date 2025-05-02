@@ -124,14 +124,14 @@ export default function CartItems({ products }) {
                     </button>
                   </div>
                   <span className=" block sm:hidden text-[15px] sm:text-lg text-center text-gray-900">
-                    ${(item?.price * item?.quantity)?.toFixed(2)}
+                    €{(item?.price * item?.quantity)?.toFixed(2)}
                   </span>
                 </div>
                 <span className=" hidden sm:block text-[15px] sm:text-lg text-gray-900">
-                  ${item?.price?.toFixed(2)}
+                  €{item?.price?.toFixed(2)}
                 </span>
                 <span className=" hidden sm:block text-[15px] sm:text-lg  text-gray-900">
-                  ${(item?.price * item?.quantity)?.toFixed(2)}
+                  €{(item?.price * item?.quantity)?.toFixed(2)}
                 </span>
                 <div className="w-full flex items-center justify-end px-4">
                   <button
@@ -154,7 +154,7 @@ export default function CartItems({ products }) {
             <div className="flex items-center justify-between text-xl font-medium">
               <span className="text-gray-600">Total:</span>
               <span className="text-black font-medium">
-                ${parseFloat(getTotal()).toFixed(2)}
+                €{parseFloat(getTotal()).toFixed(2)}
               </span>
             </div>
             <div className=" py-4">
@@ -166,7 +166,7 @@ export default function CartItems({ products }) {
 
         {/* 📋 Order Summary */}
 
-        <div className="py-[2rem]  pb-[4rem] px-[1.5rem] rounded-sm relative cart max-h-fit min-h-[20rem] flex flex-col gap-3 border border-gray-300 bg-white/80 ">
+        <div className="py-[2rem] z-10 pb-[4rem] px-[1.5rem] rounded-sm relative cart max-h-fit min-h-[20rem] flex flex-col gap-3 border border-gray-300 bg-white/80 ">
           <div
             className="glow-effect"
             style={{
@@ -179,16 +179,16 @@ export default function CartItems({ products }) {
           <h3 className="text-xl font-semibold mb-4 z-10">Order Summary</h3>
           <div className="flex justify-between z-10">
             <span className="text-red-600 uppercase">Subtotal:</span>
-            <span>${getTotal()}</span>
+            <span>€{getTotal()}</span>
           </div>
           <div className="flex justify-between">
             <span className="text-red-600 uppercase">G.S.T:</span>
-            <span>$0.00</span>
+            <span>€0.00</span>
             {/* {(getTotal() * 0.1).toFixed(2)} */}
           </div>
           <div className="flex justify-between">
             <span className="text-red-600 uppercase">Delivery:</span>
-            <span>$10.00</span>
+            <span>€0.00</span>
           </div>
           {/* <div className="w-full flex flex-col gap-3 z-10">
             <div
@@ -221,23 +221,23 @@ export default function CartItems({ products }) {
           </div>
           <div className="flex justify-between font-semibold text-lg">
             <span>Total:</span>
-            <span>${(parseFloat(getTotal()) + 10).toFixed(2)}</span>
+            <span>€{(parseFloat(getTotal()) + 10).toFixed(2)}</span>
           </div>
           <div className="py-2 w-full">
             <Separator className="h-px w-full bg-gray-500" />
           </div>
-          <div className="flex items-center justify-center w-full">
+          <div className="flex items-center justify-center w-full z-10">
             <button
-              className={`px-8 text-white mt-4 bg-red-600 hover:bg-red-700 transition-all duration-300 ${
+              className={`px-8 text-white mt-4 bg-red-600 rounded hover:bg-red-700 transition-all duration-300 ${
                 selectedProduct?.length === 0
                   ? "cursor-not-allowed"
                   : "cursor-pointer"
               } py-2  font-medium disabled:opacity-50`}
               disabled={selectedProduct?.length === 0}
-              style={{
-                clipPath:
-                  " polygon(6.71% 0%, 86.4% 0%, 100% 0%, 100% 66.1%, 94.08% 100%, 9.8% 100%, 0% 100%, 0% 42.16%)",
-              }}
+              // style={{
+              //   clipPath:
+              //     " polygon(6.71% 0%, 86.4% 0%, 100% 0%, 100% 66.1%, 94.08% 100%, 9.8% 100%, 0% 100%, 0% 42.16%)",
+              // }}
               onClick={() => router.push("/checkout")}
             >
               Checkout

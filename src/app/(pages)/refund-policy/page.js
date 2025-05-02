@@ -31,7 +31,7 @@ export default function RefundPolicy() {
                 <div>
                   <h2 className="text-xl font-bold mb-3">Introduction</h2>
                   <p className="text-gray-700 mb-4">
-                    At Ayoob E-commerce, we want you to be completely satisfied
+                    At Zorante store, we want you to be completely satisfied
                     with your purchase. If you&apos;re not entirely happy with
                     your order, we&apos;re here to help. This refund policy
                     outlines our guidelines for returns, exchanges, and refunds.
@@ -105,7 +105,7 @@ export default function RefundPolicy() {
                       <span className="font-medium">
                         Contact Customer Service:
                       </span>{" "}
-                      Email us at returns@ayoobecommerce.com or call us at +1
+                      Email us at returns@zorantestore.com or call us at +1
                       (555) 123-4567 to request a return authorization.
                     </li>
                     <li>
@@ -256,7 +256,7 @@ export default function RefundPolicy() {
                   <p className="text-gray-700">
                     If you&apos;ve done all of this and still haven&apos;t
                     received your refund, please contact us at
-                    refunds@ayoobecommerce.com with your order number and refund
+                    refunds@zorantestore.com with your order number and refund
                     details.
                   </p>
                 </div>
@@ -272,7 +272,7 @@ export default function RefundPolicy() {
               </h2>
               <p className="text-gray-700 mb-4">
                 If you receive a damaged or defective item, please contact us
-                immediately at support@ayoobecommerce.com with photos of the
+                immediately at support@zorantestore.com with photos of the
                 damaged item and packaging. We&apos;ll work with you to resolve
                 the issue promptly, either by sending a replacement or issuing a
                 full refund including shipping costs.
@@ -296,8 +296,10 @@ export default function RefundPolicy() {
                 please contact our customer service team:
               </p>
               <div className="bg-gray-50 p-4 rounded-lg">
-                <p className="font-medium">Ayoob E-commerce Customer Service</p>
-                <p>Email: support@ayoobecommerce.com</p>
+                <p className="font-medium">
+                  Zorante E-commerce Customer Service
+                </p>
+                <p>Email: support@zorantestore.com</p>
                 <p>Phone: +1 (555) 123-4567</p>
                 <p>Hours: Monday-Friday, 9am-6pm EST</p>
               </div>

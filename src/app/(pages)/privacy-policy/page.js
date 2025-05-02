@@ -1,6 +1,6 @@
 "use client";
 import MainLayout from "@/app/components/Layout/Layout";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   ShieldCheck,
@@ -12,8 +12,29 @@ import {
   CreditCard,
   UserCheck,
 } from "lucide-react";
+import axios from "axios";
 
 export default function PrivacyPolicy() {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const { data } = await axios.get(
+        `${process.env.NEXT_PUBLIC_SERVER_URI}/api/v1/privacy/fetch/privacy`
+      );
+      setData(data.privacy);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
   return (
     <MainLayout title="Privacy Policy - Zorante">
       <div className="min-h-screen bg-gray-50">
@@ -25,7 +46,7 @@ export default function PrivacyPolicy() {
               Your Security Is Our Priority
             </h2>
             <p className="text-gray-700">
-              At Ayoob E-commerce, we implement industry-leading security
+              At Zorante E-commerce, we implement industry-leading security
               measures to protect your personal information and ensure safe
               transactions. This page outlines the steps we take to secure your
               account and provides guidance on how you can enhance your
@@ -209,8 +230,8 @@ export default function PrivacyPolicy() {
                     <p className="text-gray-700">
                       We will never ask for sensitive information via email or
                       text message. If you receive suspicious communications
-                      claiming to be from Ayoob E-commerce, do not click on any
-                      links or provide any information.
+                      claiming to be from Zorante E-commerce, do not click on
+                      any links or provide any information.
                     </p>
                   </div>
                 </li>
@@ -248,11 +269,11 @@ export default function PrivacyPolicy() {
                     </h3>
                     <p className="text-gray-700 mb-4">
                       We&apos;ve detected phishing emails claiming to be from
-                      Ayoob E-commerce asking customers to update their payment
-                      information due to &quot;security concerns.&quot; These
-                      emails are NOT from us. We will never ask you to provide
-                      sensitive information via email or direct you to external
-                      websites to update your account details.
+                      Zorante E-commerce asking customers to update their
+                      payment information due to &quot;security concerns.&quot;
+                      These emails are NOT from us. We will never ask you to
+                      provide sensitive information via email or direct you to
+                      external websites to update your account details.
                     </p>
                     <div className="bg-red-50 border-l-4 border-red-500 p-4">
                       <p className="text-red-800">
@@ -278,7 +299,7 @@ export default function PrivacyPolicy() {
           </div>
 
           {/* Report Security Issues */}
-          <div className="bg-gradient-to-r from-[#C6080A] to-[#ff4b4e] rounded-lg p-8 text-white">
+          <div className="bg-gradient-to-r z-10 relative from-[#C6080A] to-[#ff4b4e] rounded-lg p-8 text-white">
             <div className="max-w-3xl mx-auto text-center">
               <h2 className="text-2xl font-bold mb-4">
                 Report Security Issues
@@ -290,7 +311,7 @@ export default function PrivacyPolicy() {
               </p>
               <div className="inline-block bg-white text-[#C6080A] rounded-lg p-4">
                 <p className="font-bold">Security Contact Information:</p>
-                <p>Email: security@ayoobecommerce.com</p>
+                <p>Email: security@zorantestore.com</p>
                 <p>Phone: +1 (555) 987-6543</p>
                 <p>Available 24/7 for security emergencies</p>
               </div>

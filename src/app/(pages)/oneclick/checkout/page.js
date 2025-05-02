@@ -195,6 +195,24 @@ export default function Checkout() {
     });
   }, [oneClickBuyProduct, auth?.user, discount, shippingFee]);
 
+  // Handle Verification
+  const handelVerification = () => {
+    if (
+      !auth?.user?.name ||
+      !auth?.user?.email ||
+      !auth?.user?.number ||
+      !auth?.user?.addressDetails?.address ||
+      !auth?.user?.addressDetails?.country ||
+      !auth?.user?.addressDetails?.state ||
+      !auth?.user?.addressDetails?.city ||
+      !auth?.user?.addressDetails?.pincode
+    ) {
+      toast.error("Please complete shipping information");
+      return;
+    }
+    setShowPayment(true);
+  };
+
   return (
     <MainLayout title="Zorante - Checkout">
       <div className="bg-transparent min-h-screen w-full z-10 relative px-4 sm:px-8 py-5 sm:py-6 overflow-hidden">
@@ -212,7 +230,11 @@ export default function Checkout() {
                 </p>
                 <span
                   onClick={() =>
-                    router.push(`profile/${auth.user._id}?tab=profile`)
+                    router.push(
+                      auth.user
+                        ? `profile/${auth.user._id}?tab=profile`
+                        : `/authentication`
+                    )
                   }
                   className="p-1 rounded-full bg-red-100 flex items-center justify-center cursor-pointer"
                 >
@@ -424,15 +446,15 @@ export default function Checkout() {
                 />
               </div>
               <button
-                className={`w-full h-[2.8rem] flex items-center justify-center gap-2  transition-all duration-300 text-white py-2 mt-2 ${
+                className={`w-full h-[2.8rem] flex items-center rounded justify-center gap-2  transition-all duration-300 text-white py-2 mt-2 ${
                   isDisabled
                     ? "cursor-not-allowed bg-red-400"
                     : "cursor-pointer bg-red-600 hover:bg-red-700"
                 }  `}
-                style={{
-                  clipPath:
-                    "polygon(4.98% 0%, 86.4% 0%, 100% 0%, 100% 70.29%, 95.08% 100%, 9.8% 100%, 0% 100%, 0% 30.23%)",
-                }}
+                // style={{
+                //   clipPath:
+                //     "polygon(4.98% 0%, 86.4% 0%, 100% 0%, 100% 70.29%, 95.08% 100%, 9.8% 100%, 0% 100%, 0% 30.23%)",
+                // }}
                 disabled={isDisabled}
               >
                 Apply Voucher{" "}
@@ -465,17 +487,28 @@ export default function Checkout() {
                 </button>
               ) : (
                 <button
-                  className={`px-8 text-white mt-4 bg-red-600 hover:bg-red-700 transition-all duration-300 ${
+                  className={`px-8 text-white mt-4 rounded bg-red-600 hover:bg-red-700 transition-all duration-300 ${
                     oneClickBuyProduct.length === 0
                       ? "cursor-not-allowed"
                       : "cursor-pointer"
                   } py-2  font-medium disabled:opacity-50`}
-                  disabled={oneClickBuyProduct?.length === 0}
-                  style={{
-                    clipPath:
-                      " polygon(6.71% 0%, 86.4% 0%, 100% 0%, 100% 66.1%, 94.08% 100%, 9.8% 100%, 0% 100%, 0% 42.16%)",
-                  }}
-                  onClick={() => setShowPayment(true)}
+                  disabled={
+                    oneClickBuyProduct?.length === 0 ||
+                    loading ||
+                    !auth?.user?.name ||
+                    !auth?.user?.email ||
+                    !auth?.user?.number ||
+                    !auth?.user?.addressDetails?.address ||
+                    !auth?.user?.addressDetails?.country ||
+                    !auth?.user?.addressDetails?.state ||
+                    !auth?.user?.addressDetails?.city ||
+                    !auth?.user?.addressDetails?.pincode
+                  }
+                  // style={{
+                  //   clipPath:
+                  //     " polygon(6.71% 0%, 86.4% 0%, 100% 0%, 100% 66.1%, 94.08% 100%, 9.8% 100%, 0% 100%, 0% 42.16%)",
+                  // }}
+                  onClick={() => handelVerification()}
                 >
                   Checkout
                 </button>

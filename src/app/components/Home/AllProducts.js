@@ -17,7 +17,7 @@ export default function AllProducts() {
   const router = useRouter();
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const productsPerPage = 12;
+  const productsPerPage = 15;
   const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
 
   // ------------------------Pegination---------------------->
@@ -136,7 +136,7 @@ export default function AllProducts() {
           <p className="text-gray-500">Try adjusting your filters.</p>
         </motion.div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 px-4 sm:px-0">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 px-4 sm:px-0">
           {isFetching
             ? Array.from({ length: 12 }).map((_, index) => (
                 <div

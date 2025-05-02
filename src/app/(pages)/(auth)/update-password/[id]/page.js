@@ -117,15 +117,15 @@ export default function UpdatePassword() {
             </div>
             <div className="col-span-2 flex items-center justify-center w-full">
               <button
-                className={`min-w-fit  px-14 bg-red-600 hover:bg-red-700 transition-all duration-300 text-white py-[.7rem] mt-2  flex items-center justify-center gap-2 ${
+                className={`min-w-fit rounded px-14 bg-red-600 hover:bg-red-700 transition-all duration-300 text-white py-[.7rem] mt-2  flex items-center justify-center gap-2 ${
                   loading
                     ? "animate-pulse cursor-not-allowed"
                     : "cursor-pointer"
                 } `}
-                style={{
-                  clipPath:
-                    "polygon(7.56% 0%, 86.4% 0%, 100% 0%, 100% 66.93%, 93.88% 100%, 9.8% 100%, 0% 100%, 0% 43.07%)",
-                }}
+                // style={{
+                //   clipPath:
+                //     "polygon(7.56% 0%, 86.4% 0%, 100% 0%, 100% 66.93%, 93.88% 100%, 9.8% 100%, 0% 100%, 0% 43.07%)",
+                // }}
                 disabled={loading}
               >
                 Update Password

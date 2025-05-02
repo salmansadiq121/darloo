@@ -64,7 +64,7 @@ export default function ShareData({ url, title, setShowShare }) {
             <div className="relative w-[2.7rem] h-[2.7rem] sm:w-[3rem] sm:h-[3rem] bg-white dark:bg-gray-800 rounded-full border-2 border-orange-600 overflow-hidden z-20">
               <Image
                 src={
-                  auth && auth?.user.avatar
+                  auth && auth?.user?.avatar
                     ? auth?.user?.avatar
                     : "/profile.png"
                 }

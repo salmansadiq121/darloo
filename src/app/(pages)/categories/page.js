@@ -57,9 +57,9 @@ export default function Categories() {
                     <Image
                       src={category.image}
                       alt="Category Image"
-                      width={100}
-                      height={100}
-                      className="rounded-full object-fill h-[100px] shadow1 w-[100px]  group-hover:border-2 group-hover:border-red-500 transition-all duration-300"
+                      width={80}
+                      height={80}
+                      className="rounded-full object-fill h-[80px] shadow1 w-[80px]  group-hover:border-2 group-hover:border-red-500 transition-all duration-300"
                     />
                     <p className="text-sm font-medium">{category.name}</p>
                   </div>

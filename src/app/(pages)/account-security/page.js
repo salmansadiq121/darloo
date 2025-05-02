@@ -4,18 +4,20 @@ import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   AlertCircle,
-  ArrowLeftRight,
-  Clock,
-  Package,
-  CreditCard,
-  CheckCircle,
+  Lock,
+  ShieldCheck,
+  KeyRound,
+  UserCheck,
+  EyeOff,
 } from "lucide-react";
 
 export default function AccountSecurity() {
   return (
     <MainLayout
       title="Account Security - Zorante"
-      description={"Our guidelines for returns, exchanges, and refunds"}
+      description={
+        "How we keep your account safe and what you can do to protect it."
+      }
     >
       <div className="min-h-screen bg-transparent relative z-10">
         <div className="container mx-auto py-12 px-4 md:px-6">
@@ -34,273 +36,142 @@ export default function AccountSecurity() {
                 <div>
                   <h2 className="text-xl font-bold mb-3">Introduction</h2>
                   <p className="text-gray-700 mb-4">
-                    At Ayoob E-commerce, we want you to be completely satisfied
-                    with your purchase. If you&apos;re not entirely happy with
-                    your order, we&apos;re here to help. This refund policy
-                    outlines our guidelines for returns, exchanges, and refunds.
+                    At Zorante, we prioritize the security of your personal and
+                    account information. This policy explains our security
+                    practices and what steps you can take to ensure your account
+                    remains protected.
                   </p>
                   <p className="text-gray-700">
-                    Please read this policy carefully before making a purchase.
-                    By placing an order with us, you agree to the terms of this
-                    refund policy.
+                    By using our services, you agree to adhere to the following
+                    guidelines to help safeguard your data.
                   </p>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          {/* Return Eligibility */}
+          {/* Password Guidelines */}
           <Card className="mb-8">
             <CardContent className="pt-6">
               <div className="flex items-start gap-4">
                 <div className="p-2 bg-red-50 rounded-full">
-                  <CheckCircle className="h-6 w-6 text-[#C6080A]" />
-                </div>
-                <div>
-                  <h2 className="text-xl font-bold mb-3">Return Eligibility</h2>
-                  <p className="text-gray-700 mb-4">
-                    To be eligible for a return, please make sure that:
-                  </p>
-                  <ul className="list-disc pl-6 space-y-2 text-gray-700 mb-4">
-                    <li>The item was purchased within the last 30 days</li>
-                    <li>The item is in its original packaging</li>
-                    <li>
-                      The item is unused, unworn, and in the same condition that
-                      you received it
-                    </li>
-                    <li>You have the receipt or proof of purchase</li>
-                  </ul>
-                  <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4">
-                    <p className="text-yellow-800">
-                      <span className="font-bold">Please Note:</span> Certain
-                      items are non-returnable for hygiene reasons, including:
-                    </p>
-                    <ul className="list-disc pl-6 space-y-1 text-yellow-800 mt-2">
-                      <li>Intimate apparel</li>
-                      <li>Personal care products</li>
-                      <li>Earrings and body jewelry</li>
-                      <li>Opened beauty products</li>
-                    </ul>
-                  </div>
-                  <p className="text-gray-700">
-                    Sale items may be final sale and not eligible for return, as
-                    specified at the time of purchase.
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Return Process */}
-          <Card className="mb-8">
-            <CardContent className="pt-6">
-              <div className="flex items-start gap-4">
-                <div className="p-2 bg-red-50 rounded-full">
-                  <ArrowLeftRight className="h-6 w-6 text-[#C6080A]" />
-                </div>
-                <div>
-                  <h2 className="text-xl font-bold mb-3">Return Process</h2>
-                  <p className="text-gray-700 mb-4">
-                    To initiate a return, please follow these steps:
-                  </p>
-                  <ol className="list-decimal pl-6 space-y-3 text-gray-700 mb-4">
-                    <li>
-                      <span className="font-medium">
-                        Contact Customer Service:
-                      </span>{" "}
-                      Email us at returns@ayoobecommerce.com or call us at +1
-                      (555) 123-4567 to request a return authorization.
-                    </li>
-                    <li>
-                      <span className="font-medium">
-                        Receive Return Authorization:
-                      </span>{" "}
-                      Once your return request is approved, we will provide you
-                      with a Return Merchandise Authorization (RMA) number and
-                      return instructions.
-                    </li>
-                    <li>
-                      <span className="font-medium">Package Your Return:</span>{" "}
-                      Pack the item securely in its original packaging along
-                      with all accessories, manuals, and free gifts that came
-                      with it.
-                    </li>
-                    <li>
-                      <span className="font-medium">Include Return Form:</span>{" "}
-                      Include the return form with your RMA number inside the
-                      package.
-                    </li>
-                    <li>
-                      <span className="font-medium">Ship Your Return:</span>{" "}
-                      Send your return to the address provided in the return
-                      instructions. We recommend using a trackable shipping
-                      method.
-                    </li>
-                  </ol>
-                  <div className="bg-blue-50 border-l-4 border-blue-400 p-4">
-                    <p className="text-blue-800">
-                      <span className="font-bold">Tip:</span> Take photos of the
-                      item before shipping it back to us, in case the package
-                      gets damaged during transit.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Refund Process */}
-          <Card className="mb-8">
-            <CardContent className="pt-6">
-              <div className="flex items-start gap-4">
-                <div className="p-2 bg-red-50 rounded-full">
-                  <CreditCard className="h-6 w-6 text-[#C6080A]" />
-                </div>
-                <div>
-                  <h2 className="text-xl font-bold mb-3">Refund Process</h2>
-                  <p className="text-gray-700 mb-4">
-                    Once we receive and inspect your return, we will notify you
-                    about the status of your refund:
-                  </p>
-                  <ul className="list-disc pl-6 space-y-2 text-gray-700 mb-4">
-                    <li>
-                      <span className="font-medium">Approved Refunds:</span> If
-                      your return is approved, we will initiate a refund to your
-                      original payment method. The time it takes for the refund
-                      to appear in your account depends on your payment
-                      provider&apos;s processing time, typically 5-10 business
-                      days.
-                    </li>
-                    <li>
-                      <span className="font-medium">Store Credit:</span> In some
-                      cases, we may offer store credit instead of a refund to
-                      your original payment method.
-                    </li>
-                    <li>
-                      <span className="font-medium">Rejected Returns:</span> If
-                      your return doesn&apos;t meet our eligibility criteria, we
-                      may reject it and send the item back to you.
-                    </li>
-                  </ul>
-                  <p className="text-gray-700 mb-4">
-                    Refunds include the price of the product and any applicable
-                    taxes. Shipping costs are non-refundable unless the return
-                    is due to our error (e.g., you received an incorrect or
-                    defective item).
-                  </p>
-                  <div className="bg-green-50 border-l-4 border-green-400 p-4">
-                    <p className="text-green-800">
-                      <span className="font-bold">Good to Know:</span> You can
-                      check the status of your refund by logging into your
-                      account or contacting our customer service team.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Exchanges */}
-          <Card className="mb-8">
-            <CardContent className="pt-6">
-              <div className="flex items-start gap-4">
-                <div className="p-2 bg-red-50 rounded-full">
-                  <Package className="h-6 w-6 text-[#C6080A]" />
-                </div>
-                <div>
-                  <h2 className="text-xl font-bold mb-3">Exchanges</h2>
-                  <p className="text-gray-700 mb-4">
-                    If you&apos;d like to exchange an item for a different size,
-                    color, or product, please follow these steps:
-                  </p>
-                  <ol className="list-decimal pl-6 space-y-2 text-gray-700 mb-4">
-                    <li>Initiate a return using the process described above</li>
-                    <li>Place a new order for the item you want instead</li>
-                  </ol>
-                  <p className="text-gray-700">
-                    This approach ensures you get the item you want as quickly
-                    as possible, rather than waiting for the exchange process to
-                    complete. If you have any questions about exchanges, please
-                    contact our customer service team.
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Late or Missing Refunds */}
-          <Card className="mb-8">
-            <CardContent className="pt-6">
-              <div className="flex items-start gap-4">
-                <div className="p-2 bg-red-50 rounded-full">
-                  <Clock className="h-6 w-6 text-[#C6080A]" />
+                  <KeyRound className="h-6 w-6 text-[#C6080A]" />
                 </div>
                 <div>
                   <h2 className="text-xl font-bold mb-3">
-                    Late or Missing Refunds
+                    Password Guidelines
                   </h2>
                   <p className="text-gray-700 mb-4">
-                    If you haven&apos;t received your refund within the expected
-                    timeframe:
+                    Use strong, unique passwords for your account. Avoid using
+                    common words, names, or easily guessed information.
                   </p>
-                  <ol className="list-decimal pl-6 space-y-2 text-gray-700 mb-4">
+                  <ul className="list-disc pl-6 space-y-2 text-gray-700">
                     <li>
-                      Check your bank account or credit card statement again
+                      Use at least 8 characters, including uppercase, lowercase,
+                      numbers, and symbols
                     </li>
                     <li>
-                      Contact your bank or credit card company, as it may take
-                      some time for the refund to be officially posted
+                      Avoid using the same password across multiple websites
                     </li>
                     <li>
-                      Contact our customer service team if the above steps
-                      don&apos;t resolve the issue
+                      Change your password periodically and avoid sharing it
+                      with others
                     </li>
-                  </ol>
+                  </ul>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Two-Factor Authentication */}
+          <Card className="mb-8">
+            <CardContent className="pt-6">
+              <div className="flex items-start gap-4">
+                <div className="p-2 bg-red-50 rounded-full">
+                  <ShieldCheck className="h-6 w-6 text-[#C6080A]" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold mb-3">
+                    Two-Factor Authentication (2FA)
+                  </h2>
+                  <p className="text-gray-700 mb-4">
+                    Enable 2FA on your Zorante account for an extra layer of
+                    security. This helps protect your account even if your
+                    password is compromised.
+                  </p>
                   <p className="text-gray-700">
-                    If you&apos;ve done all of this and still haven&apos;t
-                    received your refund, please contact us at
-                    refunds@ayoobecommerce.com with your order number and refund
-                    details.
+                    We support SMS and authenticator apps for 2FA. You can
+                    manage your 2FA settings in your account security
+                    preferences.
                   </p>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          {/* Damaged or Defective Items */}
+          {/* Login Alerts */}
           <Card className="mb-8">
             <CardContent className="pt-6">
-              <h2 className="text-xl font-bold mb-3">
-                Damaged or Defective Items
-              </h2>
-              <p className="text-gray-700 mb-4">
-                If you receive a damaged or defective item, please contact us
-                immediately at support@ayoobecommerce.com with photos of the
-                damaged item and packaging. We&apos;ll work with you to resolve
-                the issue promptly, either by sending a replacement or issuing a
-                full refund including shipping costs.
-              </p>
-              <p className="text-gray-700">
-                For items damaged during shipping, we may need you to provide
-                additional information to help us file a claim with the shipping
-                carrier.
-              </p>
+              <div className="flex items-start gap-4">
+                <div className="p-2 bg-red-50 rounded-full">
+                  <EyeOff className="h-6 w-6 text-[#C6080A]" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold mb-3">Login Alerts</h2>
+                  <p className="text-gray-700 mb-4">
+                    Stay informed about activity on your account. We&apos;ll
+                    send you an alert for any suspicious login or access
+                    attempt.
+                  </p>
+                  <p className="text-gray-700">
+                    If you receive an alert that wasn&apos;t you, change your
+                    password immediately and contact our support team.
+                  </p>
+                </div>
+              </div>
             </CardContent>
           </Card>
 
-          {/* Contact Information */}
+          {/* Secure Your Devices */}
+          <Card className="mb-8">
+            <CardContent className="pt-6">
+              <div className="flex items-start gap-4">
+                <div className="p-2 bg-red-50 rounded-full">
+                  <Lock className="h-6 w-6 text-[#C6080A]" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold mb-3">
+                    Secure Your Devices
+                  </h2>
+                  <p className="text-gray-700 mb-4">
+                    Keep your devices secure by using updated software and
+                    antivirus tools. Avoid using public or shared devices to
+                    access your Zorante account.
+                  </p>
+                  <ul className="list-disc pl-6 space-y-2 text-gray-700">
+                    <li>Use device passwords or biometric locks</li>
+                    <li>Keep operating systems and apps up to date</li>
+                    <li>Be cautious of phishing emails or suspicious links</li>
+                  </ul>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Contact Security Team */}
           <Card>
             <CardContent className="pt-6">
               <h2 className="text-xl font-bold mb-3">
-                Questions About Our Refund Policy?
+                Need Help with Account Security?
               </h2>
               <p className="text-gray-700 mb-4">
-                If you have any questions about returns, exchanges, or refunds,
-                please contact our customer service team:
+                If you believe your account has been compromised or have
+                questions about account security, reach out to our security
+                support team:
               </p>
               <div className="bg-gray-50 p-4 rounded-lg">
-                <p className="font-medium">Ayoob E-commerce Customer Service</p>
-                <p>Email: support@ayoobecommerce.com</p>
+                <p className="font-medium">Zorante Security Support</p>
+                <p>Email: security@zorantestore.com</p>
                 <p>Phone: +1 (555) 123-4567</p>
                 <p>Hours: Monday-Friday, 9am-6pm EST</p>
               </div>

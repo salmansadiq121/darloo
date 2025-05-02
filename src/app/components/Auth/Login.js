@@ -39,7 +39,7 @@ export default function Login({ setActive }) {
         localStorage.setItem("@ayoob", JSON.stringify({ user: data.user }));
         Cookies.set("@ayoob", data.token, {
           expires: 1,
-          secure: true,
+          secure: window?.location?.protocol === "https:",
           sameSite: "Strict",
           path: "/",
         });
@@ -72,7 +72,7 @@ export default function Login({ setActive }) {
         localStorage.setItem("@ayoob", JSON.stringify({ user: data.user }));
         Cookies.set("@ayoob", data.token, {
           expires: 1,
-          secure: true,
+          secure: window?.location?.protocol === "https:",
           sameSite: "Strict",
           path: "/",
         });
@@ -211,11 +211,11 @@ export default function Login({ setActive }) {
             </span>
             <span
               onClick={() => signIn("github")}
-              style={{
-                clipPath:
-                  " polygon(70.71% 100%, 100% 70.71%, 100% 29.29%, 70.71% 0%, 29.29% 0%, 0% 29.29%, 0% 70.71%, 29.29% 100%)",
-              }}
-              className="w-[4rem] h-[4rem] flex items-center justify-center bg-red-400 hover:bg-red-700 transition-all duration-300 cursor-pointer"
+              // style={{
+              //   clipPath:
+              //     " polygon(70.71% 100%, 100% 70.71%, 100% 29.29%, 70.71% 0%, 29.29% 0%, 0% 29.29%, 0% 70.71%, 29.29% 100%)",
+              // }}
+              className="w-[4rem] h-[4rem] flex items-center rounded justify-center bg-red-400 hover:bg-red-700 transition-all duration-300 cursor-pointer"
             >
               <BsGithub size={25} color="white" />
             </span>

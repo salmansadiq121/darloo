@@ -20,6 +20,13 @@ export const AuthProvider = ({ children }) => {
   const [selectedProduct, setSelectedProduct] = useState([]);
   const router = useRouter();
   const [oneClickBuyProduct, setOneClickBuyProduct] = useState(null);
+  const [filters, setFilters] = useState({
+    page: 1,
+    category: "",
+    minPrice: "",
+    maxPrice: "",
+    sortBy: "price_asc",
+  });
 
   //   Token Check
   axios.defaults.headers.common["Authorization"] = auth?.token;
@@ -41,6 +48,7 @@ export const AuthProvider = ({ children }) => {
   //   Check Expiry token
 
   // Fetch All Products
+  // http://localhost:8000/api/v1/products/all/products?page=1&category=68105c2d2c66a6b42f0ea53e&minPrice=1&maxPrice=2000&sortBy=price_asc
   const fetchProducts = async () => {
     const { data } = await axios.get(`${productsURI}/all/products`);
     return data.products;
@@ -52,6 +60,28 @@ export const AuthProvider = ({ children }) => {
     staleTime: 5 * 60 * 1000,
     refetchOnWindowFocus: false,
   });
+
+  // const fetchProducts = async ({
+  //   page = 1,
+  //   category,
+  //   minPrice,
+  //   maxPrice,
+  //   sortBy,
+  // }) => {
+  //   const { data } = await axios.get(`${productsURI}/all/products`, {
+  //     params: { page, category, minPrice, maxPrice, sortBy },
+  //   });
+
+  //   return data.products;
+  // };
+
+  // // Usage inside useQuery:
+  // const { data: products, isFetching } = useQuery({
+  //   queryKey: ["products", filters], // filters = { page, category, etc. }
+  //   queryFn: () => fetchProducts(filters),
+  //   staleTime: 5 * 60 * 1000,
+  //   refetchOnWindowFocus: false,
+  // });
 
   // Load cart from localStorage on mount
   useEffect(() => {
@@ -173,6 +203,8 @@ export const AuthProvider = ({ children }) => {
         setSelectedProduct,
         oneClickBuyProduct,
         setOneClickBuyProduct,
+        filters,
+        setFilters,
       }}
     >
       {children}

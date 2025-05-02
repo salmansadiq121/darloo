@@ -48,7 +48,7 @@ function ProductsContent() {
   const [openFilter, setOpenFilter] = useState(false);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const productsPerPage = 12;
+  const productsPerPage = 40;
   const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
   const [sortOption, setSortOption] = useState("");
   const selectedFiltersCount =
@@ -257,7 +257,7 @@ function ProductsContent() {
                   <p className="text-gray-500">Try adjusting your filters.</p>
                 </motion.div>
               ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3  gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4  gap-4">
                   {isFetching
                     ? Array.from({ length: 12 }).map((_, index) => (
                         <div

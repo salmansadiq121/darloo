@@ -62,15 +62,15 @@ export default function ProductCard({ product, sale, tranding, isDesc }) {
     });
   };
   return (
-    <div className="group bg-white min-w-[17rem]  rounded-xl border border-gray-300  shadow-xl overflow-hidden transition-all duration-300 hover:shadow-[#9333EA]/20 hover:shadow-2xl  hover:border-red-500/50 hover:-translate-y-1">
+    <div className="group bg-white min-w-[14rem] border overflow-hidden transition-all duration-300  hover:shadow-[#9333EA]/20 hover:shadow-2xl hover:border-red-500/50 hover:-translate-y-1">
       <div className="relative ">
         <Image
           src={product?.thumbnails[0]}
           alt={product?.name}
           width={200}
-          height={200}
+          height={230}
           priority
-          className="w-full h-48 object-fill"
+          className="w-full h-[230px] object-fill"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-[#0F172A]   to-transparent"></div>
 
@@ -122,15 +122,15 @@ export default function ProductCard({ product, sale, tranding, isDesc }) {
           <h3 className="text-lg font-semibold capitalize line-clamp-1">
             {product?.name}
           </h3>
-          {isDesc && (
+          {/* {isDesc && (
             <p className="capitalize text-sm text-gray-600 font-light line-clamp-2">
               {product?.description}
             </p>
-          )}
+          )} */}
         </div>
 
         <div className="flex items-center justify-between pb-2">
-          <div>
+          <div className="flex items-center gap-2">
             <div className="text-xl font-bold  text-black">
               €{product?.price?.toFixed(2)}
             </div>
@@ -140,7 +140,7 @@ export default function ProductCard({ product, sale, tranding, isDesc }) {
           </div>
           <button
             onClick={() => handleAddToCart(product)}
-            className="w-[1.8rem] h-[1.8rem] cursor-pointer flex items-center justify-center rounded-full  bg-gradient-to-r from-orange-600 via-orange-500 to-amber-500 text-white hover:opacity-90 transition-opacity duration-200 "
+            className="w-[1.8rem] h-[1.8rem] cursor-pointer flex items-center justify-center rounded-full  bg-gradient-to-r from-red-600 via-red-500 to-amber-500 text-white hover:opacity-90 transition-opacity duration-200 "
           >
             <FaCartPlus size={16} className=" text-white" />
           </button>

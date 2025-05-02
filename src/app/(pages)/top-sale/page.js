@@ -36,7 +36,7 @@ export default function TopSale() {
           <Flame className="h-6 sm:h-7 w-6 sm:w-7 text-orange-600" />
           Top Sale Products
         </h1>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-3">
           {isLoading
             ? Array.from({ length: 8 }).map((_, index) => (
                 <div

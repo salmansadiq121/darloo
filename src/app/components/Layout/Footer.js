@@ -267,18 +267,28 @@ const Footer = () => {
             </div>
 
             <div className="flex items-center space-x-4">
-              <div className="flex items-center">
+              <div className="flex flex-col gap-2">
+                <div className="flex flex-col gap-1">
+                  <h3 className="text-black font-medium text-[17px]">
+                    Newsletter
+                  </h3>
+                  <p className="text-sm text-gray-500">
+                    Get the latest updates and exclusive offers straight to your
+                    inbox.
+                  </p>
+                </div>
+
                 <form className="flex" onSubmit={handleSubmit}>
                   <input
                     type="email"
                     placeholder="Enter your email address"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="px-4 py-2 rounded-l-lg bg-white border border-gray-400 focus:border-red-500  text-sm focus:outline-none focus:ring-2 focus:ring-red-600 min-w-[200px]"
+                    className="px-4 py-2 rounded-l bg-white border border-gray-400 focus:border-red-500  text-sm focus:outline-none focus:ring-2 focus:ring-red-600 min-w-[200px]"
                   />
                   <button
                     type={"submit"}
-                    className="px-4 py-2 rounded-r-lg bg-red-500 text-white text-sm font-medium hover:bg-red-600 transition-colors duration-200 flex items-center gap-1"
+                    className="px-4 py-2 rounded-r bg-red-500 text-white text-sm font-medium hover:bg-red-600 transition-colors duration-200 flex items-center gap-1"
                   >
                     Subscribe{" "}
                     {isLoading && (

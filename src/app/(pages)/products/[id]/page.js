@@ -366,9 +366,9 @@ export default function ProductDetail() {
             <div className="space-y-4">
               <Skeleton className="aspect-square w-full rounded-xl" />
               <div className="flex space-x-2">
-                <Skeleton className="h-24 w-24 rounded-lg" />
-                <Skeleton className="h-24 w-24 rounded-lg" />
-                <Skeleton className="h-24 w-24 rounded-lg" />
+                <Skeleton className="h-24 w-24 rounded" />
+                <Skeleton className="h-24 w-24 rounded" />
+                <Skeleton className="h-24 w-24 rounded" />
               </div>
             </div>
 
@@ -468,13 +468,17 @@ export default function ProductDetail() {
               <Link href="/" className="hover:text-primary transition-colors">
                 Home
               </Link>
-              <ChevronRight className="h-4 w-4 mx-2" />
-              <Link
-                href="/categories"
-                className="hover:text-primary transition-colors"
-              >
-                {product?.category?.name}
-              </Link>
+              {product?.category?.name && (
+                <ChevronRight className="h-4 w-4 mx-2" />
+              )}
+              {product?.category?.name && (
+                <Link
+                  href="/categories"
+                  className="hover:text-primary transition-colors"
+                >
+                  {product?.category?.name}
+                </Link>
+              )}
               <ChevronRight className="h-4 w-4 mx-2" />
               <span className="text-red-600 font-medium truncate">
                 {product?.name?.slice(0, 40)}...
@@ -495,7 +499,7 @@ export default function ProductDetail() {
               transition={{ duration: 0.5 }}
             >
               <div
-                className="relative aspect-square overflow-hidden rounded-xl border bg-background"
+                className="relative aspect-square overflow-hidden rounded border bg-background"
                 ref={imageRef}
                 onMouseEnter={() => setIsZoomed(true)}
                 onMouseLeave={() => setIsZoomed(false)}
@@ -578,7 +582,7 @@ export default function ProductDetail() {
                 {product?.thumbnails?.map((thumbnail, index) => (
                   <button
                     key={index}
-                    className={`relative h-24 w-24 min-w-24 cursor-pointer rounded-lg border-2 overflow-hidden transition-all ${
+                    className={`relative h-24 w-24 min-w-24 cursor-pointer rounded border-2 overflow-hidden transition-all ${
                       activeImageIndex === index
                         ? "border-red-500  shadow-md"
                         : "border-border hover:border-primary/50"
@@ -668,14 +672,14 @@ export default function ProductDetail() {
                     €{product?.price?.toLocaleString()}
                   </span>
                   {product?.estimatedPrice > product?.price && (
-                    <span className="text-lg text-gray-500 line-through">
+                    <span className="text text-gray-500 line-through">
                       €{product?.estimatedPrice?.toLocaleString()}
                     </span>
                   )}
                 </div>
 
                 {product?.sale?.isActive && saleEndDate && (
-                  <div className="mt-3 bg-red-100 rounded-lg p-3 border border-red-200">
+                  <div className="mt-3 bg-red-100 rounded p-3 border border-red-200">
                     <div className="flex items-center gap-2 text-sm font-medium text-red-600 mb-2">
                       <Clock className="h-4 w-4" />
                       <span>Sale ends in:</span>
@@ -814,7 +818,7 @@ export default function ProductDetail() {
                       <Minus className="h-4 w-4" />
                       <span className="sr-only">Decrease quantity</span>
                     </Button>
-                    <div className="flex h-11 w-16 items-center justify-center border-y border-red-500 text-white bg-red-600 text-lg font-medium">
+                    <div className="flex h-11 w-16 items-center justify-center border-y border-red-500 text-white bg-red-600 text font-medium">
                       {quantity}
                     </div>
                     <Button
@@ -833,12 +837,12 @@ export default function ProductDetail() {
 
               <div className="flex flex-col sm:flex-row gap-4 pt-4">
                 <Button
-                  className="sm:flex-1 h-12 cursor-pointer rounded-none text-base font-semibold bg-transparent hover:bg-primary/90 overflow-visible"
+                  className="sm:flex-1 h-12 cursor-pointer rounded text-base font-semibold bg-transparent hover:bg-primary/90 overflow-visible"
                   size="lg"
                   style={{
                     backgroundColor: "var(--primary)",
-                    clipPath:
-                      "polygon(12% 0, 100% 0, 100% 73%, 90% 100%, 0 100%, 0 25%)",
+                    // clipPath:
+                    //   "polygon(12% 0, 100% 0, 100% 73%, 90% 100%, 0 100%, 0 25%)",
                   }}
                   onClick={() => handleAddToCart(product)}
                 >
@@ -847,13 +851,13 @@ export default function ProductDetail() {
                 </Button>
                 <Button
                   variant="secondary"
-                  className="sm:flex-1 h-12 text-base font-semibold rounded-none cursor-pointer bg-cyan-600 text-white hover:bg-cyan-700 overflow-visible"
+                  className="sm:flex-1 h-12 text-base font-semibold rounded cursor-pointer bg-cyan-600 text-white hover:bg-cyan-700 overflow-visible"
                   size="lg"
                   style={{
                     backgroundColor: "rgb(8, 145, 178)",
-                    clipPath:
-                      "polygon(12% 0, 100% 0, 100% 73%, 90% 100%, 0 100%, 0 25%)",
-                    willChange: "clip-path",
+                    // clipPath:
+                    //   "polygon(12% 0, 100% 0, 100% 73%, 90% 100%, 0 100%, 0 25%)",
+                    // willChange: "clip-path",
                   }}
                   onClick={() => {
                     handleOneClickBuy(product);
@@ -922,22 +926,22 @@ export default function ProductDetail() {
 
           {/* Product Details and Reviews */}
           <Tabs defaultValue="details" className="w-full mt-12">
-            <TabsList className="w-full max-w-fit grid grid-cols-3 overflow-y-auto  shidden h-14 rounded-xl bg-red-100 border border-red-200 p-1">
+            <TabsList className="w-full max-w-fit grid grid-cols-3 overflow-y-auto  shidden h-14 rounded bg-red-100 border border-red-200 p-1">
               <TabsTrigger
                 value="details"
-                className="rounded-lg cursor-pointer px-4 min-w-fit  data-[state=active]:bg-red-600 data-[state=active]:text-white data-[state=active]:shadow-sm transition-all duration-300"
+                className="rounded cursor-pointer px-4 min-w-fit  data-[state=active]:bg-red-600 data-[state=active]:text-white data-[state=active]:shadow-sm transition-all duration-300"
               >
                 Product Details
               </TabsTrigger>
               <TabsTrigger
                 value="reviews"
-                className="rounded-lg cursor-pointer px-4 min-w-fit mx-6 sm:mx-0 data-[state=active]:bg-red-600 data-[state=active]:text-white data-[state=active]:shadow-sm transition-all duration-300"
+                className="rounded cursor-pointer px-4 min-w-fit mx-6 sm:mx-0 data-[state=active]:bg-red-600 data-[state=active]:text-white data-[state=active]:shadow-sm transition-all duration-300"
               >
                 Reviews ({product?.reviews?.length})
               </TabsTrigger>
               <TabsTrigger
                 value="shipping"
-                className="rounded-lg cursor-pointer px-4 min-w-fit mx-6 sm:mx-0 data-[state=active]:bg-red-600 data-[state=active]:text-white data-[state=active]:shadow-sm transition-all duration-300"
+                className="rounded cursor-pointer px-4 min-w-fit mx-6 sm:mx-0 data-[state=active]:bg-red-600 data-[state=active]:text-white data-[state=active]:shadow-sm transition-all duration-300"
               >
                 Shipping & Returns
               </TabsTrigger>
@@ -962,7 +966,7 @@ export default function ProductDetail() {
                       Product Information
                     </h3>
                     <dl className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">
-                      <div className="bg-gray-200 p-3 rounded-lg">
+                      <div className="bg-gray-200 p-3 rounded">
                         <dt className="text-sm font-medium text-gray-500">
                           Category
                         </dt>
@@ -970,7 +974,7 @@ export default function ProductDetail() {
                           {product?.category?.name}
                         </dd>
                       </div>
-                      <div className="bg-gray-200 p-3 rounded-lg">
+                      <div className="bg-gray-200 p-3 rounded">
                         <dt className="text-sm font-medium text-gray-500">
                           Available Colors
                         </dt>
@@ -978,7 +982,7 @@ export default function ProductDetail() {
                           {product?.colors?.map((c) => c.name).join(", ")}
                         </dd>
                       </div>
-                      <div className="bg-gray-200 p-3 rounded-lg">
+                      <div className="bg-gray-200 p-3 rounded">
                         <dt className="text-sm font-medium text-gray-500">
                           Available Sizes
                         </dt>
@@ -986,7 +990,7 @@ export default function ProductDetail() {
                           {product?.sizes?.join(", ")}
                         </dd>
                       </div>
-                      <div className="bg-gray-200 p-3 rounded-lg">
+                      <div className="bg-gray-200 p-3 rounded">
                         <dt className="text-sm font-medium text-gray-500">
                           Shipping Fee
                         </dt>
@@ -1179,7 +1183,7 @@ export default function ProductDetail() {
                             </p>
                             {review?.commentReplies &&
                               review?.commentReplies?.length > 0 && (
-                                <div className="ml-12 mt-4 rounded-lg bg-white p-4 border border-gray-100">
+                                <div className="ml-12 mt-4 rounded bg-white p-4 border border-gray-100">
                                   <p className="text-xs font-medium text-gray-900">
                                     Seller Response
                                   </p>
@@ -1247,7 +1251,7 @@ export default function ProductDetail() {
                       Shipping Information
                     </h3>
                     <div className="mt-4 space-y-4">
-                      <div className="flex gap-4 p-4 bg-gray-50 rounded-lg border border-gray-100">
+                      <div className="flex gap-4 p-4 bg-gray-50 rounded border border-gray-100">
                         <Truck className="h-6 w-6 text-primary shrink-0 mt-1" />
                         <div>
                           <h4 className="font-medium text-gray-900">
@@ -1262,7 +1266,7 @@ export default function ProductDetail() {
                         </div>
                       </div>
 
-                      <div className="flex gap-4 p-4 bg-gray-50 rounded-lg border border-gray-100">
+                      <div className="flex gap-4 p-4 bg-gray-50 rounded border border-gray-100">
                         <Truck className="h-6 w-6 text-amber-500 shrink-0 mt-1" />
                         <div>
                           <h4 className="font-medium text-gray-900">
@@ -1291,7 +1295,7 @@ export default function ProductDetail() {
                       note that shipping costs are non-refundable, and the
                       customer is responsible for return shipping fees.
                     </p>
-                    <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-100">
+                    <div className="mt-4 p-4 bg-gray-50 rounded border border-gray-100">
                       <h4 className="font-medium text-gray-900">
                         How to Return
                       </h4>
@@ -1332,7 +1336,7 @@ export default function ProductDetail() {
         <AnimatePresence>
           {showStickyBar && (
             <motion.div
-              className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 md:hidden z-50 shadow-lg"
+              className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 md:hidden z-50 shadow"
               initial={{ y: 100 }}
               animate={{ y: 0 }}
               exit={{ y: 100 }}
@@ -1340,7 +1344,7 @@ export default function ProductDetail() {
             >
               <div className="flex items-center justify-between gap-4">
                 <div>
-                  <div className="text-lg font-bold text-gray-900">
+                  <div className="text font-bold text-gray-900">
                     €{product?.price?.toLocaleString()}
                   </div>
                   {product.estimatedPrice > product.price && (

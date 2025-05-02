@@ -7,6 +7,7 @@ import { metadata } from "./metaData";
 import QueryProvider from "./content/QueryProvider";
 import { SessionProvider } from "next-auth/react";
 import SocketHandler from "./content/SocketHandler";
+import NextTopLoader from "nextjs-toploader";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -59,6 +60,7 @@ export default function RootLayout({ children }) {
         <SessionProvider>
           <QueryProvider>
             <AuthProvider>
+              <NextTopLoader color="#fc030b" height={3} showSpinner={false} />
               <main className=" bg-white w-full min-h-screen text-black">
                 {children}
 

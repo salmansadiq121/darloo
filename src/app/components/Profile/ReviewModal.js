@@ -111,7 +111,7 @@ export default function AddReviewModal({ setShow, productId, setProductId }) {
               placeholder="Write your review here..."
               value={review}
               onChange={(e) => setReview(e.target.value)}
-              className="bg-white border-gray-700 text-black placeholder-gray-500 min-h-[100px] "
+              className="bg-white border-gray-700 text-black placeholder-gray-500 min-h-[100px] w-full"
               required
             />
           </div>

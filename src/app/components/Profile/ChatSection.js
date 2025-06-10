@@ -40,10 +40,10 @@ import toast from "react-hot-toast";
 import { format, formatDistanceToNow } from "date-fns";
 import { TbFileDownload } from "react-icons/tb";
 
-import socketIO from "socket.io-client";
 import { fileType } from "@/app/utils/UploadChatFile";
 import Image from "next/image";
 import MessageLoader from "../Skeltons/MessageLoader";
+import socketIO from "socket.io-client";
 const ENDPOINT = process.env.NEXT_PUBLIC_SOCKET_SERVER_URI || "";
 const socketId = socketIO(ENDPOINT, { transports: ["websocket"] });
 
@@ -53,12 +53,12 @@ export default function ChatSection({ user }) {
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedQuickQuestion, setSelectedQuickQuestion] = useState(null);
   const [messageLoad, setMessageLoad] = useState(false);
   const initialMessagesLoad = useRef(true);
   const [selectedChat, setSelectedChat] = useState(null);
   const [loading, setLoading] = useState(false);
   const [typing, setTyping] = useState(false);
+  const [selectedQuickQuestion, setSelectedQuickQuestion] = useState(null);
 
   // Socket.io
   useEffect(() => {
@@ -86,7 +86,7 @@ export default function ChatSection({ user }) {
     sender: {
       _id: "67f8b7adfd43f87ee1498a9c",
       name: "Admin",
-      email: "support@ayoob.com",
+      email: "support@darloo.com",
       avatar: "https://example.com/default-avatar.jpg",
       isOnline: true,
     },
@@ -298,6 +298,21 @@ export default function ChatSection({ user }) {
     }, timerLenght);
   };
 
+  const formatMessageDate = (timestamp) => {
+    const date = new Date(timestamp);
+    const today = new Date();
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+
+    if (date.toDateString() === today.toDateString()) {
+      return "Today";
+    } else if (date.toDateString() === yesterday.toDateString()) {
+      return "Yesterday";
+    } else {
+      return date.toLocaleDateString();
+    }
+  };
+
   const generateAdminResponse = (message) => {
     const lowerMessage = message.toLowerCase();
 
@@ -330,21 +345,6 @@ export default function ChatSection({ user }) {
       return "You can change your shipping address if your order hasn't been processed yet. Go to your order details and click on 'Edit' next to the shipping address. If your order has already been processed, please contact us immediately.";
     } else {
       return "Thank you for your message. Our team will review your inquiry and get back to you as soon as possible. Is there anything else I can help you with?";
-    }
-  };
-
-  const formatMessageDate = (timestamp) => {
-    const date = new Date(timestamp);
-    const today = new Date();
-    const yesterday = new Date(today);
-    yesterday.setDate(yesterday.getDate() - 1);
-
-    if (date.toDateString() === today.toDateString()) {
-      return "Today";
-    } else if (date.toDateString() === yesterday.toDateString()) {
-      return "Yesterday";
-    } else {
-      return date.toLocaleDateString();
     }
   };
 

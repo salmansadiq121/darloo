@@ -157,7 +157,7 @@ function ProductsContent() {
   };
 
   return (
-    <MainLayout title="Zorante - Products">
+    <MainLayout title="Darloo - Products">
       <div className=" relative bg-transparent text-black h-screen  z-10 overflow-hidden">
         <div className="grid grid-cols-4 z-10">
           {/* Filters */}

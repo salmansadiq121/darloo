@@ -10,7 +10,7 @@ export default function Cart() {
   const { selectedProduct } = useAuth();
 
   return (
-    <MainLayout title="Zorante - Cart">
+    <MainLayout title="Darloo - Cart">
       <div className="bg-transparent min-h-screen w-full z-10 relative px-4 sm:px-8 py-5 sm:py-6 overflow-hidden">
         <CartItems products={selectedProduct} />
         <Separator />

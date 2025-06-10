@@ -13,7 +13,7 @@ import {
 
 export default function RefundPolicy() {
   return (
-    <MainLayout title="Refund Policy - Zorante">
+    <MainLayout title="Refund Policy - Darloo">
       <div className="min-h-screen bg-gray-50 z-10 relative">
         <div className="container mx-auto py-12 px-4 md:px-6">
           {/* Last Updated */}
@@ -31,10 +31,10 @@ export default function RefundPolicy() {
                 <div>
                   <h2 className="text-xl font-bold mb-3">Introduction</h2>
                   <p className="text-gray-700 mb-4">
-                    At Zorante store, we want you to be completely satisfied
-                    with your purchase. If you&apos;re not entirely happy with
-                    your order, we&apos;re here to help. This refund policy
-                    outlines our guidelines for returns, exchanges, and refunds.
+                    At Darloo store, we want you to be completely satisfied with
+                    your purchase. If you&apos;re not entirely happy with your
+                    order, we&apos;re here to help. This refund policy outlines
+                    our guidelines for returns, exchanges, and refunds.
                   </p>
                   <p className="text-gray-700">
                     Please read this policy carefully before making a purchase.
@@ -105,8 +105,8 @@ export default function RefundPolicy() {
                       <span className="font-medium">
                         Contact Customer Service:
                       </span>{" "}
-                      Email us at returns@zorantestore.com or call us at +1
-                      (555) 123-4567 to request a return authorization.
+                      Email us at returns@darloo.com or call us at +1 (555)
+                      123-4567 to request a return authorization.
                     </li>
                     <li>
                       <span className="font-medium">
@@ -256,7 +256,7 @@ export default function RefundPolicy() {
                   <p className="text-gray-700">
                     If you&apos;ve done all of this and still haven&apos;t
                     received your refund, please contact us at
-                    refunds@zorantestore.com with your order number and refund
+                    refunds@darloo.com with your order number and refund
                     details.
                   </p>
                 </div>
@@ -272,9 +272,9 @@ export default function RefundPolicy() {
               </h2>
               <p className="text-gray-700 mb-4">
                 If you receive a damaged or defective item, please contact us
-                immediately at support@zorantestore.com with photos of the
-                damaged item and packaging. We&apos;ll work with you to resolve
-                the issue promptly, either by sending a replacement or issuing a
+                immediately at support@darloo.com with photos of the damaged
+                item and packaging. We&apos;ll work with you to resolve the
+                issue promptly, either by sending a replacement or issuing a
                 full refund including shipping costs.
               </p>
               <p className="text-gray-700">
@@ -297,9 +297,9 @@ export default function RefundPolicy() {
               </p>
               <div className="bg-gray-50 p-4 rounded-lg">
                 <p className="font-medium">
-                  Zorante E-commerce Customer Service
+                  Darloo E-commerce Customer Service
                 </p>
-                <p>Email: support@zorantestore.com</p>
+                <p>Email: support@darloo.com</p>
                 <p>Phone: +1 (555) 123-4567</p>
                 <p>Hours: Monday-Friday, 9am-6pm EST</p>
               </div>

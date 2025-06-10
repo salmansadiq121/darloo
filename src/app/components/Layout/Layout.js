@@ -98,20 +98,20 @@ export default function MainLayout({
 }
 
 MainLayout.defaultProps = {
-  title: "Zorante – Online Shopping for Electronics, Fashion & More",
+  title: "Darloo – Online Shopping for Electronics, Fashion & More",
   description:
-    "Shop online at Zorante for the latest fashion, electronics, home appliances, beauty products, and more. Enjoy great discounts, secure payment options, and fast delivery across Pakistan.",
+    "Shop online at Darloo for the latest fashion, electronics, home appliances, beauty products, and more. Enjoy great discounts, secure payment options, and fast delivery across Pakistan.",
   keywords:
-    "Zorante shopping, online store Pakistan, buy electronics online, fashion shopping, home appliances, beauty products, best e-commerce Pakistan, mobile phones, fast delivery shopping, best online deals",
-  author: "Zorante",
-  ogTitle: "Zorante – Your Trusted Online Shopping Destination",
+    "Darloo shopping, online store Pakistan, buy electronics online, fashion shopping, home appliances, beauty products, best e-commerce Pakistan, mobile phones, fast delivery shopping, best online deals",
+  author: "Darloo",
+  ogTitle: "Darloo – Your Trusted Online Shopping Destination",
   ogDescription:
-    "Zorante brings you a seamless online shopping experience with a wide range of products, great discounts, and fast nationwide delivery.",
-  ogImage: "/assets/zorante-preview.jpg",
-  ogUrl: "https://www.zorante.com",
+    "Darloo brings you a seamless online shopping experience with a wide range of products, great discounts, and fast nationwide delivery.",
+  ogImage: "/assets/Darloo-preview.jpg",
+  ogUrl: "https://www.Darloo.com",
   twitterCard: "summary_large_image",
-  twitterTitle: "Zorante – Shop Electronics, Fashion & More Online",
+  twitterTitle: "Darloo – Shop Electronics, Fashion & More Online",
   twitterDescription:
-    "Find the best deals on fashion, electronics, home essentials, and more at Zorante. Secure payments & fast delivery across Pakistan.",
-  twitterImage: "/assets/zorante-preview.jpg",
+    "Find the best deals on fashion, electronics, home essentials, and more at Darloo. Secure payments & fast delivery across Pakistan.",
+  twitterImage: "/assets/Darloo-preview.jpg",
 };

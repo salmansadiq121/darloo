@@ -129,7 +129,7 @@ const Header = () => {
                 loading="lazy"
               /> */}
               <h1 className="text-2xl sm:text-4xl font-extrabold  font-serif text-[#c6080a] uppercase  relative shadow-custom">
-                Zorante
+                Darloo
               </h1>
             </Link>
           </div>

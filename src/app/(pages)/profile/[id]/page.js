@@ -115,7 +115,7 @@ export default function Profile() {
     return <LoadingSkelton />;
   }
   return (
-    <MainLayout title="Zorante - Account Settings">
+    <MainLayout title="Darloo - Account Settings">
       <div className="min-h-screen bg-gray-50/30 relative z-10 ">
         <main className="container mx-auto py-8 px-2 md:px-6">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">

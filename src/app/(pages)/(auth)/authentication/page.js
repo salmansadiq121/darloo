@@ -17,7 +17,7 @@ export default function Authentication() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return (
-    <MainLayout title="Zorante - Authentication">
+    <MainLayout title="Darloo - Authentication">
       <div className="relative">
         {/* Glow Effect */}
         <div className="absolute top-[-3rem] right-4 z-[1]">

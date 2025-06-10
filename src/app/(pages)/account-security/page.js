@@ -14,7 +14,7 @@ import {
 export default function AccountSecurity() {
   return (
     <MainLayout
-      title="Account Security - Zorante"
+      title="Account Security - Darloo"
       description={
         "How we keep your account safe and what you can do to protect it."
       }
@@ -36,7 +36,7 @@ export default function AccountSecurity() {
                 <div>
                   <h2 className="text-xl font-bold mb-3">Introduction</h2>
                   <p className="text-gray-700 mb-4">
-                    At Zorante, we prioritize the security of your personal and
+                    At Darloo, we prioritize the security of your personal and
                     account information. This policy explains our security
                     practices and what steps you can take to ensure your account
                     remains protected.
@@ -95,7 +95,7 @@ export default function AccountSecurity() {
                     Two-Factor Authentication (2FA)
                   </h2>
                   <p className="text-gray-700 mb-4">
-                    Enable 2FA on your Zorante account for an extra layer of
+                    Enable 2FA on your Darloo account for an extra layer of
                     security. This helps protect your account even if your
                     password is compromised.
                   </p>
@@ -146,7 +146,7 @@ export default function AccountSecurity() {
                   <p className="text-gray-700 mb-4">
                     Keep your devices secure by using updated software and
                     antivirus tools. Avoid using public or shared devices to
-                    access your Zorante account.
+                    access your Darloo account.
                   </p>
                   <ul className="list-disc pl-6 space-y-2 text-gray-700">
                     <li>Use device passwords or biometric locks</li>
@@ -170,8 +170,8 @@ export default function AccountSecurity() {
                 support team:
               </p>
               <div className="bg-gray-50 p-4 rounded-lg">
-                <p className="font-medium">Zorante Security Support</p>
-                <p>Email: security@zorantestore.com</p>
+                <p className="font-medium">Darloo Security Support</p>
+                <p>Email: security@darloo.com</p>
                 <p>Phone: +1 (555) 123-4567</p>
                 <p>Hours: Monday-Friday, 9am-6pm EST</p>
               </div>

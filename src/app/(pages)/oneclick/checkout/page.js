@@ -214,7 +214,7 @@ export default function Checkout() {
   };
 
   return (
-    <MainLayout title="Zorante - Checkout">
+    <MainLayout title="Darloo - Checkout">
       <div className="bg-transparent min-h-screen w-full z-10 relative px-4 sm:px-8 py-5 sm:py-6 overflow-hidden">
         <div className="grid grid-cols-5 gap-5 sm:gap-[2rem] w-full">
           {/* Left */}

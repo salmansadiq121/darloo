@@ -9,7 +9,7 @@ import { useAuth } from "@/app/content/authContent";
 export default function AboutUsPage() {
   const { auth } = useAuth();
   return (
-    <MainLayout title="About Us - Zorante">
+    <MainLayout title="About Us - Darloo">
       <div className="min-h-screen bg-gray-50 z-10 relative">
         <div className="container mx-auto py-12 px-4 md:px-6">
           {/* Our Story */}
@@ -17,7 +17,7 @@ export default function AboutUsPage() {
             <div>
               <h2 className="text-2xl md:text-3xl font-bold mb-4">Our Story</h2>
               <p className="text-gray-700 mb-4">
-                Founded in 2015, Ayoob E-commerce began as a small family
+                Founded in 2025, Darloo E-commerce began as a small family
                 business with a passion for delivering quality products at
                 affordable prices. What started as a modest online store has now
                 grown into one of the region&apos;s most trusted e-commerce
@@ -34,7 +34,7 @@ export default function AboutUsPage() {
             <div className="relative h-64 md:h-80 rounded-lg overflow-hidden shadow-lg">
               <Image
                 src="/placeholder.svg?height=400&width=600"
-                alt="Ayoob E-commerce story"
+                alt="Darloo E-commerce story"
                 fill
                 className="object-cover"
               />
@@ -137,7 +137,7 @@ export default function AboutUsPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {[
                 {
-                  name: "Ahmed Ayoob",
+                  name: "Ahmed Darloo",
                   position: "Founder & CEO",
                   image: "/placeholder.svg?height=300&width=300",
                 },
@@ -181,11 +181,11 @@ export default function AboutUsPage() {
           {/* Call to Action */}
           <div className="bg-gradient-to-r from-[#C6080A] to-[#ff4b4e] rounded-lg p-8 text-white text-center">
             <h2 className="text-2xl md:text-3xl font-bold mb-4">
-              Join the Ayoob Family
+              Join the Darloo Family
             </h2>
             <p className="mb-6 max-w-2xl mx-auto">
               Whether you&apos;re a customer, partner, or looking to join our
-              team, we&apos;d love to connect with you. Discover the Ayoob
+              team, we&apos;d love to connect with you. Discover the Darloo
               difference today.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">

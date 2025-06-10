@@ -36,7 +36,7 @@ export default function PrivacyPolicy() {
     fetchData();
   }, []);
   return (
-    <MainLayout title="Privacy Policy - Zorante">
+    <MainLayout title="Privacy Policy - Darloo">
       <div className="min-h-screen bg-gray-50">
         <div className="container mx-auto py-12 px-4 md:px-6">
           {/* Introduction */}
@@ -46,7 +46,7 @@ export default function PrivacyPolicy() {
               Your Security Is Our Priority
             </h2>
             <p className="text-gray-700">
-              At Zorante E-commerce, we implement industry-leading security
+              At Darloo E-commerce, we implement industry-leading security
               measures to protect your personal information and ensure safe
               transactions. This page outlines the steps we take to secure your
               account and provides guidance on how you can enhance your
@@ -230,8 +230,8 @@ export default function PrivacyPolicy() {
                     <p className="text-gray-700">
                       We will never ask for sensitive information via email or
                       text message. If you receive suspicious communications
-                      claiming to be from Zorante E-commerce, do not click on
-                      any links or provide any information.
+                      claiming to be from Darloo E-commerce, do not click on any
+                      links or provide any information.
                     </p>
                   </div>
                 </li>
@@ -269,11 +269,11 @@ export default function PrivacyPolicy() {
                     </h3>
                     <p className="text-gray-700 mb-4">
                       We&apos;ve detected phishing emails claiming to be from
-                      Zorante E-commerce asking customers to update their
-                      payment information due to &quot;security concerns.&quot;
-                      These emails are NOT from us. We will never ask you to
-                      provide sensitive information via email or direct you to
-                      external websites to update your account details.
+                      Darloo E-commerce asking customers to update their payment
+                      information due to &quot;security concerns.&quot; These
+                      emails are NOT from us. We will never ask you to provide
+                      sensitive information via email or direct you to external
+                      websites to update your account details.
                     </p>
                     <div className="bg-red-50 border-l-4 border-red-500 p-4">
                       <p className="text-red-800">
@@ -311,7 +311,7 @@ export default function PrivacyPolicy() {
               </p>
               <div className="inline-block bg-white text-[#C6080A] rounded-lg p-4">
                 <p className="font-bold">Security Contact Information:</p>
-                <p>Email: security@zorantestore.com</p>
+                <p>Email: security@darloo.com</p>
                 <p>Phone: +1 (555) 987-6543</p>
                 <p>Available 24/7 for security emergencies</p>
               </div>

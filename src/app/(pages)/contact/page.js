@@ -5,7 +5,7 @@ import React from "react";
 
 export default function Contact() {
   return (
-    <MainLayout title="Zorante - Contact Us">
+    <MainLayout title="Darloo - Contact Us">
       <div className="flex flex-col gap-4 min-h-screen w-fit z-10 relative py-4">
         <h1 className="text-3xl sm:text-4xl font-bold text-center">
           Contact Us

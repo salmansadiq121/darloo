@@ -46,7 +46,7 @@ export default function UpdatePassword() {
     }
   };
   return (
-    <MainLayout title="Zorante - Update Password">
+    <MainLayout title="Darloo - Update Password">
       <div className="w-full min-h-screen flex items-center justify-center relative z-10 p-0 sm:p-4">
         <div className="w-full max-w-xl flex flex-col gap-4 bg-gray-50 border border-gray-300 rounded-sm p-4 ">
           <div className="flex flex-col gap-2 items-center justify-center w-full">

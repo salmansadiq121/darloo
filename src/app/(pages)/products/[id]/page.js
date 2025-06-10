@@ -459,7 +459,7 @@ export default function ProductDetail() {
   }
 
   return (
-    <MainLayout title="Product Detail - Zorante">
+    <MainLayout title="Product Detail - Darloo">
       <div className="bg-white min-h-screen relative z-10 px-4 sm:px-[2rem] md:px-[3rem] ">
         {/* Breadcrumb */}
         <div className="bg-gray-50 py-3">

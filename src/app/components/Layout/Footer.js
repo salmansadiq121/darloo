@@ -52,13 +52,20 @@ const Footer = () => {
           {/* Company Info */}
           <div>
             <div className="flex items-center mb-4">
+              {/* <Image
+                src="/logo1.png"
+                alt="Darloo"
+                width={100}
+                height={100}
+                className="h-[6rem] w-[6rem] w-auto rounded-full"
+              /> */}
               <div className="h-8 w-8 rounded-full bg-gradient-to-r from-[#c6080a] to-[#ac0205] flex items-center justify-center">
                 <span className="text-white font-bold font-serif text-xl ">
-                  Z
+                  D
                 </span>
               </div>
               <span className="ml-2 text-2xl font-bold font-serif bg-clip-text text-transparent bg-gradient-to-r from-[#c6080a] to-[#ac0205]">
-                Zorante
+                Darloo
               </span>
             </div>
             <p className=" text-gray-800 text-sm mb-4">

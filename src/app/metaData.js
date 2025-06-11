@@ -14,7 +14,7 @@ export const metadata = {
     description:
       "Discover top deals on fashion, electronics, and home essentials. Secure shopping, fast delivery, and unbeatable prices at Darloo E-Commerce.",
     url: "https://www.darloo.com",
-    image: "/Darloo-store-preview.jpg",
+    image: "/logo2.jpg",
   },
   twitter: {
     card: "summary_large_image",
@@ -22,7 +22,7 @@ export const metadata = {
     title: "Darloo E-Commerce – Best Online Shopping Experience",
     description:
       "Shop the latest trends in fashion, high-quality electronics, and home essentials with secure checkout and fast delivery.",
-    image: "/darloo-store-preview.jpg",
+    image: "/logo2.jpg",
   },
   language: "en-US",
 };

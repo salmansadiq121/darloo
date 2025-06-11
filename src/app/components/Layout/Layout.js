@@ -107,11 +107,11 @@ MainLayout.defaultProps = {
   ogTitle: "Darloo – Your Trusted Online Shopping Destination",
   ogDescription:
     "Darloo brings you a seamless online shopping experience with a wide range of products, great discounts, and fast nationwide delivery.",
-  ogImage: "/assets/Darloo-preview.jpg",
+  ogImage: "/logo2.jpg",
   ogUrl: "https://www.Darloo.com",
   twitterCard: "summary_large_image",
   twitterTitle: "Darloo – Shop Electronics, Fashion & More Online",
   twitterDescription:
     "Find the best deals on fashion, electronics, home essentials, and more at Darloo. Secure payments & fast delivery across Pakistan.",
-  twitterImage: "/assets/Darloo-preview.jpg",
+  twitterImage: "/logo2.jpg",
 };

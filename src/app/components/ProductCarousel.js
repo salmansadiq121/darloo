@@ -61,7 +61,7 @@ export default function ProductCarousel({ products }) {
           price: product.price,
           colors: [selectedColor],
           sizes: [selectedSize],
-          image: product.thumbnails[0],
+          image: product.thumbnails,
           title: product.name,
           _id: product._id,
         });
@@ -103,7 +103,7 @@ export default function ProductCarousel({ products }) {
           >
             <div className="relative ">
               <Image
-                src={product?.thumbnails[0]}
+                src={product?.thumbnails}
                 alt={product?.name}
                 width={200}
                 height={250}

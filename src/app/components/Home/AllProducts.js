@@ -1,122 +1,289 @@
 "use client";
-import { useAuth } from "@/app/content/authContent";
-import React, { useCallback, useEffect, useRef, useState } from "react";
-import ProductCard from "../ProductCard";
+
+import { useCallback, useEffect, useRef, useState, useMemo } from "react";
+
 import { Style } from "@/app/utils/CommonStyle";
-import { FaArrowRight } from "react-icons/fa6";
-import Pagination from "@/app/utils/Pagination";
+import { FaArrowRight, FaExclamationTriangle } from "react-icons/fa";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
+import { productsURI } from "@/app/utils/ServerURI";
+import axios from "axios";
+import { Loader2, RefreshCw, WifiOff } from "lucide-react";
+import ProductCard from "../ProductCard";
 
 export default function AllProducts() {
-  const { products, isFetching, search } = useAuth();
-  const [visibleProducts, setVisibleProducts] = useState(12);
-  const observerRef = useRef(null);
-  const isFetchingRef = useRef(false);
-  const router = useRouter();
-  const [filteredProducts, setFilteredProducts] = useState([]);
+  const [products, setProducts] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const productsPerPage = 15;
-  const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [error, setError] = useState(null);
+  const [hasNextPage, setHasNextPage] = useState(true);
+  const [totalProducts, setTotalProducts] = useState(0);
+  const [retryCount, setRetryCount] = useState(0);
+  const [isOnline, setIsOnline] = useState(true);
 
-  // ------------------------Pegination---------------------->
-  const indexOfLastProduct = currentPage * productsPerPage;
-  const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
-  const currentProducts = filteredProducts.slice(
-    indexOfFirstProduct,
-    indexOfLastProduct
+  const observerRef = useRef(null);
+  const abortControllerRef = useRef(null);
+  const router = useRouter();
+
+  const productsPerPage = 20;
+  const maxRetries = 3;
+
+  // Network status monitoring
+  useEffect(() => {
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+
+    window.addEventListener("online", handleOnline);
+    window.addEventListener("offline", handleOffline);
+
+    return () => {
+      window.removeEventListener("online", handleOnline);
+      window.removeEventListener("offline", handleOffline);
+    };
+  }, []);
+
+  // Optimized fetch function with retry logic
+  const fetchProducts = useCallback(
+    async (page, isLoadMore) => {
+      if (!isOnline) {
+        setError("No internet connection. Please check your network.");
+        return;
+      }
+
+      // Cancel previous request
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+
+      abortControllerRef.current = new AbortController();
+
+      try {
+        if (isLoadMore) {
+          setIsLoadingMore(true);
+        } else {
+          setIsLoading(true);
+        }
+        setError(null);
+
+        const response = await axios.get(
+          `${productsURI}/pagination?page=${page}&limit=${productsPerPage}`,
+          {
+            signal: abortControllerRef.current.signal,
+            timeout: 10000,
+          }
+        );
+
+        const {
+          products: newProducts,
+          hasNextPage: hasMore,
+          totalProducts: total,
+        } = response.data;
+
+        if (isLoadMore) {
+          setProducts((prev) => {
+            // Remove duplicates based on _id
+            const existingIds = new Set(prev.map((p) => p._id));
+            const uniqueNewProducts = newProducts.filter(
+              (p) => !existingIds.has(p._id)
+            );
+            return [...prev, ...uniqueNewProducts];
+          });
+        } else {
+          setProducts(newProducts);
+        }
+
+        setHasNextPage(hasMore);
+        setTotalProducts(total);
+        setRetryCount(0);
+      } catch (error) {
+        if (error.name === "AbortError") return;
+
+        console.error("Error fetching products:", error);
+
+        if (retryCount < maxRetries) {
+          setRetryCount((prev) => prev + 1);
+          setTimeout(() => {
+            fetchProducts(page, isLoadMore);
+          }, Math.pow(2, retryCount) * 1000);
+        } else {
+          setError(
+            error.response?.status === 404
+              ? "Products not found. Please try again later."
+              : error.code === "NETWORK_ERROR"
+              ? "Network error. Please check your connection."
+              : "Failed to load products. Please try again."
+          );
+        }
+      } finally {
+        setIsLoading(false);
+        setIsLoadingMore(false);
+      }
+    },
+    [isOnline, retryCount, maxRetries, productsPerPage]
   );
 
-  // -------------------------Filter Products------------------->
-
+  // Initial load
   useEffect(() => {
-    let filtered = products;
+    fetchProducts(1, false);
+  }, []);
 
-    // Search Filter
-    if (search?.trim()) {
-      const lowerSearch = search.toLowerCase().trim();
-
-      filtered = filtered.filter((product) => {
-        const nameMatch = product?.name?.toLowerCase().includes(lowerSearch);
-        const categoryMatch = product?.category?.name
-          ?.toLowerCase()
-          .includes(lowerSearch);
-        const priceMatch = product?.price?.toString() === lowerSearch;
-
-        return nameMatch || categoryMatch || priceMatch;
-      });
-    }
-
-    // Filter by category
-    // if (selectedCategories.length > 0) {
-    //   filtered = filtered.filter(
-    //     (product) =>
-    //       product?.category?.name &&
-    //       selectedCategories.some(
-    //         (category) =>
-    //           category.toLowerCase() === product.category.name.toLowerCase()
-    //       )
-    //   );
-    // }
-
-    setFilteredProducts(filtered);
-  }, [search, products]);
-
-  // Function to load more products
+  // Load more products when scrolling to bottom
   const loadMoreProducts = useCallback(() => {
-    if (
-      isFetchingRef.current ||
-      !products?.length ||
-      visibleProducts >= products.length
-    )
-      return;
-    isFetchingRef.current = true;
+    if (isLoadingMore || !hasNextPage || error) return;
 
-    setTimeout(() => {
-      setVisibleProducts((prev) => prev + 8);
-      isFetchingRef.current = false;
-    }, 500);
-  }, [products, visibleProducts]);
+    const nextPage = currentPage + 1;
+    setCurrentPage(nextPage);
+    fetchProducts(nextPage, true);
+  }, [currentPage, hasNextPage, isLoadingMore, error, fetchProducts]);
 
-  useEffect(() => {
-    if (!products?.length) return;
+  // Intersection Observer for infinite scroll
+  // useEffect(() => {
+  //   const observer = new IntersectionObserver(
+  //     (entries) => {
+  //       const target = entries[0];
+  //       if (target.isIntersecting && hasNextPage && !isLoadingMore) {
+  //         loadMoreProducts();
+  //       }
+  //     },
+  //     {
+  //       threshold: 0.1,
+  //       rootMargin: "100px", // Start loading 100px before reaching the bottom
+  //     }
+  //   );
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) {
-          loadMoreProducts();
-        }
-      },
-      { threshold: 0.5 }
-    );
+  //   if (observerRef.current) {
+  //     observer.observe(observerRef.current);
+  //   }
 
-    if (observerRef.current) {
-      observer.observe(observerRef.current);
-    }
+  //   return () => observer.disconnect();
+  // }, [loadMoreProducts, hasNextPage, isLoadingMore]);
 
-    return () => observer.disconnect();
-  }, [products, loadMoreProducts]);
+  // Retry function
+  const handleRetry = useCallback(() => {
+    setRetryCount(0);
+    setCurrentPage(1);
+    setProducts([]);
+    fetchProducts(1, false);
+  }, [fetchProducts]);
+
+  // Memoized skeleton loader
+  const SkeletonLoader = useMemo(
+    () => (
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 px-4 sm:px-0">
+        {Array.from({ length: productsPerPage }).map((_, index) => (
+          <motion.div
+            key={index}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: index * 0.05 }}
+            className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden"
+          >
+            <div className="aspect-square bg-gradient-to-br from-gray-200 to-gray-300 animate-pulse" />
+            <div className="p-4 space-y-3">
+              <div className="h-4 bg-gray-200 rounded animate-pulse" />
+              <div className="h-3 bg-gray-200 rounded w-3/4 animate-pulse" />
+              <div className="flex justify-between items-center">
+                <div className="h-5 bg-gray-200 rounded w-1/3 animate-pulse" />
+                <div className="h-8 bg-gray-200 rounded w-1/4 animate-pulse" />
+              </div>
+            </div>
+          </motion.div>
+        ))}
+      </div>
+    ),
+    [productsPerPage]
+  );
+
+  // Memoized products grid
+  const ProductsGrid = useMemo(
+    () => (
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 px-4 sm:px-0">
+        <AnimatePresence>
+          {products.map((product, index) => (
+            <motion.div
+              key={product._id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3, delay: index * 0.02 }}
+            >
+              <ProductCard
+                product={product}
+                sale={true}
+                trending={true}
+                isDesc={true}
+              />
+            </motion.div>
+          ))}
+        </AnimatePresence>
+      </div>
+    ),
+    [products]
+  );
 
   return (
     <div className="py-5 bg-transparent text-black z-10 w-full min-h-[80vh] flex flex-col gap-5">
+      {/* Header */}
       <div className="flex items-center justify-between gap-6">
-        <h1
-          className={`${Style.h1} text-start text-black flex items-center gap-2 min-w-fit`}
-        >
-          Just for you
-        </h1>
+        <div className="flex items-center gap-3">
+          <h1
+            className={`${Style.h1} text-start text-black flex items-center gap-2 min-w-fit`}
+          >
+            Just for you
+          </h1>
+          {!isOnline && (
+            <div className="flex items-center gap-1 text-red-500 text-sm">
+              <WifiOff className="w-4 h-4" />
+              <span>Offline</span>
+            </div>
+          )}
+          {totalProducts > 0 && (
+            <span className="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
+              {products.length} of {totalProducts}
+            </span>
+          )}
+        </div>
+
         <button
           onClick={() => router.push("/products")}
-          className=" text-black font-medium text-[17px] cursor-pointer flex items-center gap-1"
+          className="text-black font-medium text-[17px] cursor-pointer flex items-center gap-1 hover:gap-2 transition-all duration-300"
         >
-          View All{" "}
-          <span className="p-1 rounded-full bg-orange-500 hover:bg-orange-600 transition-all duration-300 cursor-pointer">
+          View All
+          <span className="p-1 rounded-full bg-gray-500 hover:bg-gray-900 transition-all duration-300 cursor-pointer">
             <FaArrowRight size={17} className="text-white" />
           </span>
         </button>
       </div>
-      {currentProducts.length === 0 ? (
+
+      {/* Error State */}
+      {error && (
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-red-50 border border-red-200 rounded-lg p-6 flex flex-col items-center gap-4"
+        >
+          <div className="flex items-center gap-2 text-red-600">
+            <FaExclamationTriangle className="w-5 h-5" />
+            <span className="font-medium">Something went wrong</span>
+          </div>
+          <p className="text-red-700 text-center">{error}</p>
+          <button
+            onClick={handleRetry}
+            disabled={isLoading}
+            className="flex items-center gap-2 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors duration-200 disabled:opacity-50"
+          >
+            <RefreshCw
+              className={`w-4 h-4 ${isLoading ? "animate-spin" : ""}`}
+            />
+            {isLoading ? "Retrying..." : "Try Again"}
+          </button>
+        </motion.div>
+      )}
+
+      {/* Empty State */}
+      {!isLoading && !error && products.length === 0 && (
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -124,64 +291,45 @@ export default function AllProducts() {
           className="flex flex-col items-center justify-center mt-10"
         >
           <Image
-            src="/9960436.jpg"
+            src="/placeholder.svg?height=200&width=200"
             alt="No products found"
             width={200}
             height={200}
-            className="w-64 h-64"
+            className="w-64 h-64 opacity-50"
           />
           <h3 className="text-lg font-semibold mt-4 text-gray-600">
             No products found!
           </h3>
-          <p className="text-gray-500">Try adjusting your filters.</p>
+          <p className="text-gray-500">
+            Try adjusting your filters or check back later.
+          </p>
         </motion.div>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 px-4 sm:px-0">
-          {isFetching
-            ? Array.from({ length: 12 }).map((_, index) => (
-                <div
-                  key={index}
-                  className="w-full min-w-[320px] h-[300px] bg-gray-600 animate-pulse rounded-lg"
-                ></div>
-              )) // ?.slice(0, visibleProducts)
-            : currentProducts?.map((product) => (
-                <ProductCard
-                  key={product._id}
-                  product={product}
-                  sale={true}
-                  tranding={true}
-                  isDesc={true}
-                />
-              ))}
-        </div>
       )}
 
-      {/* Pegination */}
-      {currentProducts.length > 0 && (
-        <div className="flex items-center justify-center w-full">
-          <Pagination
-            totalPages={totalPages}
-            currentPage={currentPage}
-            setCurrentPage={setCurrentPage}
-          />
-        </div>
-      )}
+      {/* Loading State */}
+      {isLoading && products.length === 0 && SkeletonLoader}
 
-      {/* {!isFetching && visibleProducts < products.length && (
-        <div
-          ref={observerRef}
-          className="h-[550px] flex justify-center items-center mt-4"
+      {/* Products Grid */}
+      {!isLoading && !error && products.length > 0 && ProductsGrid}
+
+      {/* Load More Indicator */}
+      {isLoadingMore && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="flex items-center justify-center py-8"
         >
-          <div className=" w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 ">
-            {Array.from({ length: 8 }).map((_, index) => (
-              <div
-                key={index}
-                className="w-[230px] min-w-[280px] h-[300px] bg-gray-600 animate-pulse rounded-lg"
-              ></div>
-            ))}
+          <div className="flex items-center gap-3 bg-white rounded-full px-6 py-3 shadow-lg border">
+            <Loader2 className="w-5 h-5 animate-spin text-orange-500" />
+            <span className="text-gray-600 font-medium">
+              Loading more products...
+            </span>
           </div>
-        </div>
-      )} */}
+        </motion.div>
+      )}
+
+      {/* Intersection Observer Target */}
+      <div ref={observerRef} className="h-1" />
     </div>
   );
 }

@@ -304,7 +304,7 @@ export default function OrdersHistory({ userId }) {
                             }
                           >
                             <Image
-                              src={product?.product?.thumbnails[0]}
+                              src={product?.product?.thumbnails}
                               alt={product?.product?.name}
                               width={80}
                               height={70}
@@ -559,7 +559,7 @@ export default function OrdersHistory({ userId }) {
                                 }
                               >
                                 <Image
-                                  src={product?.product?.thumbnails[0]}
+                                  src={product?.product?.thumbnails}
                                   alt={product?.product?.name}
                                   width={80}
                                   height={70}

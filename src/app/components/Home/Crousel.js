@@ -288,7 +288,7 @@ const TrendingProducts = ({ products, loading }) => {
                   {/* Product Image */}
                   <div className="relative aspect-square overflow-hidden">
                     <Image
-                      src={product.thumbnails?.[0] || "/placeholder.svg"}
+                      src={product.thumbnails || "/placeholder.svg"}
                       alt={product.name || "Product image"}
                       fill
                       className={`object-cover transition-transform duration-300 ${

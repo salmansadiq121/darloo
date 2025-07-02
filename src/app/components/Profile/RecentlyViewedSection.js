@@ -67,7 +67,7 @@ export default function RecentlyViewedSection() {
           product: product._id,
           quantity,
           price: product.price,
-          image: product.thumbnails[0],
+          image: product.thumbnails,
           title: product.name,
           _id: product._id,
         });
@@ -97,7 +97,7 @@ export default function RecentlyViewedSection() {
             >
               <div className="h-20 w-20 flex-shrink-0">
                 <Image
-                  src={item?.thumbnails[0] || "/placeholder.svg"}
+                  src={item?.thumbnails || "/placeholder.svg"}
                   alt={item?.name}
                   width={200}
                   height={200}

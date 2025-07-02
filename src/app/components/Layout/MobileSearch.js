@@ -117,7 +117,7 @@ export default function MobileProductSearch({ isShow }) {
                   <div className="flex-shrink-0 h-12 w-12 bg-gray-100 rounded-md overflow-hidden">
                     <Image
                       src={
-                        product?.thumbnails[0] ||
+                        product?.thumbnails ||
                         "/placeholder.svg?height=48&width=48"
                       }
                       alt={product?.name}

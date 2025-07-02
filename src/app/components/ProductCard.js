@@ -47,7 +47,7 @@ export default function ProductCard({ product, sale, tranding, isDesc }) {
           price: product.price,
           colors: [selectedColor],
           sizes: [selectedSize],
-          image: product.thumbnails[0],
+          image: product.thumbnails,
           title: product.name,
           _id: product._id,
         });
@@ -65,12 +65,12 @@ export default function ProductCard({ product, sale, tranding, isDesc }) {
     <div className="group bg-white min-w-[14rem] border overflow-hidden transition-all duration-300  hover:shadow-[#9333EA]/20 hover:shadow-2xl hover:border-red-500/50 hover:-translate-y-1">
       <div className="relative ">
         <Image
-          src={product?.thumbnails[0]}
+          src={product?.thumbnails || "/placeholder.svg"}
           alt={product?.name}
           width={200}
           height={230}
-          priority
           className="w-full h-[230px] object-fill"
+          loading="lazy"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-[#0F172A]   to-transparent"></div>
 

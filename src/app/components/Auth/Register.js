@@ -121,10 +121,7 @@ export default function Register({ setActive }) {
           <span className={`${Style.span1} text-center`}>Sign Up</span>
           <h3 className={`${Style.h1} text-center`}>Join Us Today</h3>
         </div>
-        <form
-          onSubmit={handleSubmit}
-          className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5"
-        >
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div className="col-span-2 py-2 relative w-fit">
             <label
               htmlFor="avatar"
@@ -150,96 +147,98 @@ export default function Register({ setActive }) {
               </span>
             </label>
           </div>
-          <div className=" w-full h-[2.8rem]">
-            <input
-              type="text"
-              placeholder="Full Name"
-              value={name}
-              required
-              onChange={(e) => setName(e.target.value)}
-              className=" w-full h-full px-5  py-2  text-[15px] text-gray-900 bg-transparent border border-gray-400 rounded-sm focus:border-red-600 outline-none"
-            />
-          </div>
-
-          {/*  */}
-          <div className=" w-full h-[2.8rem]">
-            <input
-              type="email"
-              placeholder="email"
-              value={email}
-              required
-              onChange={(e) => setEmail(e.target.value)}
-              className=" w-full h-full px-5  py-2  text-[15px] text-gray-900 bg-transparent border border-gray-400 rounded-sm focus:border-red-600  outline-none"
-            />
-          </div>
-          <div className="w-full h-[2.8rem]">
-            {/* State Dropdown */}
-            <div className="flex items-center gap-1 w-full px-[1px] border border-gray-400 rounded-sm focus:border-red-600 ">
-              <select
-                value={phoneCode || "+1"}
-                onChange={(e) => setPhoneCode(e.target.value)}
-                className="bg-white text-black h-[2.5rem] border-none outline-none max-w-[4rem] px-1 "
-                style={{
-                  clipPath:
-                    "polygon(100% 50%, 100% 97.00%, 0% 97.00%, 0% 43%, 34.96% 0%, 100% 0%)",
-                }}
-              >
-                {countries.map((country) => (
-                  <option key={country.isoCode} value={country.phoneCode}>
-                    {country.phoneCode}
-                  </option>
-                ))}
-              </select>
-
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
+            <div className=" w-full h-[2.8rem]">
               <input
-                type="number"
-                placeholder="Phone Number"
-                value={number}
-                onChange={(e) => setNumber(e.target.value)}
-                className="w-full h-[2.8rem] pl-2 pr-3 py-2 text-[15px] text-gray-900 bg-transparent border-none  outline-none"
+                type="text"
+                placeholder="Full Name"
+                value={name}
                 required
+                onChange={(e) => setName(e.target.value)}
+                className=" w-full h-full px-5  py-2  text-[15px] text-gray-900 bg-transparent border border-gray-400 rounded-sm focus:border-red-600 outline-none"
               />
             </div>
-          </div>
-          {/*  */}
-          <div className=" w-full h-[2.8rem] relative">
-            <span
-              className="absolute top-[.7rem] right-3 text-gray-800 text-[14px] cursor-pointer "
-              onClick={() => setShowPassword(!showPassword)}
-            >
-              {showPassword ? (
-                <LuEyeOff size={24} color="black" />
-              ) : (
-                <LuEye size={24} color="black" />
-              )}
-            </span>
-            <input
-              type={showPassword ? "text" : "password"}
-              placeholder="Password"
-              value={password}
-              required
-              onChange={(e) => setPassword(e.target.value)}
-              className=" w-full h-full px-5  py-2  text-[15px] text-gray-900 bg-transparent border border-gray-400 rounded-sm focus:border-red-600  outline-none"
-            />
-          </div>
-          <div className=" relative w-full h-[2.8rem]">
-            <span
-              className="absolute top-[.7rem] right-3 text-gray-800 text-[14px] cursor-pointer "
-              onClick={() => setShowPassword(!showPassword)}
-            >
-              {showPassword ? (
-                <LuEyeOff size={24} color="black" />
-              ) : (
-                <LuEye size={24} color="black" />
-              )}
-            </span>
-            <input
-              type={showPassword ? "text" : "password"}
-              placeholder="Confirm Password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              className=" w-full h-full px-5  py-2  text-[15px] text-gray-900 bg-transparent border border-gray-400 rounded-sm focus:border-red-600  outline-none"
-            />
+
+            {/*  */}
+            <div className=" w-full h-[2.8rem]">
+              <input
+                type="email"
+                placeholder="email"
+                value={email}
+                required
+                onChange={(e) => setEmail(e.target.value)}
+                className=" w-full h-full px-5  py-2  text-[15px] text-gray-900 bg-transparent border border-gray-400 rounded-sm focus:border-red-600  outline-none"
+              />
+            </div>
+            <div className="w-full h-[2.8rem]">
+              {/* State Dropdown */}
+              <div className="flex items-center gap-1 w-full px-[1px] border border-gray-400 rounded-sm focus:border-red-600 ">
+                <select
+                  value={phoneCode || "+1"}
+                  onChange={(e) => setPhoneCode(e.target.value)}
+                  className="bg-white text-black h-[2.5rem] border-none outline-none max-w-[4rem] px-1 "
+                  style={{
+                    clipPath:
+                      "polygon(100% 50%, 100% 97.00%, 0% 97.00%, 0% 43%, 34.96% 0%, 100% 0%)",
+                  }}
+                >
+                  {countries.map((country) => (
+                    <option key={country.isoCode} value={country.phoneCode}>
+                      {country.phoneCode}
+                    </option>
+                  ))}
+                </select>
+
+                <input
+                  type="number"
+                  placeholder="Phone Number"
+                  value={number}
+                  onChange={(e) => setNumber(e.target.value)}
+                  className="w-full h-[2.8rem] pl-2 pr-3 py-2 text-[15px] text-gray-900 bg-transparent border-none  outline-none"
+                  required
+                />
+              </div>
+            </div>
+            {/*  */}
+            <div className=" w-full h-[2.8rem] relative">
+              <span
+                className="absolute top-[.7rem] right-3 text-gray-800 text-[14px] cursor-pointer "
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? (
+                  <LuEyeOff size={24} color="black" />
+                ) : (
+                  <LuEye size={24} color="black" />
+                )}
+              </span>
+              <input
+                type={showPassword ? "text" : "password"}
+                placeholder="Password"
+                value={password}
+                required
+                onChange={(e) => setPassword(e.target.value)}
+                className=" w-full h-full px-5  py-2  text-[15px] text-gray-900 bg-transparent border border-gray-400 rounded-sm focus:border-red-600  outline-none"
+              />
+            </div>
+            <div className=" relative w-full h-[2.8rem]">
+              <span
+                className="absolute top-[.7rem] right-3 text-gray-800 text-[14px] cursor-pointer "
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? (
+                  <LuEyeOff size={24} color="black" />
+                ) : (
+                  <LuEye size={24} color="black" />
+                )}
+              </span>
+              <input
+                type={showPassword ? "text" : "password"}
+                placeholder="Confirm Password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                className=" w-full h-full px-5  py-2  text-[15px] text-gray-900 bg-transparent border border-gray-400 rounded-sm focus:border-red-600  outline-none"
+              />
+            </div>
           </div>
           <div className=" col-span-2 flex items-center gap-2">
             <span className="text-gray-900 text-[14px]">

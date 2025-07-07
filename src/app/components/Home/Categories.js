@@ -42,8 +42,8 @@ export default function Categories({ categoriesData, isLoading }) {
   };
 
   //  Filter By Category
-  const handleCategoryClick = (category) => {
-    router.push(`/products?category=${encodeURIComponent(category)}`);
+  const handleCategoryClick = (id) => {
+    router.push(`/products?category=${id}`);
   };
 
   return (
@@ -62,7 +62,7 @@ export default function Categories({ categoriesData, isLoading }) {
                 <div
                   ref={index === products.length - 1 ? lastItemRef : null}
                   key={index}
-                  onClick={() => handleCategoryClick(category.name)}
+                  onClick={() => handleCategoryClick(category._id)}
                   className="flex flex-col items-center justify-center  min-w-fit gap-2 cursor-pointer group"
                 >
                   <Image

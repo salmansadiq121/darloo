@@ -1,167 +1,351 @@
 "use client";
 
-import React, { useEffect, useState, Suspense } from "react";
-import MainLayout from "@/app/components/Layout/Layout";
-import { useAuth } from "@/app/content/authContent";
-import FilterProducts from "@/app/components/Product/FilterProducts";
-import { ChevronDown, ChevronUp, Filter } from "lucide-react";
+import { useEffect, useState, useCallback, useMemo, Suspense } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
+import { ChevronDown, ChevronUp, Filter, Search, X } from "lucide-react";
 import {
   FaSortAlphaDown,
   FaSortAlphaUp,
   FaSortAmountDown,
   FaSortAmountUp,
 } from "react-icons/fa";
-import { motion } from "framer-motion";
-import Pagination from "@/app/utils/Pagination";
-import ProductCard from "@/app/components/ProductCard";
-import { useSearchParams } from "next/navigation";
-import Image from "next/image";
 import { FaSliders } from "react-icons/fa6";
+import Image from "next/image";
+import toast from "react-hot-toast";
+import MainLayout from "@/app/components/Layout/Layout";
+import FilterProducts from "@/app/components/Product/FilterProducts";
+import ProductCard from "@/app/components/ProductCard";
+import Pagination from "@/app/utils/Pagination";
+import axios from "axios";
 
 const sortingOptions = [
   {
     label: "Price: Low to High",
-    value: "lowToHigh",
+    value: "price_asc",
     icon: <FaSortAmountDown />,
   },
-  { label: "Price: High to Low", value: "highToLow", icon: <FaSortAmountUp /> },
-  { label: "Alphabetical (A-Z)", value: "az", icon: <FaSortAlphaDown /> },
-  { label: "Alphabetical (Z-A)", value: "za", icon: <FaSortAlphaUp /> },
+  {
+    label: "Price: High to Low",
+    value: "price_desc",
+    icon: <FaSortAmountUp />,
+  },
+  {
+    label: "Alphabetical (A-Z)",
+    value: "name_asc",
+    icon: <FaSortAlphaDown />,
+  },
+  {
+    label: "Alphabetical (Z-A)",
+    value: "name_desc",
+    icon: <FaSortAlphaUp />,
+  },
+  {
+    label: "Newest First",
+    value: "createdAt_desc",
+    icon: <FaSortAmountDown />,
+  },
+  {
+    label: "Most Popular",
+    value: "purchased_desc",
+    icon: <FaSortAmountUp />,
+  },
 ];
+
+// Loading skeleton component
+const ProductSkeleton = () => (
+  <div className="group bg-white min-w-[14rem] border overflow-hidden animate-pulse">
+    <div className="relative">
+      <div className="w-full h-[230px] bg-gray-300"></div>
+      <div className="absolute top-3 right-3 w-16 h-6 bg-gray-400 rounded-full"></div>
+    </div>
+    <div className="p-3">
+      <div className="h-6 bg-gray-300 rounded mb-2"></div>
+      <div className="h-4 bg-gray-200 rounded mb-3 w-3/4"></div>
+      <div className="flex items-center justify-between pb-2">
+        <div className="flex items-center gap-2">
+          <div className="h-6 bg-gray-300 rounded w-16"></div>
+          <div className="h-4 bg-gray-200 rounded w-12"></div>
+        </div>
+        <div className="w-7 h-7 bg-gray-300 rounded-full"></div>
+      </div>
+      <div className="flex gap-1">
+        {[...Array(5)].map((_, i) => (
+          <div key={i} className="w-4 h-4 bg-gray-200 rounded"></div>
+        ))}
+      </div>
+    </div>
+  </div>
+);
+
+// Empty state component
+const EmptyState = ({ onClearFilters }) => (
+  <motion.div
+    initial={{ opacity: 0, scale: 0.8 }}
+    animate={{ opacity: 1, scale: 1 }}
+    transition={{ duration: 0.5 }}
+    className="flex flex-col items-center justify-center mt-10 py-12"
+  >
+    <Image
+      src="/9960436.jpg?height=200&width=200"
+      alt="No products found"
+      width={200}
+      height={200}
+      className="w-64 h-64 opacity-50"
+    />
+    <h3 className="text-xl font-semibold mt-6 text-gray-700">
+      No products found!
+    </h3>
+    <p className="text-gray-500 mt-2 text-center max-w-md">
+      We couldn&apos;t find any products matching your criteria. Try adjusting
+      your filters or search terms.
+    </p>
+    <button
+      onClick={onClearFilters}
+      className="mt-4 px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+    >
+      Clear All Filters
+    </button>
+  </motion.div>
+);
 
 export default function Products() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center h-screen">
+          Loading...
+        </div>
+      }
+    >
       <ProductsContent />
     </Suspense>
   );
 }
 
 function ProductsContent() {
-  const { products, isFetching, search } = useAuth();
-  const searchParams = useSearchParams();
-  const selectedCategory = searchParams.get("category") || "";
+  // State management
+  const [products, setProducts] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
+
+  // Filter states
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
   const [selectedCategories, setSelectedCategories] = useState([]);
+  const [selectedSubCategories, setSelectedSubCategories] = useState([]);
+  const [trending, setTrending] = useState(false);
+  const [onSale, setOnSale] = useState(false);
+  const [sortOption, setSortOption] = useState("");
+
+  // UI states
   const [openSort, setOpenSort] = useState(false);
   const [openFilter, setOpenFilter] = useState(false);
-  const [filteredProducts, setFilteredProducts] = useState([]);
+
+  // Pagination
   const [currentPage, setCurrentPage] = useState(1);
-  const productsPerPage = 40;
-  const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
-  const [sortOption, setSortOption] = useState("");
-  const selectedFiltersCount =
-    (selectedCategories.length > 0 ? selectedCategories.length : 0) +
-    (search ? 1 : 0) +
-    (minPrice !== "" ? 1 : 0) +
-    (maxPrice !== "" ? 1 : 0);
+  const [totalProducts, setTotalProducts] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+  const productsPerPage = 20;
 
-  console.log("selectedCategory:", selectedCategory);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [filtersInitialized, setFiltersInitialized] = useState(false);
 
-  // Apply filters
+  // Debounced search
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
+
   useEffect(() => {
-    setFilteredProducts(products);
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 500);
 
-    let filtered = products;
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
 
-    // Search Filter
-    if (search?.trim()) {
-      const lowerSearch = search.toLowerCase().trim();
-
-      filtered = filtered.filter((product) => {
-        const nameMatch = product?.name?.toLowerCase().includes(lowerSearch);
-        const categoryMatch = product?.category?.name
-          ?.toLowerCase()
-          .includes(lowerSearch);
-        const priceMatch = product?.price?.toString() === lowerSearch;
-
-        return nameMatch || categoryMatch || priceMatch;
-      });
-    }
-
-    // Filter by category
-    if (selectedCategories.length > 0) {
-      filtered = filtered.filter(
-        (product) =>
-          product?.category?.name &&
-          selectedCategories.some(
-            (category) =>
-              category.toLowerCase() === product.category.name.toLowerCase()
-          )
-      );
-    }
-
-    if (selectedCategory) {
-      filtered = filtered.filter((product) =>
-        product?.category?.name
-          .toLowerCase()
-          .includes(selectedCategory.toLowerCase())
-      );
-    }
-
-    // Filter by price range
-    if (minPrice !== "" || maxPrice !== "") {
-      const min = minPrice ? Number(minPrice) : 0;
-      const max = maxPrice ? Number(maxPrice) : Infinity;
-
-      filtered = filtered.filter((product) => {
-        const price = Number(product.price);
-        return price >= min && price <= max;
-      });
-    }
-
-    // Apply sorting
-    if (sortOption === "lowToHigh") {
-      filtered = [...filtered].sort((a, b) => a.price - b.price);
-    } else if (sortOption === "highToLow") {
-      filtered = [...filtered].sort((a, b) => b.price - a.price);
-    } else if (sortOption === "az") {
-      filtered = [...filtered].sort((a, b) =>
-        a.name.toLowerCase().localeCompare(b.name.toLowerCase())
-      );
-    } else if (sortOption === "za") {
-      filtered = [...filtered].sort((a, b) =>
-        b.name.toLowerCase().localeCompare(a.name.toLowerCase())
-      );
-    }
-
-    setFilteredProducts(filtered);
+  // Calculate selected filters count
+  const selectedFiltersCount = useMemo(() => {
+    return (
+      (selectedCategories.length > 0 ? selectedCategories.length : 0) +
+      (selectedSubCategories.length > 0 ? selectedSubCategories.length : 0) +
+      (debouncedSearchTerm ? 1 : 0) +
+      (minPrice !== "" ? 1 : 0) +
+      (maxPrice !== "" ? 1 : 0) +
+      (trending ? 1 : 0) +
+      (onSale ? 1 : 0)
+    );
   }, [
-    products,
-    search,
     selectedCategories,
+    selectedSubCategories,
+    debouncedSearchTerm,
+    minPrice,
+    maxPrice,
+    trending,
+    onSale,
+  ]);
+
+  console.log("products", products);
+
+  useEffect(() => {
+    const cat = searchParams.get("category");
+    const sub = searchParams.get("subcategory");
+
+    if (cat) setSelectedCategories([cat]);
+    if (sub) setSelectedSubCategories([sub]);
+
+    setTimeout(() => {
+      setFiltersInitialized(true);
+    }, 0);
+  }, [searchParams]);
+
+  // Fetch products function
+  const fetchProducts = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const params = new URLSearchParams();
+
+      // Pagination
+      params.append("page", currentPage.toString());
+      params.append("limit", productsPerPage.toString());
+
+      // Categories (comma-separated)
+      if (selectedCategories.length > 0) {
+        params.append("category", selectedCategories.join(","));
+      }
+
+      // Subcategories (comma-separated)
+      if (selectedSubCategories.length > 0) {
+        params.append("subCategory", selectedSubCategories.join(","));
+      }
+
+      // Price range
+      if (minPrice !== "" && minPrice !== "0") {
+        params.append("minPrice", minPrice.toString());
+      }
+      if (maxPrice !== "" && maxPrice !== "5000") {
+        params.append("maxPrice", maxPrice.toString());
+      }
+
+      // Sort option
+      if (sortOption) {
+        params.append("sortBy", sortOption);
+      }
+
+      // Boolean flags
+      if (trending) {
+        params.append("trending", "true");
+      }
+      if (onSale) {
+        params.append("onSale", "true");
+      }
+
+      // Search term
+      if (debouncedSearchTerm) {
+        params.append("search", debouncedSearchTerm);
+      }
+
+      const { data } = await axios.get(
+        `${
+          process.env.NEXT_PUBLIC_SERVER_URI
+        }/api/v1/products/pagination?${params.toString()}`
+      );
+
+      console.log("data", data);
+
+      if (data) {
+        setProducts(data.products || []);
+        setTotalProducts(data.pagination?.total || 0);
+        setTotalPages(data.pagination?.totalPages || 0);
+      } else {
+        throw new Error(data.message || "Failed to fetch products");
+      }
+    } catch (err) {
+      console.error("❌ Error fetching products:", err);
+      setError(err.message);
+      toast.error("Error fetching products. Please try again.");
+      setProducts([]);
+      setTotalProducts(0);
+      setTotalPages(0);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [
+    currentPage,
+    selectedCategories,
+    selectedSubCategories,
     minPrice,
     maxPrice,
     sortOption,
-    selectedCategory,
+    trending,
+    onSale,
+    debouncedSearchTerm,
   ]);
 
-  // ------------------------Pegination---------------------->
+  // Fetch products when dependencies change
+  useEffect(() => {
+    if (filtersInitialized) {
+      fetchProducts();
+    }
+  }, [fetchProducts, filtersInitialized]);
 
-  const indexOfLastProduct = currentPage * productsPerPage;
-  const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
-  const currentProducts = filteredProducts.slice(
-    indexOfFirstProduct,
-    indexOfLastProduct
-  );
+  // Reset to first page when filters change
+  useEffect(() => {
+    if (currentPage !== 1) {
+      setCurrentPage(1);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    selectedCategories,
+    selectedSubCategories,
+    minPrice,
+    maxPrice,
+    sortOption,
+    trending,
+    onSale,
+    debouncedSearchTerm,
+  ]);
 
-  // Clear filters
-  const clearFilters = () => {
+  // Clear all filters
+  const clearFilters = useCallback(() => {
     setMinPrice("");
     setMaxPrice("");
     setSelectedCategories([]);
+    setSelectedSubCategories([]);
     setSortOption("");
-    setSortOption(false);
+    setTrending(false);
+    setOnSale(false);
+    setSearchTerm("");
+    setDebouncedSearchTerm("");
+    setCurrentPage(1);
     setOpenFilter(false);
-  };
+    // const params = new URLSearchParams(searchParams.toString());
+    // params.delete("subCategory");
+    router.push(`/products`);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Handle sort selection
+  const handleSortSelection = useCallback((value) => {
+    setSortOption(value);
+    setOpenSort(false);
+  }, []);
+
+  // Get current sort label
+  const currentSortLabel = useMemo(() => {
+    const option = sortingOptions.find((opt) => opt.value === sortOption);
+    return option ? option.label : "Sort By";
+  }, [sortOption]);
 
   return (
     <MainLayout title="Darloo - Products">
-      <div className=" relative bg-transparent text-black h-screen  z-10 overflow-hidden">
+      <div className="relative bg-transparent text-black min-h-screen z-10">
         <div className="grid grid-cols-4 z-10">
-          {/* Filters */}
-          <div className=" hidden md:block col-span-1  sm:border-r sm:border-gray-200 w-full h-screen overflow-y-auto shidden ">
+          {/* Desktop Filters */}
+          <div className="hidden lg:block col-span-1 border-r border-gray-200 w-full min-h-screen overflow-y-auto">
             <FilterProducts
               maxPrice={maxPrice}
               minPrice={minPrice}
@@ -171,115 +355,197 @@ function ProductsContent() {
               setSelectedCategories={setSelectedCategories}
               clearFilters={clearFilters}
               selectedFiltersCount={selectedFiltersCount}
+              selectedSubCategories={selectedSubCategories}
+              setSelectedSubCategories={setSelectedSubCategories}
+              setOpenFilter={setOpenFilter}
             />
           </div>
-          {/* Mobile View */}
-          {openFilter && (
-            <div className=" flex md:hidden absolute top-0 left-0 z-20 bg-white w-full h-screen overflow-y-auto shidden ">
-              <FilterProducts
-                maxPrice={maxPrice}
-                minPrice={minPrice}
-                setMaxPrice={setMaxPrice}
-                setMinPrice={setMinPrice}
-                selectedCategories={selectedCategories}
-                setSelectedCategories={setSelectedCategories}
-                clearFilters={clearFilters}
-                selectedFiltersCount={selectedFiltersCount}
-              />
-            </div>
-          )}
-          {/* Products */}
-          <div className=" col-span-4 md:col-span-3 w-full h-screen overflow-y-auto flex flex-col gap-4">
-            <div className="w-full flex items-center justify-between gap-5 py-3 px-4 border-b border-gray-200">
-              <div className="" onClick={() => setOpenFilter(!openFilter)}>
-                <FaSliders className="text-gray-600 hover:text-gray-900 transition-all duration-300 cursor-pointer block md:hidden" />
-              </div>
 
-              <div className="relative w-full sm:w-auto max-w-[10rem]">
-                <button
-                  onClick={() => setOpenSort(!openSort)}
-                  className="px-4 py-2 w-full sm:w-auto rounded-lg cursor-pointer text-sm font-medium bg-gray-200 hover:bg-gray-300  transition-all flex items-center justify-between"
-                >
-                  <Filter size={16} className="mr-2 text-gray-600 " />
-                  Sort By
-                  {openSort ? (
-                    <ChevronUp size={16} className="ml-2" />
-                  ) : (
-                    <ChevronDown size={16} className="ml-2" />
-                  )}
-                </button>
-
-                {openSort && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    className="absolute top-12 right-0 w-56 bg-white  shadow-lg rounded-lg z-20"
-                  >
-                    <ul className="flex flex-col divide-y divide-gray-100 ">
-                      {sortingOptions.map((option) => (
-                        <li
-                          key={option.value}
-                          className="flex items-center gap-2 p-3 cursor-pointer text-gray-700  hover:bg-gray-100  transition-all"
-                          onClick={() => {
-                            setSortOption(option.value);
-                            setOpenSort(false);
-                          }}
-                        >
-                          {option.icon}
-                          {option.label}
-                        </li>
-                      ))}
-                    </ul>
-                  </motion.div>
-                )}
-              </div>
-            </div>
-            {/* ---------------Products----------------- */}
-            <div className="flex flex-col gap-5 px-4 py-4">
-              {currentProducts.length === 0 ? (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.5 }}
-                  className="flex flex-col items-center justify-center mt-10"
-                >
-                  <Image
-                    src="/9960436.jpg"
-                    alt="No products found"
-                    width={200}
-                    height={200}
-                    className="w-64 h-64"
+          {/* Mobile Filter Overlay */}
+          <AnimatePresence>
+            {openFilter && (
+              <motion.div
+                initial={{ x: "-100%" }}
+                animate={{ x: 0 }}
+                exit={{ x: "-100%" }}
+                transition={{ type: "spring", damping: 20 }}
+                className="flex lg:hidden absolute top-[0rem] max-w-[24rem] left-0 z-50 bg-white border border-gray-400 w-full h-screen overflow-y-auto shadow-2xl"
+              >
+                <div className="w-full">
+                  <FilterProducts
+                    maxPrice={maxPrice}
+                    minPrice={minPrice}
+                    setMaxPrice={setMaxPrice}
+                    setMinPrice={setMinPrice}
+                    selectedCategories={selectedCategories}
+                    setSelectedCategories={setSelectedCategories}
+                    clearFilters={clearFilters}
+                    selectedFiltersCount={selectedFiltersCount}
+                    selectedSubCategories={selectedSubCategories}
+                    setSelectedSubCategories={setSelectedSubCategories}
+                    setOpenFilter={setOpenFilter}
                   />
-                  <h3 className="text-lg font-semibold mt-4 text-gray-600">
-                    No products found!
-                  </h3>
-                  <p className="text-gray-500">Try adjusting your filters.</p>
-                </motion.div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Products Section */}
+          <div className="col-span-4 lg:col-span-3 w-full min-h-screen flex flex-col">
+            {/* Header */}
+            <div className="sticky top-0 bg-white z-10 border-b border-gray-200 shadow-sm">
+              <div className="flex flex-col gap-4 px-4 py-2">
+                {/* Top Row - Mobile Filter Toggle & Search */}
+                {/* <div className="flex items-center gap-4">
+                  <button
+                    onClick={() => setOpenFilter(!openFilter)}
+                    className="md:hidden p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                  >
+                    <FaSliders className="text-gray-600 w-5 h-5" />
+                  </button>
+
+                  <div className="flex-1 relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                    <input
+                      type="text"
+                      placeholder="Search products..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                    />
+                    {searchTerm && (
+                      <button
+                        onClick={() => {
+                          setSearchTerm("");
+                          setDebouncedSearchTerm("");
+                        }}
+                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
+                </div> */}
+
+                {/* Bottom Row - Results & Sort */}
+                <div className="flex items-center justify-between">
+                  <button
+                    onClick={() => setOpenFilter(!openFilter)}
+                    className="lg:hidden p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                  >
+                    <FaSliders className="text-gray-600 w-5 h-5" />
+                  </button>
+                  <div className="text-sm text-gray-600 hidden sm:block">
+                    {isLoading ? (
+                      <div className="h-5 w-32 bg-gray-200 rounded animate-pulse"></div>
+                    ) : (
+                      <span>
+                        Showing {products.length} of {totalProducts} products
+                        {selectedFiltersCount > 0 && (
+                          <span className="ml-2 px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs">
+                            {selectedFiltersCount} filter
+                            {selectedFiltersCount > 1 ? "s" : ""} applied
+                          </span>
+                        )}
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Sort Dropdown */}
+                  <div className="relative ">
+                    <button
+                      onClick={() => setOpenSort(!openSort)}
+                      className="px-4 py-2 rounded-lg cursor-pointer text-sm font-medium bg-gray-100 hover:bg-gray-200 transition-all flex items-center justify-between min-w-[140px]"
+                    >
+                      <Filter size={16} className="mr-2 text-gray-600" />
+                      <span className="truncate">{currentSortLabel}</span>
+                      {openSort ? (
+                        <ChevronUp size={16} className="ml-2 flex-shrink-0" />
+                      ) : (
+                        <ChevronDown size={16} className="ml-2 flex-shrink-0" />
+                      )}
+                    </button>
+
+                    <AnimatePresence>
+                      {openSort && (
+                        <motion.div
+                          initial={{ opacity: 0, y: -10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -10 }}
+                          className="absolute top-12 right-0 w-56 bg-white shadow-lg rounded-lg z-20 border border-gray-200"
+                        >
+                          <ul className="py-2">
+                            {sortingOptions.map((option) => (
+                              <li
+                                key={option.value}
+                                className={`flex items-center gap-3 px-4 py-2 cursor-pointer text-gray-700 hover:bg-gray-50 transition-all ${
+                                  sortOption === option.value
+                                    ? "bg-red-50 text-red-700"
+                                    : ""
+                                }`}
+                                onClick={() =>
+                                  handleSortSelection(option.value)
+                                }
+                              >
+                                {option.icon}
+                                {option.label}
+                              </li>
+                            ))}
+                          </ul>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Products Grid */}
+            <div className="flex-1 max-[350px]:px-6 px-1 sm:px-4 py-4">
+              {error ? (
+                <div className="flex flex-col items-center justify-center py-12">
+                  <div className="text-red-500 text-center">
+                    <h3 className="text-lg font-semibold mb-2">
+                      Error Loading Products
+                    </h3>
+                    <p className="text-sm mb-4">{error}</p>
+                    <button
+                      onClick={fetchProducts}
+                      className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                    >
+                      Try Again
+                    </button>
+                  </div>
+                </div>
+              ) : products.length === 0 && !isLoading ? (
+                <EmptyState onClearFilters={clearFilters} />
               ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4  gap-4">
-                  {isFetching
+                <div className="grid  max-[350px]:grid-cols-1 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6 gap-6">
+                  {isLoading
                     ? Array.from({ length: 12 }).map((_, index) => (
-                        <div
-                          key={index}
-                          className="w-full min-w-[320px] h-[300px] bg-gray-600 animate-pulse rounded-lg"
-                        ></div>
+                        <ProductSkeleton key={index} />
                       ))
-                    : currentProducts?.map((product) => (
-                        <ProductCard
+                    : products.map((product) => (
+                        <motion.div
                           key={product._id}
-                          product={product}
-                          sale={true}
-                          tranding={true}
-                          isDesc={true}
-                        />
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.3 }}
+                        >
+                          <ProductCard
+                            product={product}
+                            sale={true}
+                            tranding={true}
+                            isDesc={true}
+                          />
+                        </motion.div>
                       ))}
                 </div>
               )}
 
-              {/* Pegination */}
-              {currentProducts.length > 0 && (
-                <div className="flex items-center justify-center w-full">
+              {/* Pagination */}
+              {products.length > 0 && totalPages > 1 && (
+                <div className="flex items-center justify-center mt-8">
                   <Pagination
                     totalPages={totalPages}
                     currentPage={currentPage}

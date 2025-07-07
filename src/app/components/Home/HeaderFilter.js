@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import { ChevronDown, Loader2 } from "lucide-react";
+import Image from "next/image";
 
 export default function HeaderFilter({ categoriesData, isLoading }) {
   const [active, setActive] = useState("");
@@ -17,11 +18,11 @@ export default function HeaderFilter({ categoriesData, isLoading }) {
   const dropdownRef = useRef(null);
   const timeoutRef = useRef();
 
-  useEffect(() => {
-    if (categoriesData && categoriesData.length > 0) {
-      setActive(categoriesData[0]?.name);
-    }
-  }, [categoriesData]);
+  // useEffect(() => {
+  //   if (categoriesData && categoriesData.length > 0) {
+  //     setActive(categoriesData[0]?.name);
+  //   }
+  // }, [categoriesData]);
 
   const fetchSubCategories = async (categoryId) => {
     if (!categoryId) return;
@@ -41,14 +42,12 @@ export default function HeaderFilter({ categoriesData, isLoading }) {
   };
 
   const handleCategoryClick = (category) => {
-    router.push(`/products?category=${encodeURIComponent(category.name)}`);
+    router.push(`/products?category=${category._id}`);
     setShowDropdown(false);
   };
 
   const handleSubCategoryClick = (subcategory) => {
-    router.push(
-      `/products?subcategory=${encodeURIComponent(subcategory.name)}`
-    );
+    router.push(`/products?subcategory=${subcategory._id}`);
     setShowDropdown(false);
   };
 
@@ -83,7 +82,7 @@ export default function HeaderFilter({ categoriesData, isLoading }) {
 
   return (
     <div className="w-full h-full pt-4 pb-2 bg-transparent z-50 relative">
-      <div className="flex items-center gap-4 sm:gap-5 overflow-x-auto overflow-y-hidden shidden">
+      <div className="flex items-center gap-2 overflow-x-auto overflow-y-hidden shidden">
         {isLoading
           ? Array.from({ length: 10 }).map((_, index) => (
               <div className="min-w-fit animate-pulse" key={index}>
@@ -99,7 +98,7 @@ export default function HeaderFilter({ categoriesData, isLoading }) {
                 onMouseLeave={handleMouseLeave}
               >
                 <div
-                  className={`flex items-center gap-1 text-[16px] min-w-fit capitalize sm:text-lg font-medium px-3 py-2 transition-all duration-300 cursor-pointer rounded-lg hover:bg-gray-100 ${
+                  className={`flex items-center gap-1 text-[14px] min-w-fit capitalize sm:text-[15px] font-medium px-2 py-[4px] transition-all duration-300 cursor-pointer rounded-md hover:bg-gray-100 ${
                     active === category.name
                       ? "border-b-2 border-yellow-500 text-yellow-500 bg-yellow-50"
                       : "border-b-2 border-transparent text-black"
@@ -126,7 +125,7 @@ export default function HeaderFilter({ categoriesData, isLoading }) {
       {showDropdown && hoveredCategory && (
         <div
           ref={dropdownRef}
-          className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-2xl border border-gray-200 overflow-hidden z-50 animate-in slide-in-from-top-2 duration-200"
+          className="absolute top-full left-0 right-0 mt-2 bg-white rounded-lg shadow-2xl border border-gray-200 overflow-hidden z-50 animate-in slide-in-from-top-2 duration-200"
           onMouseEnter={handleDropdownEnter}
           onMouseLeave={handleDropdownLeave}
         >
@@ -152,7 +151,7 @@ export default function HeaderFilter({ categoriesData, isLoading }) {
                 </div>
               </div>
             ) : subcategories.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 p-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 2xl:grid-cols-6 gap-2 p-4">
                 {subcategories.map((subcategory, index) => (
                   <div
                     key={index}
@@ -162,9 +161,12 @@ export default function HeaderFilter({ categoriesData, isLoading }) {
                     <div className="relative">
                       <div className="w-12 h-12 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
                         {subcategory.image ? (
-                          <img
+                          <Image
                             src={subcategory.image || "/placeholder.svg"}
                             alt={subcategory.name}
+                            width={120}
+                            height={120}
+                            loading="lazy"
                             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-200"
                           />
                         ) : (

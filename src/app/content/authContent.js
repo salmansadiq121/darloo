@@ -49,17 +49,17 @@ export const AuthProvider = ({ children }) => {
 
   // Fetch All Products
   // http://localhost:8000/api/v1/products/all/products?page=1&category=68105c2d2c66a6b42f0ea53e&minPrice=1&maxPrice=2000&sortBy=price_asc
-  const fetchProducts = async () => {
-    const { data } = await axios.get(`${productsURI}/all/products`);
-    return data.products;
-  };
+  // const fetchProducts = async () => {
+  //   const { data } = await axios.get(`${productsURI}/all/products`);
+  //   return data.products;
+  // };
 
-  const { data: products, isFetching } = useQuery({
-    queryKey: ["products"],
-    queryFn: fetchProducts,
-    staleTime: 5 * 60 * 1000,
-    refetchOnWindowFocus: false,
-  });
+  // const { data: products, isFetching } = useQuery({
+  //   queryKey: ["products"],
+  //   queryFn: fetchProducts,
+  //   staleTime: 5 * 60 * 1000,
+  //   refetchOnWindowFocus: false,
+  // });
 
   // const fetchProducts = async ({
   //   page = 1,
@@ -197,8 +197,8 @@ export const AuthProvider = ({ children }) => {
         setIsLoading,
         search,
         setSearch,
-        products: products || [],
-        isFetching,
+        // products: products || [],
+        // isFetching,
         selectedProduct,
         setSelectedProduct,
         oneClickBuyProduct,

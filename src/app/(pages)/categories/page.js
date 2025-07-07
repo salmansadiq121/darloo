@@ -67,7 +67,7 @@ export default function Categories() {
   };
 
   const handleSubCategoryClick = (id) => {
-    router.push(`/products?category=${id}`);
+    router.push(`/products?subcategory=${id}`);
   };
 
   const handleViewAllProducts = () => {

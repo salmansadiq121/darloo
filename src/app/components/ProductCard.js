@@ -62,20 +62,20 @@ export default function ProductCard({ product, sale, tranding, isDesc }) {
     });
   };
   return (
-    <div className="group bg-white min-w-[14rem] border overflow-hidden transition-all duration-300  hover:shadow-[#9333EA]/20 hover:shadow-2xl hover:border-red-500/50 hover:-translate-y-1">
+    <div className="group bg-white min-w-[10.5rem] max-w-[17rem] border overflow-hidden transition-all duration-300  hover:shadow-[#9333EA]/20 hover:shadow-2xl hover:border-red-500/50 hover:-translate-y-1">
       <div className="relative ">
         <Image
           src={product?.thumbnails || "/placeholder.svg"}
           alt={product?.name}
           width={200}
           height={230}
-          className="w-full h-[230px] object-fill"
+          className="w-full h-[180px] sm:h-[230px] object-fill"
           loading="lazy"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-[#0F172A]   to-transparent"></div>
 
         {/* Tags */}
-        <div className="absolute top-3 right-0 px-3 flex items-center justify-between w-full">
+        <div className="absolute top-2 right-0 px-2 flex items-center justify-between w-full">
           {product?.estimatedPrice > product?.price && (
             <div className="bg-red-600/80 backdrop-blur-sm px-2 py-1 rounded-full text-xs font-medium flex items-center text-white">
               <Diamond size={12} className="mr-1" />
@@ -94,13 +94,14 @@ export default function ProductCard({ product, sale, tranding, isDesc }) {
               Sale
             </div>
           )}
-          {product?.trending && (
-            <div className="bg-green-600/80 backdrop-blur-sm px-2 py-1 rounded-full text-xs font-medium flex items-center text-white">
-              <Flame size={12} className="mr-1 text-white" />
-              Trending
-            </div>
-          )}
         </div>
+
+        {product?.trending && (
+          <div className="bg-green-600/80 absolute bottom-1 right-1 backdrop-blur-sm px-2 py-1 rounded-full text-xs font-medium flex items-center text-white">
+            <Flame size={12} className="mr-1 text-white" />
+            Trending
+          </div>
+        )}
 
         {/* Quick view button (appears on hover) */}
         <div

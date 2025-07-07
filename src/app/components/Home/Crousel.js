@@ -26,8 +26,6 @@ export default function Crousel({ products, loading }) {
   const [bannerData, setBannerData] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  console.log("products:", products);
-
   // Fetch Banner Data
   const fetchBannerData = async () => {
     setIsLoading(true);

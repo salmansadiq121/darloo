@@ -81,10 +81,30 @@ export default function ProductCarousel({ products }) {
       spaceBetween={20}
       slidesPerView={1}
       breakpoints={{
-        640: { slidesPerView: 1 },
-        1024: { slidesPerView: 3 },
-        1280: { slidesPerView: 4 },
-        1380: { slidesPerView: 5 },
+        0: {
+          slidesPerView: 1.6,
+          spaceBetween: 12,
+        },
+        640: {
+          slidesPerView: 2,
+          spaceBetween: 12,
+        },
+        768: {
+          slidesPerView: 3,
+          spaceBetween: 12,
+        },
+        1024: {
+          slidesPerView: 4,
+          spaceBetween: 12,
+        },
+        1280: {
+          slidesPerView: 5,
+          spaceBetween: 12,
+        },
+        1480: {
+          slidesPerView: 6,
+          spaceBetween: 12,
+        },
       }}
       navigation={{
         nextEl: ".custom-next",

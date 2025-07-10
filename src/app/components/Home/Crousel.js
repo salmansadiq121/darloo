@@ -53,7 +53,7 @@ export default function Crousel({ products, loading }) {
   }, []);
 
   return (
-    <div className="w-full max-h-[350px] pb-4 mt-2 px-0 z-[10] relative">
+    <div className="w-full max-h-[350px] pb-4 mt-0 sm:mt-2 px-0 z-[10] relative">
       {isLoading ? (
         <div className="animate-pulse flex justify-center items-center bg-gray-300/70 h-[220px] sm:h-[400px] rounded-lg p-6">
           <div className=" bg-gray-500/70 rounded-lg animate-pulse w-full h-full"></div>

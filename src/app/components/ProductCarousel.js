@@ -161,7 +161,7 @@ export default function ProductCarousel({ products }) {
                 onClick={() => router.push(`/products/${product?._id}`)}
                 className="flex justify-between items-start mb-3"
               >
-                <h3 className="text-[14px] sm:text-lg font-medium sm:font-semibold capitalize line-clamp-2">
+                <h3 className="text-[14px] sm:text-lg font-medium sm:font-semibold capitalize line-clamp-1">
                   {product?.name}
                 </h3>
               </div>

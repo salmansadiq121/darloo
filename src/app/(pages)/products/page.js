@@ -520,7 +520,7 @@ function ProductsContent() {
               ) : products.length === 0 && !isLoading ? (
                 <EmptyState onClearFilters={clearFilters} />
               ) : (
-                <div className="grid  max-[350px]:grid-cols-1 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6 gap-6">
+                <div className="grid  max-[350px]:grid-cols-1 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6 sm:gap-3 gap-4">
                   {isLoading
                     ? Array.from({ length: 12 }).map((_, index) => (
                         <ProductSkeleton key={index} />

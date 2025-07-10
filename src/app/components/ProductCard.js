@@ -120,7 +120,7 @@ export default function ProductCard({ product, sale, tranding, isDesc }) {
           onClick={() => router.push(`/products/${product._id}`)}
           className="flex  items-start flex-col gap-1 mb-3"
         >
-          <h3 className="text-lg font-semibold capitalize line-clamp-1">
+          <h3 className="text-[14px]  sm:text-lg font-medium dm:font-semibold capitalize line-clamp-2">
             {product?.name}
           </h3>
           {/* {isDesc && (

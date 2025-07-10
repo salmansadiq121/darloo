@@ -123,7 +123,7 @@ export default function AdvancedDualMarqueeCategories({
   );
 
   return (
-    <div className="w-full py-8 mt-[0rem] sm:mt-5 z-10 relative overflow-hidden">
+    <div className="w-full py-8 z-10 relative overflow-hidden">
       {/* Background gradient */}
       <div className="absolute inset-0 bg-gradient-to-r from-red-50/30 via-transparent to-pink-50/30 pointer-events-none"></div>
 

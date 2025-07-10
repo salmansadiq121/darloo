@@ -171,7 +171,7 @@ export default function AllProducts() {
   // Memoized skeleton loader
   const SkeletonLoader = useMemo(
     () => (
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 px-4 sm:px-0">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 3xl:grid-cols-7 gap-4 px-4 sm:px-0">
         {Array.from({ length: productsPerPage }).map((_, index) => (
           <motion.div
             key={index}
@@ -199,7 +199,7 @@ export default function AllProducts() {
   // Memoized products grid
   const ProductsGrid = useMemo(
     () => (
-      <div className="grid  max-[350px]:grid-cols-1 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6 sm:gap-3 gap-4">
+      <div className="grid  max-[350px]:grid-cols-1 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 2xl:grid-cols-6 3xl:grid-cols-7 sm:gap-3 gap-4">
         <AnimatePresence>
           {products.map((product, index) => (
             <motion.div
@@ -228,11 +228,15 @@ export default function AllProducts() {
       {/* Header */}
       <div className="flex items-center justify-between gap-6">
         <div className="flex items-center gap-3">
-          <h1
-            className={`${Style.h1} text-start text-black flex items-center gap-2 min-w-fit`}
-          >
-            Just for you
-          </h1>
+          <div className="container mx-auto px-4 mb-8">
+            <h1
+              className={`${Style.h1} flex items-center gap-1 text-center bg-gradient-to-r from-red-600 to-pink-600 bg-clip-text text-transparent`}
+            >
+              Just for you
+            </h1>
+            <div className="w-24 h-1 bg-gradient-to-r from-red-400 to-pink-400 mx-auto mt-4 rounded-full"></div>
+          </div>
+
           {!isOnline && (
             <div className="flex items-center gap-1 text-red-500 text-sm">
               <WifiOff className="w-4 h-4" />

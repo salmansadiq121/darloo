@@ -82,7 +82,7 @@ export default function Crousel({ products, loading }) {
                       alt="Banner Image"
                       width={1000}
                       height={350}
-                      className=" w-full h-[170px] sm:h-[350px] object-fill"
+                      className=" w-full h-[140px] sm:h-[350px] object-fill"
                     />
                   </div>
                 </SwiperSlide>

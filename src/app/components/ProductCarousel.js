@@ -82,11 +82,11 @@ export default function ProductCarousel({ products }) {
       slidesPerView={1}
       breakpoints={{
         0: {
-          slidesPerView: 1.6,
-          spaceBetween: 12,
+          slidesPerView: 2,
+          spaceBetween: 8,
         },
         640: {
-          slidesPerView: 2,
+          slidesPerView: 3,
           spaceBetween: 12,
         },
         768: {
@@ -119,7 +119,7 @@ export default function ProductCarousel({ products }) {
         products?.map((product) => (
           <SwiperSlide
             key={product?._id}
-            className="group bg-white min-w-[14rem] backdrop-blur-sm  border   overflow-hidden transition-all duration-300 hover:shadow-[#9333EA]/20 hover:shadow-2xl dark:hover:border-[#9333EA]/50 hover:border-[#9333EA]/50 hover:-translate-y-1"
+            className="group bg-white min-w-[11rem] backdrop-blur-sm  border   overflow-hidden transition-all duration-300 hover:shadow-[#9333EA]/20 hover:shadow-2xl dark:hover:border-[#9333EA]/50 hover:border-[#9333EA]/50 hover:-translate-y-1"
           >
             <div className="relative ">
               <Image
@@ -127,7 +127,7 @@ export default function ProductCarousel({ products }) {
                 alt={product?.name}
                 width={200}
                 height={250}
-                className="w-full h-[250px] object-fill"
+                className="w-full h-[190px] sm:h-[250px] object-fill"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-[#0F172A]   to-transparent"></div>
 
@@ -161,7 +161,7 @@ export default function ProductCarousel({ products }) {
                 onClick={() => router.push(`/products/${product?._id}`)}
                 className="flex justify-between items-start mb-3"
               >
-                <h3 className="text-lg font-semibold capitalize line-clamp-1">
+                <h3 className="text-[14px] sm:text-lg font-medium sm:font-semibold capitalize line-clamp-2">
                   {product?.name}
                 </h3>
               </div>

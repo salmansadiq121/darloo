@@ -199,7 +199,7 @@ export default function AllProducts() {
   // Memoized products grid
   const ProductsGrid = useMemo(
     () => (
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 px-4 sm:px-0">
+      <div className="grid  max-[350px]:grid-cols-1 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6 sm:gap-3 gap-4">
         <AnimatePresence>
           {products.map((product, index) => (
             <motion.div

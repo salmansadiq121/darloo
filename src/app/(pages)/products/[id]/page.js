@@ -601,7 +601,7 @@ export default function ProductDetail() {
                       return (
                         <button
                           key={index}
-                          className={`relative h-24 w-24 min-w-24 cursor-pointer rounded border-2 overflow-hidden transition-all ${
+                          className={`relative h-24 w-32 min-w-32 cursor-pointer rounded border-2 overflow-hidden transition-all ${
                             activeImageIndex === index
                               ? "border-red-500 shadow-md"
                               : "border-border hover:border-primary/50"
@@ -614,7 +614,7 @@ export default function ProductDetail() {
                               imageObj.title || product?.name || "Product image"
                             }
                             fill
-                            className="object-fill"
+                            objectFit="min-cover"
                             loading="lazy"
                           />
                           {/* XS title in image */}
@@ -622,7 +622,7 @@ export default function ProductDetail() {
                             {imageObj.title}
                           </div>
                           {/* Color indicator for variation images */}
-                          {isVariationImage && (
+                          {/* {isVariationImage && (
                             <div className="absolute top-1 right-1">
                               <div
                                 className="w-3 h-3 rounded-full border border-white shadow-sm"
@@ -632,7 +632,7 @@ export default function ProductDetail() {
                                 title={`Color: ${imageObj.title}`}
                               />
                             </div>
-                          )}
+                          )} */}
                           <span></span>
                         </button>
                       );

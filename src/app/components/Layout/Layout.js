@@ -39,7 +39,7 @@ export default function MainLayout({
   }, [lastScrollY]);
 
   return (
-    <div className="min-h-screen flex flex-col relative">
+    <div className="min-h-screen  mx-auto flex flex-col relative">
       <Helmet>
         <meta charSet="utf-8" />
         <meta name="description" content={description} />
@@ -62,7 +62,7 @@ export default function MainLayout({
       >
         <Header />
       </div>
-      <main className="flex-grow overflow-hidden bg-whitw text-black relative ">
+      <main className="flex-grow overflow-hidden bg-whitw text-black relative">
         <div className="absolute top-[-2rem] sm:top-[-6rem] right-[-2rem] sm:right-[-6rem] w-[8rem] sm:w-[20rem] h-[8rem] sm:h-[20rem] bg-red-500 rounded-full z-[1]"></div>
         <div
           className="absolute top-[-2rem] right-[-2rem] w-[8rem] sm:w-[20rem] h-[8rem] sm:h-[20rem] bg-red-200 rounded-full z-0"

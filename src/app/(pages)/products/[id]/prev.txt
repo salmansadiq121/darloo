@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useMemo, use, useCallback } from "react";
+import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
@@ -50,7 +50,6 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Progress } from "@/components/ui/progress";
-
 import { useParams, useRouter } from "next/navigation";
 import MainLayout from "@/app/components/Layout/Layout";
 import axios from "axios";
@@ -65,7 +64,7 @@ export default function ProductDetail() {
   const { id: productId } = useParams();
   const [product, setProduct] = useState({});
   const [loading, setLoading] = useState(true);
-  const [selectedColor, setSelectedColor] = useState("White");
+  const [selectedColor, setSelectedColor] = useState("");
   const [selectedSize, setSelectedSize] = useState("L");
   const [quantity, setQuantity] = useState(1);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
@@ -86,12 +85,79 @@ export default function ProductDetail() {
     }
   }, []);
 
-  // console.log("product", product);
+  // Get all available images (variations)
+  const getAllImages = useMemo(() => {
+    const images = [];
+    if (product?.variations?.length > 0) {
+      product.variations.forEach((variation) => {
+        if (variation.imageURL && !images.includes(variation.imageURL)) {
+          images.push(variation.imageURL);
+        }
+      });
+    }
+    return images.filter(Boolean);
+  }, [product?.variations]);
+
+  console.log("getAllImages", getAllImages);
+
+  // Get current image based on active index
+  const getCurrentImage = useMemo(() => {
+    return (
+      getAllImages[activeImageIndex] || getAllImages[0] || "/placeholder.svg"
+    );
+  }, [getAllImages, activeImageIndex]);
+
+  // REMOVED: The useEffect that was resetting activeImageIndex when selectedColor changes
+  // This was causing the conflict with color selection image switching
+
+  // Set default selected color when product loads
+  useEffect(() => {
+    if (product?.colors?.length > 0 && !selectedColor) {
+      setSelectedColor(product.colors[0].name);
+      // Set initial image based on first color's variation if available
+      const firstColor = product.colors[0];
+      const matchingVariation = product?.variations?.find(
+        (v) => v.color === firstColor.code
+      );
+      if (matchingVariation && matchingVariation.imageURL) {
+        const imageIndex = getAllImages.findIndex(
+          (img) => img === matchingVariation.imageURL
+        );
+        if (imageIndex !== -1) {
+          setActiveImageIndex(imageIndex);
+        }
+      }
+    }
+  }, [product?.colors, selectedColor, getAllImages, product?.variations]);
+
+  // Improved color selection handler with better state management
+  const handleColorSelection = useCallback(
+    (color) => {
+      setSelectedColor(color.name);
+
+      // Find matching variation by color code
+      const matchingVariation = product?.variations?.find(
+        (v) => v.color === color.code
+      );
+
+      if (matchingVariation && matchingVariation.imageURL) {
+        // Find the index of the matching variation image in getAllImages
+        const imageIndex = getAllImages.findIndex(
+          (img) => img === matchingVariation.imageURL
+        );
+
+        if (imageIndex !== -1) {
+          // Immediately update the active image index
+          setActiveImageIndex(imageIndex);
+        }
+      }
+    },
+    [product?.variations, getAllImages]
+  );
 
   // Product data
   const fetchProductDetail = useCallback(async () => {
     if (!productId) return;
-
     setLoading(true);
     try {
       const { data } = await axios.get(
@@ -112,27 +178,21 @@ export default function ProductDetail() {
   // Handle Add to Cart
   const handleAddToCart = (product) => {
     if (!product || !product._id) return;
-
     setSelectedProduct((prevProducts) => {
-      let updatedProducts = [...prevProducts];
-
+      const updatedProducts = [...prevProducts];
       const existingProductIndex = updatedProducts.findIndex(
         (p) => p.product === product._id
       );
 
       if (existingProductIndex !== -1) {
-        let existingProduct = { ...updatedProducts[existingProductIndex] };
-
+        const existingProduct = { ...updatedProducts[existingProductIndex] };
         if (!existingProduct.colors.includes(selectedColor)) {
           existingProduct.colors = [...existingProduct.colors, selectedColor];
         }
-
         if (!existingProduct.sizes.includes(selectedSize)) {
           existingProduct.sizes = [...existingProduct.sizes, selectedSize];
         }
-
         existingProduct.quantity += quantity;
-
         updatedProducts[existingProductIndex] = existingProduct;
       } else {
         updatedProducts.push({
@@ -141,17 +201,14 @@ export default function ProductDetail() {
           price: product.price,
           colors: [selectedColor],
           sizes: [selectedSize],
-          image: product.thumbnails,
+          image: getCurrentImage,
           title: product.name,
           _id: product._id,
         });
       }
 
-      // Save the updated cart to localStorage
       localStorage.setItem("cart", JSON.stringify(updatedProducts));
-
       toast.success("Product added to cart");
-
       return updatedProducts;
     });
   };
@@ -164,7 +221,7 @@ export default function ProductDetail() {
       price: product.price,
       colors: [selectedColor],
       sizes: [selectedSize],
-      image: product.thumbnails,
+      image: getCurrentImage,
       title: product.name,
       _id: product._id,
     };
@@ -241,13 +298,13 @@ export default function ProductDetail() {
   // Handle image navigation
   const nextImage = () => {
     setActiveImageIndex((prev) =>
-      prev === product?.thumbnails?.length - 1 ? 0 : prev + 1
+      prev === getAllImages.length - 1 ? 0 : prev + 1
     );
   };
 
   const prevImage = () => {
     setActiveImageIndex((prev) =>
-      prev === 0 ? product?.thumbnails?.length - 1 : prev - 1
+      prev === 0 ? getAllImages.length - 1 : prev - 1
     );
   };
 
@@ -315,7 +372,6 @@ export default function ProductDetail() {
 
   useEffect(() => {
     const favorites = JSON.parse(localStorage.getItem("favorites")) || [];
-
     if (favorites.includes(product._id)) {
       setIsWishlisted(true);
     }
@@ -329,30 +385,24 @@ export default function ProductDetail() {
     const threeDaysInMs = 3 * 24 * 60 * 60 * 1000;
     const viewDate = new Date().toISOString();
 
-    // Get existing recent products from localStorage
     let recentProducts =
       JSON.parse(localStorage.getItem("recentProducts")) || [];
 
-    // Filter out expired products (older than 3 days)
     recentProducts = recentProducts.filter(
       (item) => now - item.timestamp < threeDaysInMs
     );
 
-    // Check if product already exists
     const existingIndex = recentProducts.findIndex(
       (item) => item.id === product._id
     );
 
     if (existingIndex === -1) {
-      // Add new product if it's not a duplicate
       recentProducts.push({ id: product._id, timestamp: now, viewDate });
     } else {
-      // Update the timestamp and viewDate if it already exists
       recentProducts[existingIndex].timestamp = now;
       recentProducts[existingIndex].viewDate = viewDate;
     }
 
-    // Update localStorage
     localStorage.setItem("recentProducts", JSON.stringify(recentProducts));
   }, [product]);
 
@@ -362,7 +412,6 @@ export default function ProductDetail() {
       <div className="bg-white min-h-screen">
         <div className="container mx-auto px-4 py-8 max-w-7xl">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 mb-12">
-            {/* Image skeleton */}
             <div className="space-y-4">
               <Skeleton className="aspect-square w-full rounded-xl" />
               <div className="flex space-x-2">
@@ -371,8 +420,6 @@ export default function ProductDetail() {
                 <Skeleton className="h-24 w-24 rounded" />
               </div>
             </div>
-
-            {/* Product info skeleton */}
             <div className="space-y-6">
               <div>
                 <Skeleton className="h-8 w-3/4 mb-2" />
@@ -381,15 +428,12 @@ export default function ProductDetail() {
                   <Skeleton className="h-5 w-32" />
                 </div>
               </div>
-
               <div>
                 <Skeleton className="h-10 w-32 mb-2" />
                 <Skeleton className="h-6 w-full mb-2" />
                 <Skeleton className="h-6 w-full" />
               </div>
-
               <Skeleton className="h-px w-full" />
-
               <div className="space-y-6">
                 <div>
                   <Skeleton className="h-6 w-24 mb-3" />
@@ -399,7 +443,6 @@ export default function ProductDetail() {
                     <Skeleton className="h-12 w-12 rounded-full" />
                   </div>
                 </div>
-
                 <div>
                   <Skeleton className="h-6 w-24 mb-3" />
                   <div className="flex gap-2">
@@ -408,7 +451,6 @@ export default function ProductDetail() {
                     <Skeleton className="h-12 w-12 rounded-md" />
                   </div>
                 </div>
-
                 <div>
                   <Skeleton className="h-6 w-24 mb-3" />
                   <div className="flex items-center">
@@ -416,7 +458,6 @@ export default function ProductDetail() {
                   </div>
                 </div>
               </div>
-
               <div className="flex gap-4 pt-4">
                 <Skeleton className="h-14 flex-1 rounded-xl" />
                 <Skeleton className="h-14 flex-1 rounded-xl" />
@@ -425,7 +466,6 @@ export default function ProductDetail() {
               </div>
             </div>
           </div>
-
           <Skeleton className="h-14 w-full max-w-md mb-6" />
           <Skeleton className="h-64 w-full rounded-xl" />
         </div>
@@ -436,7 +476,7 @@ export default function ProductDetail() {
   // If product data is empty after loading
   if (!loading && (!product || Object.keys(product).length === 0)) {
     return (
-      <div className="bg-white min-h-screen">
+      <div className="bg-white min-h-screen flex items-center justify-center flex-col">
         <div className="container mx-auto px-4 py-8 max-w-7xl">
           <div className="text-center py-12">
             <h2 className="text-2xl font-bold text-gray-900 mb-4">
@@ -519,11 +559,7 @@ export default function ProductDetail() {
                     }
                   >
                     <Image
-                      src={
-                        (product?.thumbnails &&
-                          product?.thumbnails[activeImageIndex]) ||
-                        "/placeholder.svg"
-                      }
+                      src={getCurrentImage || "/placeholder.svg"}
                       alt={product?.name || "Product"}
                       fill
                       className="object-fill"
@@ -531,26 +567,31 @@ export default function ProductDetail() {
                     />
                   </div>
                 </div>
-                <div className="absolute inset-0 flex items-center justify-between px-4">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-10 w-10 rounded-full bg-white/80 backdrop-blur-sm shadow-md hover:bg-white transition-all"
-                    onClick={prevImage}
-                  >
-                    <ChevronLeft className="h-5 w-5 text-gray-700" />
-                    <span className="sr-only">Previous image</span>
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-10 w-10 rounded-full bg-white/80 backdrop-blur-sm shadow-md hover:bg-white transition-all"
-                    onClick={nextImage}
-                  >
-                    <ChevronRight className="h-5 w-5 text-gray-700" />
-                    <span className="sr-only">Next image</span>
-                  </Button>
-                </div>
+
+                {/* Navigation arrows - only show if there are multiple images */}
+                {getAllImages.length > 1 && (
+                  <div className="absolute inset-0 flex items-center justify-between px-4">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-10 w-10 rounded-full bg-white/80 backdrop-blur-sm shadow-md hover:bg-white transition-all"
+                      onClick={prevImage}
+                    >
+                      <ChevronLeft className="h-5 w-5 text-gray-700" />
+                      <span className="sr-only">Previous image</span>
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-10 w-10 rounded-full bg-white/80 backdrop-blur-sm shadow-md hover:bg-white transition-all"
+                      onClick={nextImage}
+                    >
+                      <ChevronRight className="h-5 w-5 text-gray-700" />
+                      <span className="sr-only">Next image</span>
+                    </Button>
+                  </div>
+                )}
+
                 {product?.estimatedPrice &&
                   product?.estimatedPrice > product?.price && (
                     <div className="absolute top-4 left-4">
@@ -565,6 +606,7 @@ export default function ProductDetail() {
                       </div>
                     </div>
                   )}
+
                 {product?.trending && (
                   <div className="absolute top-4 right-4">
                     <Badge className="bg-[#06B6D4]/80 hover:bg-[#06B6D4] text-white font-semibold px-3 py-1.5 text-sm rounded-full">
@@ -572,33 +614,67 @@ export default function ProductDetail() {
                     </Badge>
                   </div>
                 )}
+
                 {isZoomed && (
                   <div className="absolute bottom-4 right-4 bg-white/80 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-medium text-gray-700">
                     Hover to zoom
                   </div>
                 )}
               </div>
-              <div className="flex space-x-2 overflow-x-auto pb-2 scrollbar-hide shidden">
-                {product?.variations?.map((thumbnail, index) => (
-                  <button
-                    key={index}
-                    className={`relative h-24 w-24 min-w-24 cursor-pointer rounded border-2 overflow-hidden transition-all ${
-                      activeImageIndex === index
-                        ? "border-red-500  shadow-md"
-                        : "border-border hover:border-primary/50"
-                    }`}
-                    onClick={() => setActiveImageIndex(index)}
-                  >
-                    <Image
-                      src={thumbnail.imageURL || "/placeholder.svg"}
-                      alt={`${product?.name} thumbnail ${index + 1}`}
-                      fill
-                      className="object-fill "
-                      loading="lazy"
-                    />
-                  </button>
-                ))}
-              </div>
+
+              {/* All Images Thumbnails - show all available images */}
+              {getAllImages.length > 1 && (
+                <div className="space-y-3">
+                  <div className="flex space-x-2 overflow-x-auto pb-2 scrollbar-hide shidden">
+                    {getAllImages.map((image, index) => {
+                      // Check if this image is from a variation
+                      const matchingVariation = product?.variations?.find(
+                        (v) => v.imageURL === image
+                      );
+                      const isVariationImage = !!matchingVariation;
+
+                      return (
+                        <button
+                          key={index}
+                          className={`relative h-24 w-24 min-w-24 cursor-pointer rounded border-2 overflow-hidden transition-all ${
+                            activeImageIndex === index
+                              ? "border-red-500 shadow-md"
+                              : "border-border hover:border-primary/50"
+                          }`}
+                          onClick={() => setActiveImageIndex(index)}
+                        >
+                          <Image
+                            src={image || "/placeholder.svg"}
+                            alt={`${product?.name} image ${index + 1}`}
+                            fill
+                            className="object-fill"
+                            loading="lazy"
+                          />
+                          {/* Color indicator for variation images */}
+                          {isVariationImage && (
+                            <div className="absolute top-1 right-1">
+                              <div
+                                className="w-3 h-3 rounded-full border border-white shadow-sm"
+                                style={{
+                                  backgroundColor: matchingVariation.color,
+                                }}
+                                title={`Color: ${matchingVariation.color}`}
+                              />
+                            </div>
+                          )}
+                          <span></span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                  {/* Image counter */}
+                  <div className="text-center">
+                    <Badge variant="outline" className="text-xs">
+                      {activeImageIndex + 1} of {getAllImages.length}
+                    </Badge>
+                  </div>
+                </div>
+              )}
             </motion.div>
 
             {/* -------------------Product Info---------------------- */}
@@ -677,7 +753,6 @@ export default function ProductDetail() {
                     </span>
                   )}
                 </div>
-
                 {product?.sale?.isActive && saleEndDate && (
                   <div className="mt-3 bg-red-100 rounded p-3 border border-red-200">
                     <div className="flex items-center gap-2 text-sm font-medium text-red-600 mb-2">
@@ -712,7 +787,6 @@ export default function ProductDetail() {
                     </div>
                   </div>
                 )}
-
                 <div className="flex items-center gap-2 mt-3">
                   <Truck className="h-4 w-4 text-gray-500" />
                   <p className="text-sm text-gray-500">
@@ -720,7 +794,6 @@ export default function ProductDetail() {
                     Delivery in 3-5 business days
                   </p>
                 </div>
-
                 <div className="flex items-center gap-2 mt-1">
                   <Check className="h-4 w-4 text-green-500" />
                   <p className="text-sm text-gray-500">
@@ -734,50 +807,95 @@ export default function ProductDetail() {
               <div className="space-y-6">
                 {product?.colors?.length > 0 && (
                   <div className="space-y-3">
-                    <div className="font-medium text-gray-900">Color</div>
+                    <div className="font-medium text-gray-900">
+                      Color: {selectedColor}
+                    </div>
                     <div className="flex flex-wrap gap-3">
-                      {product?.colors?.map((color) => (
-                        <TooltipProvider key={color._id}>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <button
-                                className={`h-10 w-10 rounded-full border-2 transition-all ${
-                                  selectedColor === color?.name
-                                    ? "border-primary ring-4 ring-primary/20"
-                                    : "border-gray-200 hover:border-gray-300"
-                                }`}
-                                style={{
-                                  backgroundColor: color?.code,
-                                  boxShadow:
-                                    color.name === "White"
-                                      ? "inset 0 0 0 1px rgba(0,0,0,0.1)"
-                                      : undefined,
-                                }}
-                                onClick={() => setSelectedColor(color?.name)}
-                                aria-label={`Select ${color?.name} color`}
-                              >
-                                {selectedColor === color?.name && (
-                                  <Check
-                                    className={`h-6 w-6 mx-auto ${
-                                      color?.name === "White"
-                                        ? "text-gray-800"
-                                        : "text-white"
-                                    }`}
-                                  />
-                                )}
-                              </button>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p>{color?.name}</p>
-                            </TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
-                      ))}
+                      {product?.colors?.map((color) => {
+                        // Check if this color has a matching variation
+                        const hasVariation = product?.variations?.some(
+                          (v) => v.color === color.code
+                        );
+
+                        return (
+                          <TooltipProvider key={color._id}>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <button
+                                  className={`relative h-10 w-10 rounded-full border-2 transition-all ${
+                                    selectedColor === color?.name
+                                      ? "border-primary ring-4 ring-primary/20"
+                                      : "border-gray-200 hover:border-gray-300"
+                                  }`}
+                                  style={{
+                                    backgroundColor: color?.code,
+                                    boxShadow:
+                                      color.name === "White"
+                                        ? "inset 0 0 0 1px rgba(0,0,0,0.1)"
+                                        : undefined,
+                                  }}
+                                  onClick={() => handleColorSelection(color)}
+                                  aria-label={`Select ${color?.name} color`}
+                                >
+                                  {selectedColor === color?.name && (
+                                    <Check
+                                      className={`h-6 w-6 mx-auto ${
+                                        color?.name === "White"
+                                          ? "text-gray-800"
+                                          : "text-white"
+                                      }`}
+                                    />
+                                  )}
+                                  {/* Variation indicator */}
+                                  {hasVariation && (
+                                    <div
+                                      className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 border-2 border-white rounded-full"
+                                      title="Has variation image"
+                                    />
+                                  )}
+                                </button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>
+                                  {color?.name}{" "}
+                                  {hasVariation ? "(Has variation)" : ""}
+                                </p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        );
+                      })}
+                    </div>
+                    {/* Show current selection info */}
+                    <div className="text-sm text-gray-600">
+                      {(() => {
+                        const selectedColorObj = product?.colors?.find(
+                          (c) => c.name === selectedColor
+                        );
+                        const hasMatchingVariation =
+                          selectedColorObj &&
+                          product?.variations?.some(
+                            (v) => v.color === selectedColorObj.code
+                          );
+
+                        return hasMatchingVariation ? (
+                          <div className="flex items-center gap-2 text-green-600">
+                            <Check className="h-4 w-4" />
+                            <span>Showing {selectedColor} variation image</span>
+                          </div>
+                        ) : (
+                          <div className="flex items-center gap-2 text-gray-500">
+                            <span>
+                              Showing default image for {selectedColor}
+                            </span>
+                          </div>
+                        );
+                      })()}
                     </div>
                   </div>
                 )}
 
-                {product?.sizes?.length > 0 && (
+                {product?.sizes?.length > 0 && product?.sizes[0] !== "" && (
                   <div className="space-y-3">
                     <div className="font-medium text-gray-900">Size</div>
                     <div className="flex flex-wrap gap-3">
@@ -811,7 +929,7 @@ export default function ProductDetail() {
                     <Button
                       variant="outline"
                       size="icon"
-                      className="h-11 w-12 rounded-r-none cursor-pointer border-gray-300 hover:bg-gray-200 hover:text-gray-900 transition-all duration-300"
+                      className="h-11 w-12 rounded-r-none cursor-pointer border-gray-300 hover:bg-gray-200 hover:text-gray-900 transition-all duration-300 bg-transparent"
                       onClick={decreaseQuantity}
                       disabled={quantity <= 1}
                     >
@@ -824,7 +942,7 @@ export default function ProductDetail() {
                     <Button
                       variant="outline"
                       size="icon"
-                      className="h-11 w-12 rounded-l-none cursor-pointer border-gray-300 hover:bg-gray-200 hover:text-gray-900 transition-all duration-300"
+                      className="h-11 w-12 rounded-l-none cursor-pointer border-gray-300 hover:bg-gray-200 hover:text-gray-900 transition-all duration-300 bg-transparent"
                       onClick={increaseQuantity}
                       disabled={quantity >= product?.quantity}
                     >
@@ -841,8 +959,6 @@ export default function ProductDetail() {
                   size="lg"
                   style={{
                     backgroundColor: "var(--primary)",
-                    // clipPath:
-                    //   "polygon(12% 0, 100% 0, 100% 73%, 90% 100%, 0 100%, 0 25%)",
                   }}
                   onClick={() => handleAddToCart(product)}
                 >
@@ -855,9 +971,6 @@ export default function ProductDetail() {
                   size="lg"
                   style={{
                     backgroundColor: "rgb(8, 145, 178)",
-                    // clipPath:
-                    //   "polygon(12% 0, 100% 0, 100% 73%, 90% 100%, 0 100%, 0 25%)",
-                    // willChange: "clip-path",
                   }}
                   onClick={() => {
                     handleOneClickBuy(product);
@@ -958,9 +1071,7 @@ export default function ProductDetail() {
                       {product?.description}
                     </p>
                   </div>
-
                   <Separator />
-
                   <div>
                     <h3 className="text-xl font-semibold text-gray-900">
                       Product Information
@@ -1004,8 +1115,7 @@ export default function ProductDetail() {
               </Card>
             </TabsContent>
 
-            {/* -------------------Product Reviews---------------------- */}
-
+            {/* Rest of the tabs content remains the same... */}
             <TabsContent
               value="reviews"
               className="mt-6 animate-fadeIn"
@@ -1022,7 +1132,6 @@ export default function ProductDetail() {
                         See what our customers are saying
                       </p>
                     </div>
-
                     <div className="bg-gray-50 p-4 rounded-xl border border-gray-100 flex flex-col sm:flex-row items-center gap-4">
                       <div className="text-center sm:text-left">
                         <div className="text-4xl font-bold text-gray-900">
@@ -1046,7 +1155,6 @@ export default function ProductDetail() {
                           Based on {product?.reviews?.length} reviews
                         </div>
                       </div>
-
                       <div className="w-full sm:w-auto sm:flex-1 max-w-xs space-y-2">
                         {[5, 4, 3, 2, 1].map((rating) => {
                           const count = ratingDistribution[rating - 1];
@@ -1079,9 +1187,7 @@ export default function ProductDetail() {
                       </div>
                     </div>
                   </div>
-
                   <Separator />
-
                   {product?.reviews?.length > 0 && (
                     <div
                       className=" w-full  overflow-y-auto shidden p-1 border border-red-200 rounded-2xl"
@@ -1108,6 +1214,8 @@ export default function ProductDetail() {
                                       <Image
                                         src={
                                           review?.user?.avatar ||
+                                          "/placeholder.svg" ||
+                                          "/placeholder.svg" ||
                                           "/placeholder.svg"
                                         }
                                         alt={review?.user?.name}
@@ -1197,6 +1305,8 @@ export default function ProductDetail() {
                                           <Image
                                             src={
                                               reply?.user?.avatar ||
+                                              "/placeholder.svg" ||
+                                              "/placeholder.svg" ||
                                               "/placeholder.svg"
                                             }
                                             alt={reply?.user?.name}
@@ -1228,12 +1338,11 @@ export default function ProductDetail() {
                       </div>
                     </div>
                   )}
-
                   {product?.reviews?.length > 0 && (
                     <div className="flex justify-center">
                       <Button
                         variant="outline"
-                        className="rounded-xl border-gray-200 text-gray-700 hover:bg-gray-50"
+                        className="rounded-xl border-gray-200 text-gray-700 hover:bg-gray-50 bg-transparent"
                       >
                         Load More Reviews
                       </Button>
@@ -1242,7 +1351,7 @@ export default function ProductDetail() {
                 </div>
               </Card>
             </TabsContent>
-            {/* -------------------Product Shipping---------------------- */}
+
             <TabsContent value="shipping" className="mt-6 animate-fadeIn">
               <Card className="p-6 rounded-xl border-gray-200 shadow-sm">
                 <div className="space-y-6">
@@ -1265,7 +1374,6 @@ export default function ProductDetail() {
                           </p>
                         </div>
                       </div>
-
                       <div className="flex gap-4 p-4 bg-gray-50 rounded border border-gray-100">
                         <Truck className="h-6 w-6 text-amber-500 shrink-0 mt-1" />
                         <div>
@@ -1282,9 +1390,7 @@ export default function ProductDetail() {
                       </div>
                     </div>
                   </div>
-
                   <Separator />
-
                   <div>
                     <h3 className="text-xl font-semibold text-gray-900">
                       Return Policy

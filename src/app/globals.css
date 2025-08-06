@@ -48,11 +48,11 @@
   }
 
   .animate-marquee-left {
-    animation: marquee-left 90s linear infinite;
+    animation: marquee-left 250s linear infinite;
   }
 
   .animate-marquee-right {
-    animation: marquee-right 90s linear infinite;
+    animation: marquee-right 250s linear infinite;
   }
 
   .animate-float {

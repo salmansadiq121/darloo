@@ -1,5 +1,4 @@
 "use client";
-
 import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
@@ -26,7 +25,6 @@ import {
   Feather,
   ArrowLeft,
 } from "lucide-react";
-
 const defaultHighlights = [
   { text: "High-quality materials for durability", icon: ShieldCheck },
   { text: "Ergonomic design for comfort", icon: Feather },
@@ -37,7 +35,6 @@ const defaultHighlights = [
   { text: "Sleek and modern aesthetics", icon: Star },
   { text: "Reliable performance with long lifespan", icon: Check },
 ];
-
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -77,6 +74,7 @@ export default function ProductDetail() {
   const [relatedProducts, setRelatedProducts] = useState([]);
   const [show, setShow] = useState(false);
   const [currentUrl, setCurrentUrl] = useState("");
+
   const router = useRouter();
 
   useEffect(() => {
@@ -85,28 +83,31 @@ export default function ProductDetail() {
     }
   }, []);
 
-  // Get all available images (variations)
+  // Get all available images (variations) with their titles and color codes
   const getAllImages = useMemo(() => {
-    const images = [];
+    const imagesWithDetails = [];
     if (product?.variations?.length > 0) {
       product.variations.forEach((variation) => {
-        if (variation.imageURL && !images.includes(variation.imageURL)) {
-          images.push(variation.imageURL);
+        if (variation.imageURL) {
+          imagesWithDetails.push({
+            url: variation.imageURL,
+            title: variation.title || product.name, // Use variation title or product name as fallback
+            colorCode: variation.color,
+          });
         }
       });
     }
-    return images.filter(Boolean);
-  }, [product?.variations]);
+    return imagesWithDetails;
+  }, [product?.variations, product?.name]);
 
   // Get current image based on active index
   const getCurrentImage = useMemo(() => {
     return (
-      getAllImages[activeImageIndex] || getAllImages[0] || "/placeholder.svg"
+      getAllImages[activeImageIndex]?.url ||
+      getAllImages[0]?.url ||
+      "/placeholder.svg"
     );
   }, [getAllImages, activeImageIndex]);
-
-  // REMOVED: The useEffect that was resetting activeImageIndex when selectedColor changes
-  // This was causing the conflict with color selection image switching
 
   // Set default selected color when product loads
   useEffect(() => {
@@ -119,7 +120,7 @@ export default function ProductDetail() {
       );
       if (matchingVariation && matchingVariation.imageURL) {
         const imageIndex = getAllImages.findIndex(
-          (img) => img === matchingVariation.imageURL
+          (imgObj) => imgObj.url === matchingVariation.imageURL
         );
         if (imageIndex !== -1) {
           setActiveImageIndex(imageIndex);
@@ -132,18 +133,15 @@ export default function ProductDetail() {
   const handleColorSelection = useCallback(
     (color) => {
       setSelectedColor(color.name);
-
       // Find matching variation by color code
       const matchingVariation = product?.variations?.find(
         (v) => v.color === color.code
       );
-
       if (matchingVariation && matchingVariation.imageURL) {
         // Find the index of the matching variation image in getAllImages
         const imageIndex = getAllImages.findIndex(
-          (img) => img === matchingVariation.imageURL
+          (imgObj) => imgObj.url === matchingVariation.imageURL
         );
-
         if (imageIndex !== -1) {
           // Immediately update the active image index
           setActiveImageIndex(imageIndex);
@@ -181,7 +179,6 @@ export default function ProductDetail() {
       const existingProductIndex = updatedProducts.findIndex(
         (p) => p.product === product._id
       );
-
       if (existingProductIndex !== -1) {
         const existingProduct = { ...updatedProducts[existingProductIndex] };
         if (!existingProduct.colors.includes(selectedColor)) {
@@ -204,11 +201,10 @@ export default function ProductDetail() {
           _id: product._id,
         });
       }
-
       localStorage.setItem("cart", JSON.stringify(updatedProducts));
-      toast.success("Product added to cart");
       return updatedProducts;
     });
+    toast.success("Product added to cart");
   };
 
   // One Click Buy Now
@@ -223,7 +219,6 @@ export default function ProductDetail() {
       title: product.name,
       _id: product._id,
     };
-
     localStorage.setItem("oneClickBuyProduct", JSON.stringify(productData));
     setOneClickBuyProduct(productData);
     router.push("/oneclick/checkout");
@@ -257,16 +252,13 @@ export default function ProductDetail() {
 
   useEffect(() => {
     if (!saleEndDate) return;
-
     const timer = setInterval(() => {
       const now = new Date();
       const difference = saleEndDate.getTime() - now.getTime();
-
       if (difference <= 0) {
         clearInterval(timer);
         return;
       }
-
       setTimeLeft({
         days: Math.floor(difference / (1000 * 60 * 60 * 24)),
         hours: Math.floor(
@@ -276,7 +268,6 @@ export default function ProductDetail() {
         seconds: Math.floor((difference % (1000 * 60)) / 1000),
       });
     }, 1000);
-
     return () => clearInterval(timer);
   }, [saleEndDate]);
 
@@ -286,7 +277,6 @@ export default function ProductDetail() {
       setQuantity(quantity - 1);
     }
   };
-
   const increaseQuantity = () => {
     if (quantity < product.quantity) {
       setQuantity(quantity + 1);
@@ -299,7 +289,6 @@ export default function ProductDetail() {
       prev === getAllImages.length - 1 ? 0 : prev + 1
     );
   };
-
   const prevImage = () => {
     setActiveImageIndex((prev) =>
       prev === 0 ? getAllImages.length - 1 : prev - 1
@@ -309,12 +298,10 @@ export default function ProductDetail() {
   // Handle image zoom
   const handleMouseMove = (e) => {
     if (!imageRef.current) return;
-
     const { left, top, width, height } =
       imageRef.current.getBoundingClientRect();
     const x = ((e.clientX - left) / width) * 100;
     const y = ((e.clientY - top) / height) * 100;
-
     setZoomPosition({ x, y });
   };
 
@@ -322,18 +309,15 @@ export default function ProductDetail() {
   useEffect(() => {
     const handleScroll = () => {
       if (!productRef.current) return;
-
       const productPosition = productRef.current.getBoundingClientRect().top;
       const productHeight = productRef.current.offsetHeight;
       const scrollPosition = window.scrollY;
-
       if (scrollPosition > productPosition + productHeight / 2) {
         setShowStickyBar(true);
       } else {
         setShowStickyBar(false);
       }
     };
-
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
@@ -378,29 +362,23 @@ export default function ProductDetail() {
   // Add product to recent View Products
   useEffect(() => {
     if (!product?._id) return;
-
     const now = Date.now();
     const threeDaysInMs = 3 * 24 * 60 * 60 * 1000;
     const viewDate = new Date().toISOString();
-
     let recentProducts =
       JSON.parse(localStorage.getItem("recentProducts")) || [];
-
     recentProducts = recentProducts.filter(
       (item) => now - item.timestamp < threeDaysInMs
     );
-
     const existingIndex = recentProducts.findIndex(
       (item) => item.id === product._id
     );
-
     if (existingIndex === -1) {
       recentProducts.push({ id: product._id, timestamp: now, viewDate });
     } else {
       recentProducts[existingIndex].timestamp = now;
       recentProducts[existingIndex].viewDate = viewDate;
     }
-
     localStorage.setItem("recentProducts", JSON.stringify(recentProducts));
   }, [product]);
 
@@ -474,7 +452,7 @@ export default function ProductDetail() {
   // If product data is empty after loading
   if (!loading && (!product || Object.keys(product).length === 0)) {
     return (
-      <div className="bg-white min-h-screen">
+      <div className="bg-white min-h-screen flex items-center justify-center flex-col">
         <div className="container mx-auto px-4 py-8 max-w-7xl">
           <div className="text-center py-12">
             <h2 className="text-2xl font-bold text-gray-900 mb-4">
@@ -524,11 +502,10 @@ export default function ProductDetail() {
             </div>
           </div>
         </div>
-
         <div className="container mx-auto px-4 py-8 max-w-7xl" ref={productRef}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 mb-12">
             {/*---------------------------
-          Left  Product Images
+              Left  Product Images
             --------------------------*/}
             <motion.div
               className="space-y-4 "
@@ -565,7 +542,6 @@ export default function ProductDetail() {
                     />
                   </div>
                 </div>
-
                 {/* Navigation arrows - only show if there are multiple images */}
                 {getAllImages.length > 1 && (
                   <div className="absolute inset-0 flex items-center justify-between px-4">
@@ -589,7 +565,6 @@ export default function ProductDetail() {
                     </Button>
                   </div>
                 )}
-
                 {product?.estimatedPrice &&
                   product?.estimatedPrice > product?.price && (
                     <div className="absolute top-4 left-4">
@@ -604,7 +579,6 @@ export default function ProductDetail() {
                       </div>
                     </div>
                   )}
-
                 {product?.trending && (
                   <div className="absolute top-4 right-4">
                     <Badge className="bg-[#06B6D4]/80 hover:bg-[#06B6D4] text-white font-semibold px-3 py-1.5 text-sm rounded-full">
@@ -612,25 +586,18 @@ export default function ProductDetail() {
                     </Badge>
                   </div>
                 )}
-
                 {isZoomed && (
                   <div className="absolute bottom-4 right-4 bg-white/80 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-medium text-gray-700">
                     Hover to zoom
                   </div>
                 )}
               </div>
-
               {/* All Images Thumbnails - show all available images */}
               {getAllImages.length > 1 && (
                 <div className="space-y-3">
                   <div className="flex space-x-2 overflow-x-auto pb-2 scrollbar-hide shidden">
-                    {getAllImages.map((image, index) => {
-                      // Check if this image is from a variation
-                      const matchingVariation = product?.variations?.find(
-                        (v) => v.imageURL === image
-                      );
-                      const isVariationImage = !!matchingVariation;
-
+                    {getAllImages.map((imageObj, index) => {
+                      const isVariationImage = !!imageObj.colorCode;
                       return (
                         <button
                           key={index}
@@ -642,24 +609,31 @@ export default function ProductDetail() {
                           onClick={() => setActiveImageIndex(index)}
                         >
                           <Image
-                            src={image || "/placeholder.svg"}
-                            alt={`${product?.name} image ${index + 1}`}
+                            src={imageObj.url || "/placeholder.svg"}
+                            alt={
+                              imageObj.title || product?.name || "Product image"
+                            }
                             fill
                             className="object-fill"
                             loading="lazy"
                           />
+                          {/* XS title in image */}
+                          <div className="absolute bottom-0 left-0 right-0 bg-black/50 text-white text-xs p-1 truncate text-center overflow-hidden">
+                            {imageObj.title}
+                          </div>
                           {/* Color indicator for variation images */}
                           {isVariationImage && (
-                            <div className="absolute bottom-1 right-1">
+                            <div className="absolute top-1 right-1">
                               <div
                                 className="w-3 h-3 rounded-full border border-white shadow-sm"
                                 style={{
-                                  backgroundColor: matchingVariation.color,
+                                  backgroundColor: imageObj.colorCode,
                                 }}
-                                title={`Color: ${matchingVariation.color}`}
+                                title={`Color: ${imageObj.title}`}
                               />
                             </div>
                           )}
+                          <span></span>
                         </button>
                       );
                     })}
@@ -673,7 +647,6 @@ export default function ProductDetail() {
                 </div>
               )}
             </motion.div>
-
             {/* -------------------Product Info---------------------- */}
             <motion.div
               className="space-y-6"
@@ -738,7 +711,6 @@ export default function ProductDetail() {
                   </div>
                 </div>
               </div>
-
               <div className="space-y-1">
                 <div className="flex items-baseline gap-2">
                   <span className="text-3xl font-bold text-gray-900">
@@ -798,9 +770,7 @@ export default function ProductDetail() {
                   </p>
                 </div>
               </div>
-
               <Separator className="my-6" />
-
               <div className="space-y-6">
                 {product?.colors?.length > 0 && (
                   <div className="space-y-3">
@@ -813,7 +783,6 @@ export default function ProductDetail() {
                         const hasVariation = product?.variations?.some(
                           (v) => v.color === color.code
                         );
-
                         return (
                           <TooltipProvider key={color._id}>
                             <Tooltip>
@@ -874,7 +843,6 @@ export default function ProductDetail() {
                           product?.variations?.some(
                             (v) => v.color === selectedColorObj.code
                           );
-
                         return hasMatchingVariation ? (
                           <div className="flex items-center gap-2 text-green-600">
                             <Check className="h-4 w-4" />
@@ -891,7 +859,6 @@ export default function ProductDetail() {
                     </div>
                   </div>
                 )}
-
                 {product?.sizes?.length > 0 && product?.sizes[0] !== "" && (
                   <div className="space-y-3">
                     <div className="font-medium text-gray-900">Size</div>
@@ -919,7 +886,6 @@ export default function ProductDetail() {
                     </Link>
                   </div>
                 )}
-
                 <div className="space-y-3">
                   <div className="font-medium text-gray-900">Quantity</div>
                   <div className="flex items-center">
@@ -949,7 +915,6 @@ export default function ProductDetail() {
                   </div>
                 </div>
               </div>
-
               <div className="flex flex-col sm:flex-row gap-4 pt-4">
                 <Button
                   className="sm:flex-1 h-12 cursor-pointer rounded text-base font-semibold bg-transparent hover:bg-primary/90 overflow-visible"
@@ -1008,7 +973,6 @@ export default function ProductDetail() {
                   </Button>
                 </div>
               </div>
-
               <div className="mt-6 bg-gray-100 rounded-xl p-4 border border-gray-200">
                 <h3 className="font-medium text-gray-900 mb-3">
                   ✨ Product Highlights
@@ -1033,7 +997,6 @@ export default function ProductDetail() {
               </div>
             </motion.div>
           </div>
-
           {/* Product Details and Reviews */}
           <Tabs defaultValue="details" className="w-full mt-12">
             <TabsList className="w-full max-w-fit grid grid-cols-3 overflow-y-auto  shidden h-14 rounded bg-red-100 border border-red-200 p-1">
@@ -1056,7 +1019,6 @@ export default function ProductDetail() {
                 Shipping & Returns
               </TabsTrigger>
             </TabsList>
-
             <TabsContent value="details" className="mt-6 animate-fadeIn">
               <Card className="p-6 rounded-xl border-gray-200 shadow-sm">
                 <div className="space-y-6">
@@ -1111,7 +1073,6 @@ export default function ProductDetail() {
                 </div>
               </Card>
             </TabsContent>
-
             {/* Rest of the tabs content remains the same... */}
             <TabsContent
               value="reviews"
@@ -1159,7 +1120,6 @@ export default function ProductDetail() {
                             product?.reviews?.length > 0
                               ? (count / product?.reviews?.length) * 100
                               : 0;
-
                           return (
                             <div
                               key={rating}
@@ -1211,6 +1171,7 @@ export default function ProductDetail() {
                                       <Image
                                         src={
                                           review?.user?.avatar ||
+                                          "/placeholder.svg" ||
                                           "/placeholder.svg" ||
                                           "/placeholder.svg" ||
                                           "/placeholder.svg"
@@ -1304,6 +1265,7 @@ export default function ProductDetail() {
                                               reply?.user?.avatar ||
                                               "/placeholder.svg" ||
                                               "/placeholder.svg" ||
+                                              "/placeholder.svg" ||
                                               "/placeholder.svg"
                                             }
                                             alt={reply?.user?.name}
@@ -1348,7 +1310,6 @@ export default function ProductDetail() {
                 </div>
               </Card>
             </TabsContent>
-
             <TabsContent value="shipping" className="mt-6 animate-fadeIn">
               <Card className="p-6 rounded-xl border-gray-200 shadow-sm">
                 <div className="space-y-6">
@@ -1421,7 +1382,6 @@ export default function ProductDetail() {
               </Card>
             </TabsContent>
           </Tabs>
-
           {/*-------------------Related Products---------------------- */}
           {relatedProducts && relatedProducts.length > 0 && (
             <div className="mt-16">
@@ -1434,7 +1394,6 @@ export default function ProductDetail() {
             </div>
           )}
         </div>
-
         {/* Sticky Add to Cart Bar (Mobile) */}
         <AnimatePresence>
           {showStickyBar && (
@@ -1467,7 +1426,6 @@ export default function ProductDetail() {
             </motion.div>
           )}
         </AnimatePresence>
-
         {/* Share Modal */}
         {show && (
           <div className="fixed top-0 left-0 w-full h-full bg-white/70 dark:bg-gray-950/70 z-50 flex items-center justify-center">

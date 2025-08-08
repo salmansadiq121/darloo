@@ -244,6 +244,7 @@ export default function Profile() {
                         icon: <Bell className="h-5 w-5" />,
                         label: "Notifications",
                         value: "notifications",
+
                         // badge: notificationCount,
                       },
                       {
@@ -260,6 +261,7 @@ export default function Profile() {
                         icon: <Users className="h-5 w-5" />,
                         label: "Affiliated Program",
                         value: "affiliate",
+                        href: "https://affiliates.darloo.com",
                       },
                       {
                         icon: <MessageSquare className="h-5 w-5" />,
@@ -278,7 +280,11 @@ export default function Profile() {
                         variant="ghost"
                         className="justify-start h-12 px-4 rounded-none relative cursor-pointer"
                         onClick={() => {
-                          item.value && setActiveTab(item.value);
+                          if (item.href) {
+                            window.open(item.href, "_blank");
+                          } else {
+                            item.value && setActiveTab(item.value);
+                          }
                         }}
                       >
                         <div className="flex items-center w-full">

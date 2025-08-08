@@ -19,6 +19,8 @@ const CheckOutForm = ({ setOpen, carts, setpayment, shippingFee }) => {
   const [message, setMessage] = useState("");
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const [amount, setAmount] = useState(0);
+  const [orderId, setOrderId] = useState("");
 
   const createOrder = async (cart, payment_info) => {
     try {
@@ -31,6 +33,9 @@ const CheckOutForm = ({ setOpen, carts, setpayment, shippingFee }) => {
         setSelectedProduct([]);
         router.push("/order-success");
         toast.success("Order successfully!");
+        setAmount(data.order.totalAmount);
+        setOrderId(data.order._id);
+
         // setOpen(false);
         // setpayment(false);
       }
@@ -39,6 +44,18 @@ const CheckOutForm = ({ setOpen, carts, setpayment, shippingFee }) => {
       toast.error(error.response?.data?.message);
     }
   };
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && orderId && amount) {
+      window.goaffpro_order = {
+        number: orderId,
+        total: parseFloat(amount),
+      };
+      if (typeof window.goaffproTrackConversion !== "undefined") {
+        window.goaffproTrackConversion(window.goaffpro_order);
+      }
+    }
+  }, [orderId, amount]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

@@ -8,6 +8,7 @@ import QueryProvider from "./content/QueryProvider";
 import { SessionProvider } from "next-auth/react";
 import SocketHandler from "./content/SocketHandler";
 import NextTopLoader from "nextjs-toploader";
+import { useEffect } from "react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -20,6 +21,25 @@ const geistMono = Geist_Mono({
 });
 
 export default function RootLayout({ children }) {
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const script = document.createElement("script");
+      script.src = "https://cdn.goaffpro.com/js/gaf.min.js";
+      script.async = true;
+
+      script.onload = () => {
+        window.gaf =
+          window.gaf ||
+          function () {
+            (window.gaf.q = window.gaf.q || []).push(arguments);
+          };
+        window.gaf("init", "axualetemf");
+        window.gaf("track");
+      };
+
+      document.body.appendChild(script);
+    }
+  }, []);
   return (
     <html lang="en" suppressHydrationWarning>
       <head>

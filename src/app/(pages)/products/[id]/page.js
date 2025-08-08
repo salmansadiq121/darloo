@@ -601,7 +601,7 @@ export default function ProductDetail() {
                       return (
                         <button
                           key={index}
-                          className={`relative h-24 w-32 min-w-32 cursor-pointer rounded border-2 overflow-hidden transition-all ${
+                          className={`relative h-24 w-24 min-w-24 cursor-pointer rounded border-2 overflow-hidden transition-all ${
                             activeImageIndex === index
                               ? "border-red-500 shadow-md"
                               : "border-border hover:border-primary/50"
@@ -618,9 +618,9 @@ export default function ProductDetail() {
                             loading="lazy"
                           />
                           {/* XS title in image */}
-                          <div className="absolute bottom-0 left-0 right-0 bg-black/50 text-white text-xs p-1 truncate text-center overflow-hidden">
+                          {/* <div className="absolute bottom-0 left-0 right-0 bg-black/50 text-white text-xs p-1 truncate text-center overflow-hidden">
                             {imageObj.title}
-                          </div>
+                          </div> */}
                           {/* Color indicator for variation images */}
                           {/* {isVariationImage && (
                             <div className="absolute top-1 right-1">
@@ -772,14 +772,58 @@ export default function ProductDetail() {
               </div>
               <Separator className="my-6" />
               <div className="space-y-6">
-                {product?.colors?.length > 0 && (
+                {/* Image */}
+                {/* All Images Thumbnails - show all available images */}
+                {getAllImages.length > 1 && (
+                  <div className="space-y-3">
+                    <div className="grid grid-cols-1 gap-4 pb-2">
+                      {getAllImages.map((imageObj, index) => {
+                        const isVariationImage = !!imageObj.colorCode;
+                        return (
+                          <button
+                            key={index}
+                            className={`relative h-[4rem] w-full flex items-center gap-1  cursor-pointer rounded border-2  overflow-hidden transition-all ${
+                              activeImageIndex === index
+                                ? "border-red-500 shadow-md"
+                                : "border-gray-200 hover:border-gray-500"
+                            }`}
+                            onClick={() => setActiveImageIndex(index)}
+                          >
+                            <Image
+                              src={imageObj.url || "/placeholder.svg"}
+                              alt={
+                                imageObj.title ||
+                                product?.name ||
+                                "Product image"
+                              }
+                              width={60}
+                              height={60}
+                              objectFit="min-cover "
+                              className={` rounded ${
+                                activeImageIndex === index
+                                  ? " w-[4.5rem] h-[4.5rem] shadow-md "
+                                  : " w-[4rem] h-[4rem]"
+                              }`}
+                              loading="lazy"
+                            />
+                            {/* XS title in image */}
+                            <div className=" text-gray-700 text-xs p-1 line-clamp-2 text-center overflow-hidden">
+                              {imageObj?.title}
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+                {/* Colors */}
+                {/* {product?.colors?.length > 0 && (
                   <div className="space-y-3">
                     <div className="font-medium text-gray-900">
                       Color: {selectedColor}
                     </div>
                     <div className="flex flex-wrap gap-3">
                       {product?.colors?.map((color) => {
-                        // Check if this color has a matching variation
                         const hasVariation = product?.variations?.some(
                           (v) => v.color === color.code
                         );
@@ -812,7 +856,6 @@ export default function ProductDetail() {
                                       }`}
                                     />
                                   )}
-                                  {/* Variation indicator */}
                                   {hasVariation && (
                                     <div
                                       className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 border-2 border-white rounded-full"
@@ -832,7 +875,6 @@ export default function ProductDetail() {
                         );
                       })}
                     </div>
-                    {/* Show current selection info */}
                     <div className="text-sm text-gray-600">
                       {(() => {
                         const selectedColorObj = product?.colors?.find(
@@ -858,7 +900,7 @@ export default function ProductDetail() {
                       })()}
                     </div>
                   </div>
-                )}
+                )} */}
                 {product?.sizes?.length > 0 && product?.sizes[0] !== "" && (
                   <div className="space-y-3">
                     <div className="font-medium text-gray-900">Size</div>

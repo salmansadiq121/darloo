@@ -33,10 +33,10 @@ export default function AboutUsPage() {
             </div>
             <div className="relative h-64 md:h-80 rounded-lg overflow-hidden shadow-lg">
               <Image
-                src="/placeholder.svg?height=400&width=600"
+                src="/3d-rendering-cartoon-shopping-cart (1).jpg?height=400&width=600"
                 alt="Darloo E-commerce story"
                 fill
-                className="object-cover"
+                className="object-cover hover:scale-[1.1] transition-all duration-300 cursor-pointer"
               />
             </div>
           </div>
@@ -132,48 +132,42 @@ export default function AboutUsPage() {
           {/* Our Team */}
           <div className="mb-16">
             <h2 className="text-2xl md:text-3xl font-bold mb-6 text-center">
-              Meet Our Leadership Team
+              Exclusive Offers Just for You ✨
             </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6">
               {[
-                {
-                  name: "Ahmed Darloo",
-                  position: "Founder & CEO",
-                  image: "/placeholder.svg?height=300&width=300",
-                },
                 {
                   name: "Sarah Khan",
                   position: "Chief Operations Officer",
-                  image: "/placeholder.svg?height=300&width=300",
+                  image:
+                    "/3d-black-friday-celebration.jpg?height=400&width=400",
                 },
                 {
                   name: "Michael Chen",
                   position: "Chief Technology Officer",
-                  image: "/placeholder.svg?height=300&width=300",
+                  image:
+                    "/3d-character-emerging-from-smartphone (1).jpg?height=400&width=400",
                 },
                 {
                   name: "Priya Sharma",
                   position: "Chief Marketing Officer",
-                  image: "/placeholder.svg?height=300&width=300",
+                  image: "/online-shopping-sale-app.jpg?height=400&width=400",
                 },
               ].map((member, index) => (
-                <Card
+                <div
                   key={index}
-                  className="overflow-hidden hover:shadow-md transition-shadow"
+                  className="overflow-hidden ] transition-shadow rounded-lg hover:shadow-lg shadow-red-200 "
                 >
                   <div className="relative h-64">
                     <Image
                       src={member.image || "/placeholder.svg"}
                       alt={member.name}
                       fill
-                      className="object-cover"
+                      objectFit="min-cover"
+                      className=" transform transition-transform duration-500 group-hover:scale-[1.2] cursor-pointer"
                     />
                   </div>
-                  <CardContent className="pt-4">
-                    <h3 className="text-lg font-bold">{member.name}</h3>
-                    <p className="text-gray-600">{member.position}</p>
-                  </CardContent>
-                </Card>
+                </div>
               ))}
             </div>
           </div>

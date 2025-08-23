@@ -93,7 +93,7 @@ export default function AffiliateSection() {
               <p className="text-sm text-gray-500">Pending Payment</p>
               <p className="text-2xl font-bold">{stats.pendingPayment}</p>
               <p className="text-xs text-gray-500 mt-2">
-                Processing period: 30 days
+                Processing period: 14 days
               </p>
             </CardContent>
           </Card>
@@ -101,21 +101,21 @@ export default function AffiliateSection() {
             <CardContent className="p-4">
               <p className="text-sm text-gray-500">Total Clicks</p>
               <p className="text-2xl font-bold">{stats.clicks}</p>
-              <p className="text-xs text-gray-500 mt-2">Last 30 days</p>
+              <p className="text-xs text-gray-500 mt-2">Last 14 days</p>
             </CardContent>
           </Card>
           <Card>
             <CardContent className="p-4">
               <p className="text-sm text-gray-500">Conversions</p>
               <p className="text-2xl font-bold">{stats.conversions}</p>
-              <p className="text-xs text-gray-500 mt-2">Last 30 days</p>
+              <p className="text-xs text-gray-500 mt-2">Last 14 days</p>
             </CardContent>
           </Card>
           <Card>
             <CardContent className="p-4">
               <p className="text-sm text-gray-500">Conversion Rate</p>
               <p className="text-2xl font-bold">{stats.conversionRate}</p>
-              <p className="text-xs text-gray-500 mt-2">Last 30 days</p>
+              <p className="text-xs text-gray-500 mt-2">Last 14 days</p>
             </CardContent>
           </Card>
         </div>

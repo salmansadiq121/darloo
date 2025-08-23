@@ -56,10 +56,9 @@ export default function ProductCard({ product, sale, tranding, isDesc }) {
       // Save the updated cart to localStorage
       localStorage.setItem("cart", JSON.stringify(updatedProducts));
 
-      toast.success("Product added to cart");
-
       return updatedProducts;
     });
+    toast.success("Product added to cart");
   };
   return (
     <div className="group bg-white min-w-[10.5rem] max-w-[17rem] border overflow-hidden transition-all duration-300  hover:shadow-[#9333EA]/20 hover:shadow-2xl hover:border-red-500/50 hover:-translate-y-1">

@@ -450,29 +450,29 @@ export default function ProductDetail() {
   }
 
   // If product data is empty after loading
-  if (!loading && (!product || Object.keys(product).length === 0)) {
-    return (
-      <div className="bg-white min-h-screen flex items-center justify-center flex-col">
-        <div className="container mx-auto px-4 py-8 max-w-7xl">
-          <div className="text-center py-12">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">
-              Product Not Found
-            </h2>
-            <p className="text-gray-600 mb-6">
-              The product you&apos;re looking for doesn&apos;t exist or has been
-              removed.
-            </p>
-            <Button asChild>
-              <Link href="/products">
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                Back to Products
-              </Link>
-            </Button>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  // if (!loading && (!product || Object.keys(product).length === 0)) {
+  //   return (
+  //     <div className="bg-white min-h-screen flex items-center justify-center flex-col">
+  //       <div className="container mx-auto px-4 py-8 max-w-7xl">
+  //         <div className="text-center py-12">
+  //           <h2 className="text-2xl font-bold text-gray-900 mb-4">
+  //             Product Not Found
+  //           </h2>
+  //           <p className="text-gray-600 mb-6">
+  //             The product you&apos;re looking for doesn&apos;t exist or has been
+  //             removed.
+  //           </p>
+  //           <Button asChild>
+  //             <Link href="/products">
+  //               <ArrowLeft className="mr-2 h-4 w-4" />
+  //               Back to Products
+  //             </Link>
+  //           </Button>
+  //         </div>
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   return (
     <MainLayout title="Product Detail - Darloo">
@@ -776,15 +776,15 @@ export default function ProductDetail() {
                 {/* All Images Thumbnails - show all available images */}
                 {getAllImages.length > 1 && (
                   <div className="space-y-3">
-                    <div className="grid grid-cols-1 gap-4 pb-2">
+                    <div className="flex items-center flex-wrap gap-2  pb-2">
                       {getAllImages.map((imageObj, index) => {
                         const isVariationImage = !!imageObj.colorCode;
                         return (
                           <button
                             key={index}
-                            className={`relative h-[4rem] w-full flex items-center gap-1  cursor-pointer rounded border-2  overflow-hidden transition-all ${
+                            className={`relative h-[3rem] max-w-fit  flex items-center gap-1  cursor-pointer rounded border-2  overflow-hidden transition-all ${
                               activeImageIndex === index
-                                ? "border-red-500 shadow-md"
+                                ? "border-red-500 shadow-md scale-105"
                                 : "border-gray-200 hover:border-gray-500"
                             }`}
                             onClick={() => setActiveImageIndex(index)}
@@ -801,13 +801,13 @@ export default function ProductDetail() {
                               objectFit="min-cover "
                               className={` rounded ${
                                 activeImageIndex === index
-                                  ? " w-[4.5rem] h-[4.5rem] shadow-md "
-                                  : " w-[4rem] h-[4rem]"
+                                  ? " w-[3rem] h-[3rem] shadow-md "
+                                  : " w-[3rem] h-[3rem]"
                               }`}
                               loading="lazy"
                             />
                             {/* XS title in image */}
-                            <div className=" text-gray-700 text-xs p-1 line-clamp-2 text-center overflow-hidden">
+                            <div className=" text-gray-700 text-xs capitalize px-3 line-clamp-2 text-center overflow-hidden">
                               {imageObj?.title}
                             </div>
                           </button>
@@ -1396,7 +1396,7 @@ export default function ProductDetail() {
                       Return Policy
                     </h3>
                     <p className="mt-3 text-gray-600 leading-relaxed">
-                      We accept returns within 30 days of delivery. Items must
+                      We accept returns within 14 days of delivery. Items must
                       be in their original condition with tags attached. Please
                       note that shipping costs are non-refundable, and the
                       customer is responsible for return shipping fees.

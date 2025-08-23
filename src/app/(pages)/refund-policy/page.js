@@ -10,6 +10,7 @@ import {
   CreditCard,
   CheckCircle,
 } from "lucide-react";
+import Link from "next/link";
 
 export default function RefundPolicy() {
   return (
@@ -59,7 +60,7 @@ export default function RefundPolicy() {
                     To be eligible for a return, please make sure that:
                   </p>
                   <ul className="list-disc pl-6 space-y-2 text-gray-700 mb-4">
-                    <li>The item was purchased within the last 30 days</li>
+                    <li>The item was purchased within the last 14 days</li>
                     <li>The item is in its original packaging</li>
                     <li>
                       The item is unused, unworn, and in the same condition that
@@ -105,8 +106,8 @@ export default function RefundPolicy() {
                       <span className="font-medium">
                         Contact Customer Service:
                       </span>{" "}
-                      Email us at returns@darloo.com or call us at +1 (555)
-                      123-4567 to request a return authorization.
+                      Email us at support@darloo.com or call us at +44 7888
+                      865833 to request a return authorization.
                     </li>
                     <li>
                       <span className="font-medium">
@@ -256,7 +257,7 @@ export default function RefundPolicy() {
                   <p className="text-gray-700">
                     If you&apos;ve done all of this and still haven&apos;t
                     received your refund, please contact us at
-                    refunds@darloo.com with your order number and refund
+                    support@darloo.com with your order number and refund
                     details.
                   </p>
                 </div>
@@ -295,12 +296,20 @@ export default function RefundPolicy() {
                 If you have any questions about returns, exchanges, or refunds,
                 please contact our customer service team:
               </p>
-              <div className="bg-gray-50 p-4 rounded-lg">
+              <div className="bg-gray-50 p-4 rounded-lg flex flex-col gap-1">
                 <p className="font-medium">
                   Darloo E-commerce Customer Service
                 </p>
-                <p>Email: support@darloo.com</p>
-                <p>Phone: +1 (555) 123-4567</p>
+                <Link href="tel:+447888865833" className="text-sm">
+                  Customer Service: +44 7888 865833‬
+                </Link>
+                <Link
+                  href="mailto:support@darloo.com 
+"
+                  className="text-sm"
+                >
+                  Email: support@darloo.com
+                </Link>
                 <p>Hours: Monday-Friday, 9am-6pm EST</p>
               </div>
             </CardContent>

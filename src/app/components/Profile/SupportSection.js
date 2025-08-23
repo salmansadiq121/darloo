@@ -15,6 +15,7 @@ import axios from "axios";
 import { ImSpinner2 } from "react-icons/im";
 import toast from "react-hot-toast";
 import { Separator } from "@/components/ui/separator";
+import Link from "next/link";
 
 export default function SupportSection() {
   const [formData, setFormData] = useState({
@@ -174,7 +175,7 @@ export default function SupportSection() {
                 {
                   question: "What is your return policy?",
                   answer:
-                    "We accept returns within 30 days of delivery. Items must be in original condition with tags attached. To initiate a return, go to your order details and click the 'Return' button.",
+                    "We accept returns within 14 days of delivery. Items must be in original condition with tags attached. To initiate a return, go to your order details and click the 'Return' button.",
                 },
                 {
                   question: "How do I redeem a coupon?",
@@ -230,10 +231,18 @@ export default function SupportSection() {
                 </svg>
                 Contact Information
               </h4>
-              <div className="mt-2 pl-7 space-y-2">
-                <p className="text-sm">Customer Service: +1 (800) 123-4567</p>
-                <p className="text-sm">Email: support@example.com</p>
-                <p className="text-sm">Hours: Monday-Friday, 9am-6pm EST</p>
+              <div className="mt-2 pl-7 space-y-2 flex flex-col gap-1">
+                <Link href="tel:+447888865833" className="text-sm">
+                  Customer Service: +44 7888 865833‬
+                </Link>
+                <Link
+                  href="mailto:support@darloo.com 
+"
+                  className="text-sm"
+                >
+                  Email: support@darloo.com
+                </Link>
+                <p className="text-sm">Hours: Monday-Friday, 9am-10pm EST</p>
               </div>
             </div>
           </div>

@@ -95,6 +95,7 @@ export default function Checkout() {
   const router = useRouter();
   const [products, setProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [country, setCountry] = useState("");
 
   // Fetch Trending Products
   useEffect(() => {
@@ -186,6 +187,7 @@ export default function Checkout() {
         `${process.env.NEXT_PUBLIC_SERVER_URI}/api/v1/shipping/${auth?.user?.addressDetails?.country}`
       );
       if (data) {
+        setCountry(data.shipping.country || "");
         setCart((prev) => ({
           ...prev,
           shippingFee: data?.shipping?.fee ?? 0,
@@ -231,6 +233,17 @@ export default function Checkout() {
       !auth?.user?.addressDetails?.pincode
     ) {
       toast.error("Please complete shipping information");
+      return;
+    }
+    if (cart?.totalAmount > 150) {
+      return toast.error(
+        "Your order total exceeds the limit of €150. Please adjust the quantity of items in your cart to proceed."
+      );
+    }
+    if (!country) {
+      toast.error(
+        "We’re sorry, purchases are currently unavailable in the selected country."
+      );
       return;
     }
     setShowPayment(true);

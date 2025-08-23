@@ -70,10 +70,9 @@ export default function ProductCarousel({ products }) {
       // Save the updated cart to localStorage
       localStorage.setItem("cart", JSON.stringify(updatedProducts));
 
-      toast.success("Product added to cart");
-
       return updatedProducts;
     });
+    toast.success("Product added to cart");
   };
   return (
     <Swiper

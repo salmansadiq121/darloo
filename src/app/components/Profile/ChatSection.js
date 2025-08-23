@@ -325,7 +325,7 @@ export default function ChatSection({ user }) {
       lowerMessage.includes("return") ||
       lowerMessage.includes("refund")
     ) {
-      return "We accept returns within 30 days of delivery. Items must be in original condition with tags attached. To initiate a return, go to your order details and click the 'Return' button.";
+      return "We accept returns within 14 days of delivery. Items must be in original condition with tags attached. To initiate a return, go to your order details and click the 'Return' button.";
     } else if (
       lowerMessage.includes("deliver") ||
       lowerMessage.includes("when") ||

@@ -20,6 +20,9 @@ import toast from "react-hot-toast";
 import axios from "axios";
 import { authUri } from "@/app/utils/ServerURI";
 import { uploadImage } from "@/app/utils/Upload";
+import countries from "world-countries";
+import ReactCountryFlag from "react-country-flag";
+import Select from "react-select";
 
 export default function UpdateProfileModal({
   isOpen,
@@ -130,6 +133,29 @@ export default function UpdateProfileModal({
       onClose();
     }
   };
+
+  // Sort countries alphabetically
+  const sortedCountries = [...countries].sort((a, b) =>
+    a.name.common.localeCompare(b.name.common)
+  );
+
+  const countryOptions = countries.map((country) => ({
+    value: country.name.common,
+    label: (
+      <div className="flex items-center gap-2">
+        <ReactCountryFlag
+          countryCode={country.cca2}
+          svg
+          style={{
+            width: "1.5em",
+            height: "1.5em",
+          }}
+        />
+        <span>{country.name.common}</span>
+      </div>
+    ),
+    name: country.name.common,
+  }));
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -294,6 +320,29 @@ export default function UpdateProfileModal({
                     value={formData?.country}
                     onChange={handleChange}
                     placeholder="Enter your country"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Country<span className="text-red-700">*</span>
+                  </label>
+                  <Select
+                    options={countryOptions}
+                    value={countryOptions.find(
+                      (option) => option.value === formData.country
+                    )}
+                    onChange={(selected) =>
+                      setFormData({
+                        ...formData,
+                        country: selected?.value || "",
+                      })
+                    }
+                    isSearchable
+                    filterOption={(option, inputValue) =>
+                      option.data.name
+                        .toLowerCase()
+                        .includes(inputValue.toLowerCase())
+                    }
                   />
                 </div>
                 <div className="space-y-2">

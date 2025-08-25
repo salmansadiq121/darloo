@@ -74,6 +74,7 @@ export default function ProductDetail() {
   const [relatedProducts, setRelatedProducts] = useState([]);
   const [show, setShow] = useState(false);
   const [currentUrl, setCurrentUrl] = useState("");
+  const [returnPolicy, setReturnPolicy] = useState("");
 
   const router = useRouter();
 
@@ -160,6 +161,7 @@ export default function ProductDetail() {
         `${process.env.NEXT_PUBLIC_SERVER_URI}/api/v1/products/product/detail/${productId}`
       );
       setProduct(data.product);
+      setReturnPolicy(data.return_policy);
     } catch (error) {
       console.log(error);
     } finally {
@@ -1381,7 +1383,7 @@ export default function ProductDetail() {
                             Express Shipping
                           </h4>
                           <p className="text-sm text-gray-600 mt-1">
-                            Delivery within 1-2 business days
+                            Delivery within 1-5 business days
                           </p>
                           <p className="text-sm font-medium text-gray-900 mt-1">
                             €{(product?.shipping * 2).toLocaleString()}
@@ -1392,10 +1394,16 @@ export default function ProductDetail() {
                   </div>
                   <Separator />
                   <div>
-                    <h3 className="text-xl font-semibold text-gray-900">
+                    <div
+                      dangerouslySetInnerHTML={{
+                        __html: returnPolicy,
+                      }}
+                      className=" px-2 py-2"
+                    ></div>
+                    {/* <h3 className="text-xl font-semibold text-gray-900">
                       Return Policy
-                    </h3>
-                    <p className="mt-3 text-gray-600 leading-relaxed">
+                    </h3> */}
+                    {/* <p className="mt-3 text-gray-600 leading-relaxed">
                       We accept returns within 14 days of delivery. Items must
                       be in their original condition with tags attached. Please
                       note that shipping costs are non-refundable, and the
@@ -1418,7 +1426,7 @@ export default function ProductDetail() {
                           refund
                         </li>
                       </ol>
-                    </div>
+                    </div> */}
                   </div>
                 </div>
               </Card>

@@ -438,7 +438,7 @@ export default function Profile() {
                         </div>
                       </div>
 
-                      <Separator />
+                      {/* <Separator />
 
                       <div>
                         <h3 className="text-lg font-medium mb-3">
@@ -489,7 +489,7 @@ export default function Profile() {
                             </p>
                           </div>
                         </div>
-                      </div>
+                      </div> */}
                     </CardContent>
                   </Card>
                 </TabsContent>

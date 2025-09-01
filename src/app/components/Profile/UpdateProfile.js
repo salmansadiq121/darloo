@@ -173,7 +173,7 @@ export default function UpdateProfileModal({
           value={activeTab}
           onValueChange={setActiveTab}
         >
-          <TabsList className="grid grid-cols-3 mb-6 gap-1 bg-red-100 overflow-x-auto shidden">
+          <TabsList className="grid grid-cols-2 mb-6 gap-1 bg-red-100 overflow-x-auto shidden">
             <TabsTrigger
               value="personal"
               className="px-4 min-w-fit mr-5 sm:mr-0 rounded-md data-[state=active]:bg-red-700 data-[state=active]:text-white text-black"
@@ -188,13 +188,13 @@ export default function UpdateProfileModal({
             >
               Address
             </TabsTrigger>
-            <TabsTrigger
+            {/* <TabsTrigger
               value="bank"
               className="px-4 min-w-fit ml-5 sm:ml-0  rounded-md data-[state=active]:bg-red-700 data-[state=active]:text-white text-black"
               onClick={() => setActiveTab("bank")}
             >
               Bank Details
-            </TabsTrigger>
+            </TabsTrigger> */}
           </TabsList>
 
           <form onSubmit={handleSubmit}>

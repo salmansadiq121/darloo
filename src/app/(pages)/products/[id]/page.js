@@ -1070,9 +1070,15 @@ export default function ProductDetail() {
                     <h3 className="text-xl font-semibold text-gray-900">
                       Description
                     </h3>
-                    <p className="mt-3 text-gray-600 leading-relaxed">
+                    {/* <p className="mt-3 text-gray-600 leading-relaxed">
                       {product?.description}
-                    </p>
+                    </p> */}
+                    <div
+                      className="mt-3 text-sm text-gray-600  w-full leading-relaxed"
+                      dangerouslySetInnerHTML={{
+                        __html: product?.description,
+                      }}
+                    />
                   </div>
                   <Separator />
                   <div>

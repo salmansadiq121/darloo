@@ -14,6 +14,7 @@ import { FaFacebookF, FaGoogle } from "react-icons/fa";
 import { LuEye, LuEyeOff, LuLoaderCircle } from "react-icons/lu";
 import { MdAddPhotoAlternate } from "react-icons/md";
 import { signIn, useSession } from "next-auth/react";
+import PhoneNumberInput from "@/app/utils/PhoneInput";
 
 export default function Register({ setActive }) {
   const { setActivationToken, setAuth } = useAuth();
@@ -55,6 +56,7 @@ export default function Register({ setActive }) {
       formData.append("password", password);
       formData.append("file", avatar);
       formData.append("number", number);
+      formData.append("phoneCode", phoneCode);
       const { data } = await axios.post(`${authUri}/register`, formData);
 
       if (data) {
@@ -67,6 +69,7 @@ export default function Register({ setActive }) {
         setPassword("");
         setAvatar(null);
         setNumber("");
+        setPhoneCode("+1");
       }
     } catch (error) {
       console.log(error);
@@ -172,7 +175,7 @@ export default function Register({ setActive }) {
             </div>
             <div className="w-full h-[2.8rem]">
               {/* State Dropdown */}
-              <div className="flex items-center gap-1 w-full px-[1px] border border-gray-400 rounded-sm focus:border-red-600 ">
+              {/* <div className="flex items-center gap-1 w-full px-[1px] border border-gray-400 rounded-sm focus:border-red-600 ">
                 <select
                   value={phoneCode || "+1"}
                   onChange={(e) => setPhoneCode(e.target.value)}
@@ -197,7 +200,14 @@ export default function Register({ setActive }) {
                   className="w-full h-[2.8rem] pl-2 pr-3 py-2 text-[15px] text-gray-900 bg-transparent border-none  outline-none"
                   required
                 />
-              </div>
+                </div> */}
+              <PhoneNumberInput
+                value={number}
+                setPhone={setNumber}
+                placeholder="+1 234 567 8901"
+                phoneCode={phoneCode}
+                setPhoneCode={setPhoneCode}
+              />
             </div>
             {/*  */}
             <div className=" w-full h-[2.8rem] relative">

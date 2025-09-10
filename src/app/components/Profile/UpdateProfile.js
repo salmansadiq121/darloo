@@ -23,6 +23,7 @@ import { uploadImage } from "@/app/utils/Upload";
 import countries from "world-countries";
 import ReactCountryFlag from "react-country-flag";
 import Select from "react-select";
+import PhoneNumberInput from "@/app/utils/PhoneInput";
 
 export default function UpdateProfileModal({
   isOpen,
@@ -35,7 +36,6 @@ export default function UpdateProfileModal({
   const [formData, setFormData] = useState({
     name: user?.name,
     email: user?.email,
-    number: user?.number,
     address: user?.addressDetails?.address,
     city: user?.addressDetails?.city,
     state: user?.addressDetails?.state,
@@ -47,6 +47,8 @@ export default function UpdateProfileModal({
   });
   const [isLoading, setIsLoading] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [phoneCode, setPhoneCode] = useState("+1");
+  const [number, setNumber] = useState(user?.number);
 
   useEffect(() => {
     setAvatar(user?.avatar);
@@ -54,6 +56,7 @@ export default function UpdateProfileModal({
       name: user?.name,
       email: user?.email,
       number: user?.number,
+      phoneCode: user?.phoneCode,
       address: user?.addressDetails?.address,
       city: user?.addressDetails?.city,
       state: user?.addressDetails?.state,
@@ -89,7 +92,8 @@ export default function UpdateProfileModal({
         const userData = new FormData();
         userData.append("name", formData.name);
         userData.append("email", formData.email);
-        userData.append("number", formData.number);
+        userData.append("number", number);
+        userData.append("phoneCode", phoneCode);
         userData.append("image", avatar);
 
         const { data } = await axios.put(
@@ -97,6 +101,7 @@ export default function UpdateProfileModal({
           userData
         );
         if (data) {
+          localStorage.setItem("@ayoob", JSON.stringify({ user: data.user }));
           getUserDetails();
           toast.success("Profile updated successfully");
         }
@@ -260,11 +265,18 @@ export default function UpdateProfileModal({
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="number">Phone Number</Label>
-                  <Input
+                  {/* <Input
                     id="number"
                     name="number"
                     value={formData?.number}
                     onChange={handleChange}
+                  /> */}
+                  <PhoneNumberInput
+                    value={number}
+                    setPhone={setNumber}
+                    placeholder="+1 234 567 8901"
+                    phoneCode={phoneCode}
+                    setPhoneCode={setPhoneCode}
                   />
                 </div>
                 {/* <div className="space-y-2">

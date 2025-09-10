@@ -24,6 +24,7 @@ import {
   User,
   Users,
 } from "lucide-react";
+import { FiTruck } from "react-icons/fi";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -52,6 +53,7 @@ import AffiliateSection from "@/app/components/Profile/AffiliateSection";
 import SupportSection from "@/app/components/Profile/SupportSection";
 import ChatSection from "@/app/components/Profile/ChatSection";
 import NotificationSection from "@/app/components/Profile/NotificationSection";
+import OrdersTracking from "@/app/components/Profile/OrdersTracking";
 
 export default function Profile() {
   const { auth, setAuth } = useAuth();
@@ -231,6 +233,11 @@ export default function Profile() {
                         value: "orders",
                       },
                       {
+                        icon: <FiTruck className="h-5 w-5" />,
+                        label: "Orders Tracking",
+                        value: "tracking",
+                      },
+                      {
                         icon: <Heart className="h-5 w-5" />,
                         label: "Favorites",
                         value: "favorites",
@@ -348,6 +355,10 @@ export default function Profile() {
 
                 <TabsContent value="orders" className="space-y-6">
                   <OrdersHistory userId={userId} />
+                </TabsContent>
+
+                <TabsContent value="tracking" className="space-y-6">
+                  <OrdersTracking userId={userId} />
                 </TabsContent>
 
                 <TabsContent value="profile">

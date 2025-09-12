@@ -343,6 +343,7 @@ export default function Checkout() {
                   alt="checkout"
                   width={80}
                   height={50}
+                  unoptimized
                   className="object-contain cursor-pointer"
                 />
               ))}

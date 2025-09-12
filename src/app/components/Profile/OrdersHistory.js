@@ -362,6 +362,7 @@ export default function OrdersHistory({ userId }) {
                                         }
                                         width={40}
                                         height={40}
+                                        unoptimized
                                         alt="Comment attachment"
                                         className="object-fill w-full h-full"
                                       />
@@ -395,6 +396,7 @@ export default function OrdersHistory({ userId }) {
                                                 }
                                                 width={200}
                                                 height={150}
+                                                unoptimized
                                                 alt="Comment attachment"
                                                 className="object-cover w-full h-full"
                                               />
@@ -563,6 +565,7 @@ export default function OrdersHistory({ userId }) {
                                   alt={product?.product?.name}
                                   width={80}
                                   height={70}
+                                  unoptimized
                                   className="rounded-md h-[70px] w-[80px] object-fill"
                                 />
                                 <div>

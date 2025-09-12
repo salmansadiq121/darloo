@@ -126,6 +126,7 @@ export default function ProductCarousel({ products }) {
                 alt={product?.name}
                 width={200}
                 height={250}
+                unoptimized
                 className="w-full h-[190px] sm:h-[250px] object-fill"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-[#0F172A]   to-transparent"></div>

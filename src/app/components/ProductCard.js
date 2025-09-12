@@ -70,6 +70,7 @@ export default function ProductCard({ product, sale, tranding, isDesc }) {
           height={230}
           className="w-full h-[180px] sm:h-[230px] object-fill"
           loading="lazy"
+          unoptimized
         />
         <div className="absolute inset-0 bg-gradient-to-t from-[#0F172A]   to-transparent"></div>
 

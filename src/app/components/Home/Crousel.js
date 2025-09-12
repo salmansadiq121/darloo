@@ -82,6 +82,7 @@ export default function Crousel({ products, loading }) {
                       alt="Banner Image"
                       width={1000}
                       height={350}
+                      unoptimized
                       className=" w-full h-[140px] sm:h-[350px] object-fill"
                     />
                   </div>
@@ -289,6 +290,7 @@ const TrendingProducts = ({ products, loading }) => {
                       src={product.thumbnails || "/placeholder.svg"}
                       alt={product.name || "Product image"}
                       fill
+                      unoptimized
                       className={`object-cover transition-transform duration-300 ${
                         isHovered ? "scale-110" : "scale-100"
                       }`}

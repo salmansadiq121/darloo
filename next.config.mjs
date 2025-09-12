@@ -2,7 +2,6 @@
 const nextConfig = {
   images: {
     domains: ["*"],
-    formats: ["image/webp"],
     remotePatterns: [
       {
         protocol: "https",

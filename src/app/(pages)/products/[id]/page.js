@@ -179,7 +179,7 @@ export default function ProductDetail() {
     setSelectedProduct((prevProducts) => {
       const updatedProducts = [...prevProducts];
       const existingProductIndex = updatedProducts.findIndex(
-        (p) => p.product === product._id
+        (p) => p?.product === product?._id
       );
       if (existingProductIndex !== -1) {
         const existingProduct = { ...updatedProducts[existingProductIndex] };
@@ -356,7 +356,7 @@ export default function ProductDetail() {
 
   useEffect(() => {
     const favorites = JSON.parse(localStorage.getItem("favorites")) || [];
-    if (favorites.includes(product._id)) {
+    if (favorites.includes(product?._id)) {
       setIsWishlisted(true);
     }
   }, [product]);

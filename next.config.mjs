@@ -2,6 +2,7 @@
 const nextConfig = {
   images: {
     domains: ["*"],
+    formats: ["image/webp"],
     remotePatterns: [
       {
         protocol: "https",
@@ -16,14 +17,6 @@ const nextConfig = {
         protocol: "https",
         hostname: "**.alicdn.com",
         pathname: "/**",
-      },
-      {
-        protocol: "https",
-        hostname: "secure.gravatar.com",
-      },
-      {
-        protocol: "https",
-        hostname: "flagcdn.com",
       },
     ],
     unoptimized: true,

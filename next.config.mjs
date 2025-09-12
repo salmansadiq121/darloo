@@ -19,7 +19,7 @@ const nextConfig = {
         pathname: "/**",
       },
     ],
-    unoptimized: false,
+    // unoptimized: false,
   },
   reactStrictMode: true,
 };

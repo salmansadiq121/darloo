@@ -7,16 +7,6 @@ const nextConfig = {
         protocol: "https",
         hostname: "**",
       },
-      {
-        protocol: "https",
-        hostname: "cbu01.alicdn.com",
-        pathname: "/**",
-      },
-      {
-        protocol: "https",
-        hostname: "**.alicdn.com",
-        pathname: "/**",
-      },
     ],
     // unoptimized: false,
   },

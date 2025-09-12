@@ -326,7 +326,6 @@ export default function ProductDetail() {
 
   // Fetch related products
   const fetchRelatedProducts = async () => {
-    setLoading(true);
     try {
       const { data } = await axios.get(
         `${process.env.NEXT_PUBLIC_SERVER_URI}/api/v1/products/category/${product?.category?._id}`
@@ -334,8 +333,6 @@ export default function ProductDetail() {
       setRelatedProducts(data.products);
     } catch (error) {
       console.log(error);
-    } finally {
-      setLoading(false);
     }
   };
 

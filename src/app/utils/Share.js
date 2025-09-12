@@ -70,6 +70,7 @@ export default function ShareData({ url, title, setShowShare }) {
                 }
                 alt="Profile"
                 layout="fill"
+                unoptimized
                 className="rounded-lg"
               />
             </div>

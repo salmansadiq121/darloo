@@ -92,6 +92,7 @@ const EmptyState = ({ onClearFilters }) => (
       width={200}
       height={200}
       className="w-64 h-64 opacity-50"
+      unoptimized
     />
     <h3 className="text-xl font-semibold mt-6 text-gray-700">
       No products found!

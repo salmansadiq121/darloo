@@ -379,6 +379,7 @@ export default function Checkout() {
                   alt="checkout"
                   width={80}
                   height={50}
+                  unoptimized
                   className="object-contain cursor-pointer"
                 />
               ))}
@@ -404,6 +405,7 @@ export default function Checkout() {
                           alt={item?.title}
                           width={40}
                           height={40}
+                          unoptimized
                           className=" text-8 w-[6rem] h-[4rem]  rounded-lg object-fill"
                         />
                       </div>

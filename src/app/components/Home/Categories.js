@@ -100,6 +100,7 @@ export default function AdvancedDualMarqueeCategories({
             alt={category.name}
             width={96}
             height={96}
+            unoptimized
             className="w-full h-full object-cover transition-all duration-500 group-hover:scale-110"
           />
 

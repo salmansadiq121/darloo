@@ -135,6 +135,7 @@ export default function Register({ setActive }) {
                 alt="avatar"
                 width={64}
                 height={64}
+                unoptimized
                 className="object-fill rounded-full w-[4rem] h-[4rem]  border-2 border-red-500"
               />
               <input

@@ -36,6 +36,7 @@ export default function AboutUsPage() {
                 src="/3d-rendering-cartoon-shopping-cart (1).jpg?height=400&width=600"
                 alt="Darloo E-commerce story"
                 fill
+                unoptimized
                 className="object-cover hover:scale-[1.1] transition-all duration-300 cursor-pointer"
               />
             </div>
@@ -163,6 +164,7 @@ export default function AboutUsPage() {
                       src={member.image || "/placeholder.svg"}
                       alt={member.name}
                       fill
+                      unoptimized
                       objectFit="min-cover"
                       className=" transform transition-transform duration-500 group-hover:scale-[1.2] cursor-pointer"
                     />

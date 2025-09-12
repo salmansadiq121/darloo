@@ -541,7 +541,6 @@ export default function ProductDetail() {
                       fill
                       className="object-fill"
                       priority
-                      unoptimized
                     />
                   </div>
                 </div>
@@ -618,7 +617,6 @@ export default function ProductDetail() {
                             }
                             fill
                             objectFit="min-cover"
-                            unoptimized
                             loading="lazy"
                           />
                           {/* XS title in image */}
@@ -809,7 +807,6 @@ export default function ProductDetail() {
                                   : " w-[3rem] h-[3rem]"
                               }`}
                               loading="lazy"
-                              unoptimized
                             />
                             {/* XS title in image */}
                             <div className=" text-gray-700 text-xs capitalize px-3 line-clamp-2 text-center overflow-hidden">

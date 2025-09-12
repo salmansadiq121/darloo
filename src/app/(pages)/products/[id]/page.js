@@ -1066,19 +1066,21 @@ export default function ProductDetail() {
             <TabsContent value="details" className="mt-6 animate-fadeIn">
               <Card className="p-6 rounded-xl border-gray-200 shadow-sm">
                 <div className="space-y-6">
-                  <div>
+                  <div className="w-full">
                     <h3 className="text-xl font-semibold text-gray-900">
                       Description
                     </h3>
                     {/* <p className="mt-3 text-gray-600 leading-relaxed">
                       {product?.description}
                     </p> */}
-                    <div
-                      className="mt-3 text-sm text-gray-600  w-full leading-relaxed"
-                      dangerouslySetInnerHTML={{
-                        __html: product?.description,
-                      }}
-                    />
+                    <div className=" w-full flex items-center justify-center">
+                      <div
+                        className="mt-3 text-sm text-gray-600  w-full leading-relaxed"
+                        dangerouslySetInnerHTML={{
+                          __html: product?.description,
+                        }}
+                      />
+                    </div>
                   </div>
                   <Separator />
                   <div>

@@ -50,7 +50,7 @@ const nextConfig = {
     ],
     // unoptimized: false,
   },
-  reactStrictMode: true,
+  reactStrictMode: false,
 };
 
 export default nextConfig;

@@ -121,7 +121,6 @@ export default function ProductSearch() {
                       alt={product.name}
                       width={48}
                       height={48}
-                      unoptimized
                       className="h-full w-full object-fill"
                     />
                   </div>

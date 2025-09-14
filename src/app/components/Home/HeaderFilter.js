@@ -167,7 +167,6 @@ export default function HeaderFilter({ categoriesData, isLoading }) {
                             width={120}
                             height={120}
                             loading="lazy"
-                            unoptimized
                             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-200"
                           />
                         ) : (

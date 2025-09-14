@@ -84,7 +84,7 @@ export default function RootLayout({ children }) {
               <main className=" bg-white w-full min-h-screen text-black">
                 {children}
 
-                <Toaster position="bottom-center" />
+                <Toaster position="bottom-right" />
                 <SocketHandler />
               </main>
             </AuthProvider>

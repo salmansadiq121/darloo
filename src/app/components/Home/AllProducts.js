@@ -68,7 +68,7 @@ export default function AllProducts() {
         setError(null);
 
         const response = await axios.get(
-          `${productsURI}/pagination?page=${page}&limit=${productsPerPage}`,
+          `${productsURI}/pagination?page=${page}&limit=${productsPerPage}&isPC=true`,
           {
             signal: abortControllerRef.current.signal,
             timeout: 10000,

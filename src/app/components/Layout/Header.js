@@ -300,7 +300,6 @@ const Header = () => {
                   alt="Profile"
                   width={70}
                   height={70}
-                  unoptimized
                   className={`h-12 w-12 rounded-full ${
                     pathName === "/profile"
                       ? "border-red-500 border-2"

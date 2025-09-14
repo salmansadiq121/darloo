@@ -54,6 +54,8 @@ import SupportSection from "@/app/components/Profile/SupportSection";
 import ChatSection from "@/app/components/Profile/ChatSection";
 import NotificationSection from "@/app/components/Profile/NotificationSection";
 import OrdersTracking from "@/app/components/Profile/OrdersTracking";
+import { TbTruckReturn } from "react-icons/tb";
+import ReturnHistory from "@/app/components/Profile/ReturnHistory";
 
 export default function Profile() {
   const { auth, setAuth } = useAuth();
@@ -233,10 +235,15 @@ export default function Profile() {
                         value: "orders",
                       },
                       {
-                        icon: <FiTruck className="h-5 w-5" />,
-                        label: "Orders Tracking",
-                        value: "tracking",
+                        icon: <TbTruckReturn className="h-5 w-5" />,
+                        label: "Return History",
+                        value: "returns",
                       },
+                      // {
+                      //   icon: <FiTruck className="h-5 w-5" />,
+                      //   label: "Orders Tracking",
+                      //   value: "tracking",
+                      // },
                       {
                         icon: <Heart className="h-5 w-5" />,
                         label: "Favorites",
@@ -359,6 +366,9 @@ export default function Profile() {
 
                 <TabsContent value="tracking" className="space-y-6">
                   <OrdersTracking userId={userId} />
+                </TabsContent>
+                <TabsContent value="returns" className="space-y-6">
+                  <ReturnHistory userId={userId} />
                 </TabsContent>
 
                 <TabsContent value="profile">

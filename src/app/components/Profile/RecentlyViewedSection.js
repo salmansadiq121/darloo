@@ -100,7 +100,6 @@ export default function RecentlyViewedSection() {
                   alt={item?.name}
                   width={200}
                   height={200}
-                  unoptimized
                   className="h-full w-full object-fill rounded-md"
                 />
               </div>

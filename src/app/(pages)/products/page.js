@@ -92,7 +92,6 @@ const EmptyState = ({ onClearFilters }) => (
       width={200}
       height={200}
       className="w-64 h-64 opacity-50"
-      unoptimized
     />
     <h3 className="text-xl font-semibold mt-6 text-gray-700">
       No products found!
@@ -153,6 +152,7 @@ function ProductsContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [filtersInitialized, setFiltersInitialized] = useState(false);
+  const [isPC, setIsPC] = useState(true);
 
   // Debounced search
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
@@ -246,6 +246,9 @@ function ProductsContent() {
       // Search term
       if (debouncedSearchTerm) {
         params.append("search", debouncedSearchTerm);
+      }
+      if (isPC) {
+        params.append("isPC", isPC);
       }
 
       const { data } = await axios.get(

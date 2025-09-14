@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Check,
   Clock,
@@ -29,6 +29,7 @@ import Swal from "sweetalert2";
 import toast from "react-hot-toast";
 import OrderCardSkeleton from "./OrderLoadingSkelton";
 import AddReviewModal from "./ReviewModal";
+import ReturnModal from "./return-modal";
 import { Separator } from "@/components/ui/separator";
 
 export default function OrdersHistory({ userId }) {
@@ -38,6 +39,28 @@ export default function OrdersHistory({ userId }) {
   const [orderId, setOrderId] = useState("");
   const [show, setShow] = useState(false);
   const [productId, setProductId] = useState("");
+  const [trackingNumber, setTrackingNumber] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [trackingData, setTrackingData] = useState(null);
+  const [error, setError] = useState(null);
+  const [returnData, setReturnData] = useState({
+    order: "",
+    product: "",
+    reason: "",
+    images: [],
+    comment: "",
+  });
+  const returnReasons = [
+    "product is damaged",
+    "wrong item received",
+    "wrong size",
+    " changed mind",
+    "other",
+  ];
+
+  const [showReturnModal, setShowReturnModal] = useState(false);
+  const [selectedReturnOrder, setSelectedReturnOrder] = useState(null);
+  const [selectedReturnProduct, setSelectedReturnProduct] = useState(null);
 
   // Fetch Orders
   const fetchOrders = async () => {
@@ -57,6 +80,119 @@ export default function OrdersHistory({ userId }) {
   useEffect(() => {
     fetchOrders();
   }, [userId]);
+
+  // Get Tracking Data
+  const getTrackingData = async (trackingNumber) => {
+    setLoading(true);
+    setError(null);
+    setTrackingData(null);
+
+    try {
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_SERVER_URI}/api/v1/order/track?trackingNumber=${trackingNumber}`
+      );
+      const data = await res.json();
+
+      if (data) {
+        setTrackingData(data.details);
+      } else {
+        setError(data.message || "Tracking failed");
+      }
+    } catch (err) {
+      console.error("❌ Error fetching tracking data:", err);
+      setError("Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (trackingNumber) {
+      getTrackingData(trackingNumber);
+    }
+  }, [trackingNumber]);
+
+  // Handle Return
+  const handleReturn = async (returnFormData) => {
+    try {
+      if (returnFormData.images.length === 0) {
+        toast.error("Please upload at least one image");
+        return;
+      }
+      const { data } = await axios.post(
+        `${process.env.NEXT_PUBLIC_SERVER_URI}/api/v1/order/return/request/${returnFormData.order}`,
+        returnFormData
+      );
+
+      if (data) {
+        toast.success(
+          "Your return request has been sent. We will contact you shortly.",
+          { position: "top-left" }
+        );
+        fetchOrders();
+        setShowReturnModal(false);
+        setSelectedReturnOrder(null);
+        setSelectedReturnProduct(null);
+      } else {
+        toast.error(data?.message || "Something went wrong.");
+      }
+    } catch (error) {
+      console.error("Error submitting return request:", error);
+      toast.error(error.response?.data?.message || "Something went wrong.");
+    }
+  };
+
+  // Handle Return Click
+  const handleReturnClick = (order, product = null) => {
+    setSelectedReturnOrder(order);
+    setSelectedReturnProduct(product);
+    setShowReturnModal(true);
+  };
+
+  // Cancel Order
+  const handleOrderCancelConfirmation = (orderId, status) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text:
+        status === "Cancelled"
+          ? "Do you want to cancel this order?"
+          : "Do you want to return this order?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText:
+        status === "Cancelled" ? "Yes, cancel order" : "Yes, return order",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        cancelOrder(orderId, status);
+      }
+    });
+  };
+  const cancelOrder = async (orderId, status) => {
+    try {
+      const { data } = await axios.put(
+        `${process.env.NEXT_PUBLIC_SERVER_URI}/api/v1/order/cancel/request/${orderId}`,
+        {
+          orderStatus: status,
+        }
+      );
+      if (data) {
+        toast.success(
+          status === "Cancelled"
+            ? "Your order cancel request has been sent."
+            : "Your order return request has been sent."
+        );
+        setOrderId("");
+        fetchOrders();
+      } else {
+        toast.error(data?.message || "Something went wrong.");
+      }
+    } catch (error) {
+      console.error("Error cancelling order:", error);
+      toast.error(error.response?.data?.message || "Something went wrong.");
+    }
+  };
 
   const getStatusIcon = (status) => {
     switch (status) {
@@ -101,51 +237,6 @@ export default function OrdersHistory({ userId }) {
         {status}
       </Badge>
     );
-  };
-
-  // Cancel Order
-  const handleOrderCancelConfirmation = (orderId, status) => {
-    Swal.fire({
-      title: "Are you sure?",
-      text:
-        status === "Cancelled"
-          ? "Do you want to cancel this order?"
-          : "Do you want to return this order?",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText:
-        status === "Cancelled" ? "Yes, cancel order" : "Yes, return order",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        cancelOrder(orderId, status);
-      }
-    });
-  };
-  const cancelOrder = async (orderId, status) => {
-    try {
-      const { data } = await axios.put(
-        `${process.env.NEXT_PUBLIC_SERVER_URI}/api/v1/order/cancel/request/${orderId}`,
-        {
-          orderStatus: status,
-        }
-      );
-      if (data) {
-        toast.success(
-          status === "Cancelled"
-            ? "Your order cancel request has been sent."
-            : "Your order return request has been sent."
-        );
-        setOrderId("");
-        fetchOrders();
-      } else {
-        toast.error(response?.data?.message || "Something went wrong.");
-      }
-    } catch (error) {
-      console.error("Error cancelling order:", error);
-      toast.error(error.response?.data?.message || "Something went wrong.");
-    }
   };
 
   return (
@@ -246,6 +337,7 @@ export default function OrdersHistory({ userId }) {
                           setOrderId((prev) =>
                             prev === order?._id ? "" : order?._id
                           );
+                          setTrackingNumber(order?.trackingId);
                         }}
                         variant="outline"
                         size="sm"
@@ -258,13 +350,8 @@ export default function OrdersHistory({ userId }) {
                         <Button
                           variant="outline"
                           size="sm"
-                          className="text-xs flex items-center gap-1 text-orange-600"
-                          onClick={() =>
-                            handleOrderCancelConfirmation(
-                              order?._id,
-                              "Returned"
-                            )
-                          }
+                          className="text-xs flex items-center gap-1 text-orange-600 bg-transparent"
+                          onClick={() => handleReturnClick(order)}
                         >
                           <Package className="h-3 w-3" />
                           Return
@@ -275,7 +362,7 @@ export default function OrdersHistory({ userId }) {
                         <Button
                           variant="outline"
                           size="sm"
-                          className="text-xs flex items-center gap-1 text-red-600"
+                          className="text-xs flex items-center gap-1 text-red-600 bg-transparent"
                           onClick={() =>
                             handleOrderCancelConfirmation(
                               order?._id,
@@ -304,7 +391,10 @@ export default function OrdersHistory({ userId }) {
                             }
                           >
                             <Image
-                              src={product?.product?.thumbnails}
+                              src={
+                                product?.product?.thumbnails ||
+                                "/placeholder.svg"
+                              }
                               alt={product?.product?.name}
                               width={80}
                               height={70}
@@ -358,11 +448,11 @@ export default function OrdersHistory({ userId }) {
                                       <Image
                                         src={
                                           comment?.user?.avatar ||
+                                          "/placeholder.svg" ||
                                           "/placeholder.svg"
                                         }
                                         width={40}
                                         height={40}
-                                        unoptimized
                                         alt="Comment attachment"
                                         className="object-fill w-full h-full"
                                       />
@@ -392,11 +482,11 @@ export default function OrdersHistory({ userId }) {
                                               <Image
                                                 src={
                                                   comment?.image ||
+                                                  "/placeholder.svg" ||
                                                   "/placeholder.svg"
                                                 }
                                                 width={200}
                                                 height={150}
-                                                unoptimized
                                                 alt="Comment attachment"
                                                 className="object-cover w-full h-full"
                                               />
@@ -512,13 +602,8 @@ export default function OrdersHistory({ userId }) {
                             <Button
                               variant="outline"
                               size="sm"
-                              className="text-xs flex items-center gap-1 text-orange-600"
-                              onClick={() =>
-                                handleOrderCancelConfirmation(
-                                  order?._id,
-                                  "Returned"
-                                )
-                              }
+                              className="text-xs flex items-center gap-1 text-orange-600 bg-transparent"
+                              onClick={() => handleReturnClick(order)}
                             >
                               <Package className="h-3 w-3" />
                               Return
@@ -529,7 +614,7 @@ export default function OrdersHistory({ userId }) {
                             <Button
                               variant="outline"
                               size="sm"
-                              className="text-xs flex items-center gap-1 text-red-600"
+                              className="text-xs flex items-center gap-1 text-red-600 bg-transparent"
                               onClick={() =>
                                 handleOrderCancelConfirmation(
                                   order?._id,
@@ -561,11 +646,13 @@ export default function OrdersHistory({ userId }) {
                                 }
                               >
                                 <Image
-                                  src={product?.product?.thumbnails}
+                                  src={
+                                    product?.product?.thumbnails ||
+                                    "/placeholder.svg"
+                                  }
                                   alt={product?.product?.name}
                                   width={80}
                                   height={70}
-                                  unoptimized
                                   className="rounded-md h-[70px] w-[80px] object-fill"
                                 />
                                 <div>
@@ -614,6 +701,32 @@ export default function OrdersHistory({ userId }) {
           setShow={setShow}
           productId={productId}
           setProductId={setProductId}
+        />
+      )}
+
+      {/* Return Modal */}
+      {showReturnModal && selectedReturnOrder && (
+        <ReturnModal
+          isOpen={showReturnModal}
+          onClose={() => {
+            setShowReturnModal(false);
+            setSelectedReturnOrder(null);
+            setSelectedReturnProduct(null);
+          }}
+          onSubmit={handleReturn}
+          orderId={selectedReturnOrder._id}
+          productId={
+            selectedReturnProduct?._id ||
+            selectedReturnOrder.products[0]?.product?._id
+          }
+          productName={
+            selectedReturnProduct?.name ||
+            selectedReturnOrder.products[0]?.product?.name
+          }
+          productImage={
+            selectedReturnProduct?.thumbnails ||
+            selectedReturnOrder.products[0]?.product?.thumbnails
+          }
         />
       )}
     </Card>

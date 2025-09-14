@@ -94,7 +94,6 @@ export default function CartItems({ products }) {
                         alt={item?.title}
                         width={70}
                         height={50}
-                        unoptimized
                         className=" text-9 w-[5rem] sm:w-[5rem] h-[3rem] sm:h-[3.5rem]  object-fill"
                       />
                     </div>

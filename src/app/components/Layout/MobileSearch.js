@@ -123,7 +123,6 @@ export default function MobileProductSearch({ isShow }) {
                       alt={product?.name}
                       width={48}
                       height={48}
-                      unoptimized
                       className="h-full w-full object-cover"
                     />
                   </div>

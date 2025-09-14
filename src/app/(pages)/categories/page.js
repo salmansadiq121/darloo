@@ -146,7 +146,6 @@ export default function Categories() {
                           alt={category.name}
                           width={48}
                           height={48}
-                          unoptimized
                           className="w-16 h-16 object-cover rounded-lg"
                         />
                         {selectedCategoryId === category._id && (
@@ -211,7 +210,6 @@ export default function Categories() {
                             alt={subCategory.name}
                             width={52}
                             height={54}
-                            unoptimized
                             className="w-12 h-12 object-cover rounded mb-2 group-hover:scale-105 transition-transform duration-200"
                           />
                         ) : (

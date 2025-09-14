@@ -1,74 +1,56 @@
-// /** @type {import('next').NextConfig} */
-// const nextConfig = {
-//   images: {
-//     domains: ["*"],
-//     remotePatterns: [
-//       {
-//         protocol: "https",
-//         hostname: "**",
-//       },
-//       {
-//         protocol: "https",
-//         hostname: "cbu01.alicdn.com",
-//       },
-//     ],
-//     unoptimized: true,
-//   },
-//   reactStrictMode: true,
-// };
-
-// export default nextConfig;
-
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  async rewrites() {
-    return [
-      {
-        source: "/robots.txt",
-        destination: "/api/robots",
-      },
-    ];
-  },
-
-  webpack(config, { isServer }) {
-    // Handle SVG with @svgr/webpack
-    config.module.rules.push({
-      test: /\.svg$/,
-      use: ["@svgr/webpack"],
-    });
-
-    config.externals.push({
-      "thread-stream": "commonjs thread-stream",
-    });
-
-    return config;
-  },
-
   images: {
-    unoptimized: true, // allows all external images without optimization
+    domains: ["*"],
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "**", // allow all https hosts
+        hostname: "**",
+      },
+      {
+        protocol: "https",
+        hostname: "cbu01.alicdn.com",
         pathname: "/**",
       },
       {
-        protocol: "http",
-        hostname: "**", // allow all http hosts too (if needed)
+        protocol: "https",
+        hostname: "*.alicdn.com",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "lh3.googleusercontent.com",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "avatars.githubusercontent.com",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "s3.eu-north-1.amazonaws.com",
         pathname: "/**",
       },
       {
         protocol: "https",
         hostname: "secure.gravatar.com",
+        pathname: "/**",
       },
       {
         protocol: "https",
         hostname: "flagcdn.com",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "cdn.shopify.com",
+        pathname: "**",
       },
     ],
+    // unoptimized: false,
   },
-
-  staticPageGenerationTimeout: 280,
+  reactStrictMode: true,
 };
 
 export default nextConfig;

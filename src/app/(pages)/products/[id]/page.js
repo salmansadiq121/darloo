@@ -758,8 +758,8 @@ export default function ProductDetail() {
                 <div className="flex items-center gap-2 mt-3">
                   <Truck className="h-4 w-4 text-gray-500" />
                   <p className="text-sm text-gray-500">
-                    Shipping: {"€" + product?.shipping?.toLocaleString()} ·
-                    Delivery in 3-5 business days
+                    Shipping: Free
+                    {/* Delivery in 3-5 business days */}
                   </p>
                 </div>
                 <div className="flex items-center gap-2 mt-1">
@@ -1366,7 +1366,7 @@ export default function ProductDetail() {
                     <h3 className="text-xl font-semibold text-gray-900">
                       Shipping Information
                     </h3>
-                    <div className="mt-4 space-y-4">
+                    {/* <div className="mt-4 space-y-4">
                       <div className="flex gap-4 p-4 bg-gray-50 rounded border border-gray-100">
                         <Truck className="h-6 w-6 text-primary shrink-0 mt-1" />
                         <div>
@@ -1395,7 +1395,7 @@ export default function ProductDetail() {
                           </p>
                         </div>
                       </div>
-                    </div>
+                    </div> */}
                   </div>
                   <Separator />
                   <div>

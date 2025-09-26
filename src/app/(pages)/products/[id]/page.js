@@ -75,6 +75,7 @@ export default function ProductDetail() {
   const [show, setShow] = useState(false);
   const [currentUrl, setCurrentUrl] = useState("");
   const [returnPolicy, setReturnPolicy] = useState("");
+  const [varientPrice, setVarientPrice] = useState(0);
 
   const router = useRouter();
 
@@ -94,6 +95,7 @@ export default function ProductDetail() {
             url: variation.imageURL,
             title: variation.title || product.name, // Use variation title or product name as fallback
             colorCode: variation.color,
+            price: variation.price,
           });
         }
       });
@@ -195,7 +197,7 @@ export default function ProductDetail() {
         updatedProducts.push({
           product: product._id,
           quantity,
-          price: product.price,
+          price: varientPrice > 0 ? varientPrice : product.price,
           colors: [selectedColor],
           sizes: [selectedSize],
           image: getCurrentImage,
@@ -214,7 +216,7 @@ export default function ProductDetail() {
     const productData = {
       product: product._id,
       quantity,
-      price: product.price,
+      price: varientPrice > 0 ? varientPrice : product.price,
       colors: [selectedColor],
       sizes: [selectedSize],
       image: getCurrentImage,
@@ -713,7 +715,10 @@ export default function ProductDetail() {
               <div className="space-y-1">
                 <div className="flex items-baseline gap-2">
                   <span className="text-3xl font-bold text-gray-900">
-                    €{product?.price?.toLocaleString()}
+                    €
+                    {varientPrice > 0
+                      ? varientPrice
+                      : product?.price?.toLocaleString()}
                   </span>
                   {product?.estimatedPrice > product?.price && (
                     <span className="text text-gray-500 line-through">
@@ -786,7 +791,10 @@ export default function ProductDetail() {
                                 ? "border-red-500 shadow-md scale-105"
                                 : "border-gray-200 hover:border-gray-500"
                             }`}
-                            onClick={() => setActiveImageIndex(index)}
+                            onClick={() => {
+                              setActiveImageIndex(index);
+                              setVarientPrice(imageObj?.price);
+                            }}
                           >
                             <Image
                               src={imageObj.url || "/placeholder.svg"}
@@ -1067,9 +1075,14 @@ export default function ProductDetail() {
                     <h3 className="text-xl font-semibold text-gray-900">
                       Description
                     </h3>
-                    {/* <p className="mt-3 text-gray-600 leading-relaxed">
-                      {product?.description}
-                    </p> */}
+                    <Image
+                      src={product?.size_chart}
+                      alt="size chart"
+                      width={400}
+                      height={500}
+                      priority
+                      className="rounded-lg object-contain"
+                    />
                     <div className=" w-full flex items-center justify-center">
                       <div
                         className="mt-3 text-sm text-gray-600  w-full leading-relaxed"

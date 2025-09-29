@@ -285,14 +285,20 @@ const TrendingProducts = ({ products, loading }) => {
                 >
                   {/* Product Image */}
                   <div className="relative aspect-square overflow-hidden">
-                    <Image
-                      src={product.thumbnails || "/placeholder.svg"}
-                      alt={product.name || "Product image"}
-                      fill
-                      className={`object-cover transition-transform duration-300 ${
-                        isHovered ? "scale-110" : "scale-100"
-                      }`}
-                    />
+                    <figure className="relative w-full h-64 overflow-hidden rounded-none">
+                      <Image
+                        src={product?.thumbnails || "/placeholder.svg"}
+                        alt={product?.name || "Product image"}
+                        fill
+                        className={`object-cover transition-transform duration-300 rounded-none ${
+                          isHovered ? "scale-110" : "scale-100"
+                        }`}
+                        sizes="(max-width: 768px) 100vw, 
+           (max-width: 1200px) 50vw, 
+           33vw"
+                        priority={false} // set to true if this is above the fold
+                      />
+                    </figure>
 
                     {/* Trending tag */}
                     <div

@@ -84,7 +84,7 @@ export default function CartItems({ products }) {
                 >
                   <div className="w-[6rem]">
                     <div
-                      className=" bg-gray-300/50 relative w-[5rem] h-[3rem] sm:h-[3.5rem] rounded-md overflow-hidden "
+                      className=" bg-gray-300/50 relative w-[4rem] sm:w-[4rem] h-[4rem] sm:h-[5rem] rounded-md overflow-hidden "
                       style={{
                         width: "5rem !important",
                       }}
@@ -94,7 +94,7 @@ export default function CartItems({ products }) {
                         alt={item?.title}
                         width={70}
                         height={50}
-                        className=" text-9 w-[5rem] sm:w-[5rem] h-[3rem] sm:h-[3.5rem]  object-fill"
+                        className=" text-9 w-[4rem] sm:w-[4rem] h-[4rem] sm:h-[5rem]  object-fill"
                       />
                     </div>
                   </div>

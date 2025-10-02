@@ -37,11 +37,7 @@ export default function PaymentMethodModal({
           {/* Select Payment Method */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mt-8">
             <button
-              className="w-full flex items-center justify-center py-3   bg-sky-600 hover:bg-sky-700 text-white cursor-pointer transition-all duration-300 "
-              style={{
-                clipPath:
-                  "polygon(8.98% 0%, 86.4% 0%, 100% 0%, 100% 62.29%, 91.08% 100%, 9.8% 100%, 0% 100%, 0% 36.23%)",
-              }}
+              className="w-full flex items-center rounded-lg justify-center py-3   bg-sky-600 hover:bg-sky-700 text-white cursor-pointer transition-all duration-300 "
               onClick={() => {
                 setPaymentMethod("Credit Card");
                 setpayment(true);
@@ -51,11 +47,7 @@ export default function PaymentMethodModal({
               Checkout with Card
             </button>
             <button
-              className="w-full flex items-center justify-center  py-3 bg-red-600 hover:bg-red-700 transition-all duration-300 text-white cursor-pointer "
-              style={{
-                clipPath:
-                  "polygon(8.98% 0%, 86.4% 0%, 100% 0%, 100% 62.29%, 91.08% 100%, 9.8% 100%, 0% 100%, 0% 36.23%)",
-              }}
+              className="w-full flex items-center justify-center rounded-lg  py-3 bg-red-600 hover:bg-red-700 transition-all duration-300 text-white cursor-pointer "
               onClick={() => {
                 setPaymentMethod("Paypal");
                 setpayment(true);

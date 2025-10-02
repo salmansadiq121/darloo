@@ -509,11 +509,7 @@ export default function Checkout() {
             <div className="flex items-center justify-center w-full z-10">
               {!auth?.user ? (
                 <button
-                  className={`px-8 text-white mt-4 bg-red-600 hover:bg-red-700 transition-all duration-300 cursor-pointer py-2  font-medium disabled:opacity-50`}
-                  style={{
-                    clipPath:
-                      " polygon(6.71% 0%, 86.4% 0%, 100% 0%, 100% 66.1%, 94.08% 100%, 9.8% 100%, 0% 100%, 0% 42.16%)",
-                  }}
+                  className={`px-8 text-white mt-4 bg-red-600 rounded-md hover:bg-red-700 transition-all duration-300 cursor-pointer py-2  font-medium disabled:opacity-50`}
                   onClick={() => router.push("/authentication")}
                 >
                   Login

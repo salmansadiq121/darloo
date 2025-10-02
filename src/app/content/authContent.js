@@ -28,6 +28,8 @@ export const AuthProvider = ({ children }) => {
     sortBy: "price_asc",
   });
 
+  console.log("selectedProduct:", selectedProduct);
+
   //   Token Check
   axios.defaults.headers.common["Authorization"] = auth?.token;
 

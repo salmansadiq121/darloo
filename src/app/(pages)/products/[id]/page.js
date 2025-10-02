@@ -794,6 +794,7 @@ export default function ProductDetail() {
                             onClick={() => {
                               setActiveImageIndex(index);
                               setVarientPrice(imageObj?.price);
+                              setSelectedColor(imageObj?.title);
                             }}
                           >
                             <Image

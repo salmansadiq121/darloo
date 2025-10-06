@@ -40,6 +40,7 @@ export default function RootLayout({ children }) {
       document.body.appendChild(script);
     }
   }, []);
+
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
@@ -49,6 +50,19 @@ export default function RootLayout({ children }) {
         <meta name="keywords" content={metadata.keywords} />
         <meta name="robots" content={metadata.robots} />
         <link rel="canonical" href={metadata.canonical} />
+
+        {/* 🔒 Important for AliCDN / local IP image fixes */}
+        <meta name="referrer" content="no-referrer" />
+        <meta
+          httpEquiv="Content-Security-Policy"
+          content="default-src * 'unsafe-inline' 'unsafe-eval' data: blob:;"
+        />
+        <meta httpEquiv="Cross-Origin-Resource-Policy" content="cross-origin" />
+        <meta httpEquiv="Cross-Origin-Embedder-Policy" content="unsafe-none" />
+        <meta
+          httpEquiv="Cross-Origin-Opener-Policy"
+          content="same-origin-allow-popups"
+        />
 
         {/* Open Graph Metadata */}
         <meta property="og:type" content={metadata.og.type} />
@@ -74,6 +88,7 @@ export default function RootLayout({ children }) {
 
         <title>{metadata.title}</title>
       </head>
+
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
@@ -81,9 +96,8 @@ export default function RootLayout({ children }) {
           <QueryProvider>
             <AuthProvider>
               <NextTopLoader color="#fc030b" height={3} showSpinner={false} />
-              <main className=" bg-white w-full min-h-screen text-black">
+              <main className="bg-white w-full min-h-screen text-black">
                 {children}
-
                 <Toaster position="bottom-right" />
                 <SocketHandler />
               </main>

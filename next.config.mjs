@@ -45,7 +45,10 @@ const nextConfig = {
       {
         protocol: "https",
         hostname: "cdn.shopify.com",
-        pathname: "**",
+      },
+      {
+        protocol: "https",
+        hostname: "cbu01.alicdn.com",
       },
     ],
     unoptimized: true,

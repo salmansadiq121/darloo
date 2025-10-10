@@ -103,13 +103,13 @@ export default function Profile() {
   // Handle Logout
   const handleLogout = async () => {
     try {
-      await signOut({ redirect: false });
       localStorage.removeItem("@ayoob");
       Cookies.remove("@ayoob");
 
       setAuth({ user: null, token: "" });
 
       router.replace("/");
+      await signOut({ redirect: false });
     } catch (error) {
       console.error("Logout failed:", error);
     }

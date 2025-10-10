@@ -404,7 +404,7 @@ export default function Checkout() {
                           alt={item?.title}
                           width={40}
                           height={40}
-                          className=" text-8 w-[6rem] h-[4rem]  rounded-lg object-fill"
+                          className=" text-8 w-[4.5rem] h-[5rem]  rounded-lg object-fill"
                         />
                       </div>
                       <div className="flex flex-col gap-1">
@@ -412,7 +412,7 @@ export default function Checkout() {
                           {item?.title}
                         </span>
                         <div
-                          className="flex items-center max-w-[9rem] min-w-[9rem]  border-2 border-red-500 rounded-sm"
+                          className="flex items-center h-[2.4rem] max-w-[9rem] min-w-[9rem]  border-2 border-red-500 rounded-sm"
                           style={{ padding: "0rem" }}
                         >
                           <button

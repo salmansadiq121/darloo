@@ -9,6 +9,9 @@ import {
   Truck,
   XCircle,
   AlertCircle,
+  MapPin,
+  CreditCard,
+  Hash,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -239,6 +242,156 @@ export default function OrdersHistory({ userId }) {
     );
   };
 
+  const OrderTimeline = ({ timeline }) => {
+    return (
+      <div className="space-y-4">
+        <h3 className="text-lg font-semibold text-foreground">
+          Order Timeline
+        </h3>
+        <div className="relative space-y-6 pl-6">
+          {/* Timeline line */}
+          <div className="absolute left-[7px] top-2 bottom-2 w-0.5 bg-border" />
+
+          {timeline?.map((item, index) => (
+            <div key={item._id} className="relative flex items-start gap-4">
+              {/* Timeline dot */}
+              <div className="absolute -left-6 flex h-4 w-4 items-center justify-center">
+                <div
+                  className={`h-3 w-3 rounded-full border-2 ${
+                    index === timeline.length - 1
+                      ? "bg-primary border-primary"
+                      : "bg-muted border-border"
+                  }`}
+                />
+              </div>
+
+              {/* Timeline content */}
+              <div className="flex-1 space-y-1">
+                <div className="flex items-center gap-2">
+                  {getStatusIcon(item.status.toLowerCase())}
+                  <p className="font-medium text-foreground capitalize">
+                    {item.status}
+                  </p>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  {format(new Date(item.date), "MMM dd, yyyy • h:mm a")}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
+  const OrderDetailsSection = ({ order }) => {
+    return (
+      <div className="grid gap-6 md:grid-cols-2">
+        {/* Shipping Information */}
+        <div className="space-y-3 rounded-lg border bg-card p-4">
+          <div className="flex items-center gap-2">
+            <MapPin className="h-5 w-5 text-primary" />
+            <h3 className="font-semibold text-foreground">Shipping Address</h3>
+          </div>
+          <div className="space-y-1 text-sm text-muted-foreground">
+            <p className="font-medium text-foreground">{order?.user?.name}</p>
+            <p>{order?.shippingAddress?.address}</p>
+            <p>
+              {order?.shippingAddress?.city}, {order?.shippingAddress?.state}{" "}
+              {order?.shippingAddress?.postalCode}
+            </p>
+            <p>{order?.shippingAddress?.country}</p>
+            {order?.user?.number && (
+              <p className="pt-1 font-medium text-foreground">
+                Phone: {order?.user?.number}
+              </p>
+            )}
+          </div>
+        </div>
+
+        {/* Payment Information */}
+        <div className="space-y-3 rounded-lg border bg-card p-4">
+          <div className="flex items-center gap-2">
+            <CreditCard className="h-5 w-5 text-primary" />
+            <h3 className="font-semibold text-foreground">Payment Details</h3>
+          </div>
+          <div className="space-y-2 text-sm">
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Payment Method:</span>
+              <span className="font-medium text-foreground">
+                {order?.paymentMethod}
+              </span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Payment Status:</span>
+              <Badge
+                variant={
+                  order?.paymentStatus === "Completed" ? "default" : "secondary"
+                }
+              >
+                {order?.paymentStatus}
+              </Badge>
+            </div>
+            <Separator className="my-2" />
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Subtotal:</span>
+              <span className="font-medium text-foreground">
+                €
+                {(
+                  Number.parseFloat(order?.totalAmount) -
+                  Number.parseFloat(order?.shippingFee || 0)
+                ).toFixed(2)}
+              </span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Shipping Fee:</span>
+              <span className="font-medium text-foreground">
+                €{order?.shippingFee || "0.00"}
+              </span>
+            </div>
+            <Separator className="my-2" />
+            <div className="flex justify-between text-base">
+              <span className="font-semibold text-foreground">Total:</span>
+              <span className="font-bold text-primary">
+                €{order?.totalAmount}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Order Information */}
+        {(order?.trackingId || order?.shippingCarrier) && (
+          <div className="space-y-3 rounded-lg border bg-card p-4 md:col-span-2">
+            <div className="flex items-center gap-2">
+              <Hash className="h-5 w-5 text-primary" />
+              <h3 className="font-semibold text-foreground">
+                Tracking Information
+              </h3>
+            </div>
+            <div className="grid gap-2 text-sm md:grid-cols-2">
+              {order?.trackingId && (
+                <div className="flex flex-col gap-1">
+                  <span className="text-muted-foreground">Tracking ID:</span>
+                  <span className="font-mono font-medium text-foreground">
+                    {order?.trackingId}
+                  </span>
+                </div>
+              )}
+              {order?.shippingCarrier && (
+                <div className="flex flex-col gap-1">
+                  <span className="text-muted-foreground">Carrier:</span>
+                  <span className="font-medium text-foreground">
+                    {order?.shippingCarrier}
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
   return (
     <Card className="relative">
       <CardHeader>
@@ -376,139 +529,158 @@ export default function OrdersHistory({ userId }) {
                       )}
                     </div>
                   </div>
-                  {/* Product details */}
                   {orderId === order?._id && (
-                    <div className="flex flex-col gap-3 w-full overflow-hidden">
-                      {order?.products?.map((product) => (
-                        <div
-                          key={product?._id}
-                          className=" flex flex-col  sm:items-center justify-between  sm:flex-row gap-5 p-2 rounded-md bg-gray-50 hover:bg-gray-100 cursor-pointer transition-all duration-300"
-                        >
-                          <div
-                            className="flex items-center gap-2"
-                            onClick={() =>
-                              router.push(`/products/${product?.product?._id}`)
-                            }
-                          >
-                            <Image
-                              src={
-                                product?.product?.thumbnails ||
-                                "/placeholder.svg"
-                              }
-                              alt={product?.product?.name}
-                              width={80}
-                              height={70}
-                              className="rounded-md h-[70px] w-[80px] object-fill"
-                            />
-                            <div>
-                              <p className="text-lg text-gray-900 font-medium line-clamp-1 w-full">
-                                {product?.product?.name}
-                              </p>
-                              <div className="flex items-center gap-8">
-                                <p className="text-[14px] text-gray-700 font-medium">
-                                  €{product?.price}
-                                </p>
-                                <p className="text-sm text-gray-500">
-                                  Qty: {product?.quantity}
-                                </p>
-                              </div>
-                            </div>
-                          </div>
-                          {order?.orderStatus === "Delivered" && (
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => {
-                                setProductId(product?.product?._id);
-                                setShow(true);
-                              }}
-                              className="text-xs flex items-center gap-1 cursor-pointer group hover:text-red-700 hover:border-red-700 transition-all duration-300"
-                            >
-                              <Star className="h-3 w-3 group-hover:text-red-700 transition-all duration-300" />
-                              Review
-                            </Button>
-                          )}
+                    <div className="flex flex-col gap-6 w-full overflow-hidden mt-4">
+                      {/* Timeline Section */}
+                      {order?.timeline && order.timeline.length > 0 && (
+                        <div className="rounded-lg border bg-muted/30 p-4">
+                          <OrderTimeline timeline={order.timeline} />
                         </div>
-                      ))}
-                      {order?.comments.length > 0 && (
-                        <div className="flex flex-col ">
-                          <Separator className="h-px w-full bg-gray-500" />
-                          <div className="">
-                            <h3 className="text-lg font-medium text-gray-800 pb-4">
-                              Comments
-                            </h3>
-                            <div className="flex flex-col gap-4">
-                              {order?.comments?.map((comment, index) => (
-                                <div
-                                  key={index}
-                                  className="flex flex-col gap-2 border-b border-gray-100 pb-3"
-                                >
-                                  <div className="flex items-start gap-3">
-                                    <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-600">
-                                      <Image
-                                        src={
-                                          comment?.user?.avatar ||
-                                          "/placeholder.svg" ||
-                                          "/placeholder.svg"
-                                        }
-                                        width={40}
-                                        height={40}
-                                        alt="Comment attachment"
-                                        className="object-fill w-full h-full"
-                                      />
-                                    </div>
-                                    <div className="flex-1">
-                                      <div className="flex items-center justify-between">
-                                        <h4 className="text-sm font-medium text-gray-800">
-                                          {comment.user?.name || "Admin"}
-                                        </h4>
-                                        <span className="text-xs text-gray-500">
-                                          {comment?.createdAt
-                                            ? format(
-                                                new Date(comment?.createdAt),
-                                                "MMM dd, yyyy • h:mm a"
-                                              )
-                                            : "N/A"}
-                                        </span>
-                                      </div>
-                                      <p className="text-sm text-gray-600 mt-1">
-                                        {comment?.question}
-                                      </p>
+                      )}
 
-                                      {comment?.image && (
-                                        <div className="mt-2 group">
-                                          <div className="relative group cursor-pointer overflow-hidden w-fit">
-                                            <div className="w-full max-w-[200px] h-auto rounded-md overflow-hidden border border-gray-200">
-                                              <Image
-                                                src={
-                                                  comment?.image ||
-                                                  "/placeholder.svg" ||
-                                                  "/placeholder.svg"
-                                                }
-                                                width={200}
-                                                height={150}
-                                                alt="Comment attachment"
-                                                className="object-cover w-full h-full"
-                                              />
-                                            </div>
-                                            <a
-                                              href={comment?.image}
-                                              target="_blank"
-                                              rel="noopener noreferrer"
-                                              className="absolute z-20 inset-0 rounded-lg bg-opacity-[0] group-hover:bg-opacity-[.3] transition-all duration-300 flex items-center justify-center"
-                                            >
-                                              <span className="text-white opacity-0 group-hover:opacity-100 transition-opacity">
-                                                View
-                                              </span>
-                                            </a>
-                                          </div>
-                                        </div>
-                                      )}
-                                    </div>
+                      {/* Shipping and Payment Details */}
+                      <OrderDetailsSection order={order} />
+
+                      {/* Products Section */}
+                      <div className="space-y-3">
+                        <h3 className="text-lg font-semibold text-foreground">
+                          Order Items
+                        </h3>
+                        <div className="flex flex-col gap-3">
+                          {order?.products?.map((product) => (
+                            <div
+                              key={product?._id}
+                              className="flex flex-col sm:items-center justify-between sm:flex-row gap-5 p-3 rounded-lg border bg-card hover:bg-accent/50 cursor-pointer transition-all duration-300"
+                            >
+                              <div
+                                className="flex items-center gap-3"
+                                onClick={() =>
+                                  router.push(
+                                    `/products/${product?.product?._id}`
+                                  )
+                                }
+                              >
+                                <Image
+                                  src={
+                                    product?.product?.thumbnails ||
+                                    "/placeholder.svg" ||
+                                    "/placeholder.svg"
+                                  }
+                                  alt={product?.product?.name}
+                                  width={80}
+                                  height={70}
+                                  className="rounded-md h-[70px] w-[80px] object-cover border"
+                                />
+                                <div>
+                                  <p className="text-base font-medium line-clamp-1 w-full text-foreground">
+                                    {product?.product?.name}
+                                  </p>
+                                  <div className="flex items-center gap-6 mt-1">
+                                    <p className="text-sm font-semibold text-primary">
+                                      €{product?.price}
+                                    </p>
+                                    <p className="text-sm text-muted-foreground">
+                                      Qty: {product?.quantity}
+                                    </p>
                                   </div>
                                 </div>
-                              ))}
+                              </div>
+                              {order?.orderStatus === "Delivered" && (
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => {
+                                    setProductId(product?.product?._id);
+                                    setShow(true);
+                                  }}
+                                  className="text-xs flex items-center gap-1 cursor-pointer group hover:text-amber-600 hover:border-amber-600 transition-all duration-300"
+                                >
+                                  <Star className="h-3 w-3 group-hover:text-amber-600 transition-all duration-300" />
+                                  Review
+                                </Button>
+                              )}
                             </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Comments Section */}
+                      {order?.comments.length > 0 && (
+                        <div className="space-y-3 rounded-lg border bg-card p-4">
+                          <h3 className="text-lg font-semibold text-foreground">
+                            Comments
+                          </h3>
+                          <div className="flex flex-col gap-4">
+                            {order?.comments?.map((comment, index) => (
+                              <div
+                                key={index}
+                                className="flex flex-col gap-2 border-b border-border pb-3 last:border-0"
+                              >
+                                <div className="flex items-start gap-3">
+                                  <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center overflow-hidden">
+                                    <Image
+                                      src={
+                                        comment?.user?.avatar ||
+                                        "/placeholder.svg" ||
+                                        "/placeholder.svg"
+                                      }
+                                      width={40}
+                                      height={40}
+                                      alt="User avatar"
+                                      className="object-cover w-full h-full"
+                                    />
+                                  </div>
+                                  <div className="flex-1">
+                                    <div className="flex items-center justify-between">
+                                      <h4 className="text-sm font-medium text-foreground">
+                                        {comment.user?.name || "Admin"}
+                                      </h4>
+                                      <span className="text-xs text-muted-foreground">
+                                        {comment?.createdAt
+                                          ? format(
+                                              new Date(comment?.createdAt),
+                                              "MMM dd, yyyy • h:mm a"
+                                            )
+                                          : "N/A"}
+                                      </span>
+                                    </div>
+                                    <p className="text-sm text-muted-foreground mt-1">
+                                      {comment?.question}
+                                    </p>
+
+                                    {comment?.image && (
+                                      <div className="mt-2 group">
+                                        <div className="relative group cursor-pointer overflow-hidden w-fit">
+                                          <div className="w-full max-w-[200px] h-auto rounded-md overflow-hidden border">
+                                            <Image
+                                              src={
+                                                comment?.image ||
+                                                "/placeholder.svg" ||
+                                                "/placeholder.svg"
+                                              }
+                                              width={200}
+                                              height={150}
+                                              alt="Comment attachment"
+                                              className="object-cover w-full h-full"
+                                            />
+                                          </div>
+                                          <a
+                                            href={comment?.image}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="absolute z-20 inset-0 rounded-lg bg-black/0 group-hover:bg-black/30 transition-all duration-300 flex items-center justify-center"
+                                          >
+                                            <span className="text-white opacity-0 group-hover:opacity-100 transition-opacity font-medium">
+                                              View
+                                            </span>
+                                          </a>
+                                        </div>
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
                           </div>
                         </div>
                       )}
@@ -519,20 +691,13 @@ export default function OrdersHistory({ userId }) {
             )}
             {orders?.length === 0 && (
               <div className="w-full min-h-[40vh] flex items-center justify-center flex-col gap-2">
-                {/* <Image
-                  src="/no-order.png"
-                  alt="No Orders"
-                  width={200}
-                  height={200}
-                  className="object-contain animate-pulse"
-                /> */}
                 <video
                   src="/no-items-13843399-11127022.mp4"
                   autoPlay
                   loop
                   muted
                 />
-                <p className="text-center text-gray-400 ">
+                <p className="text-center text-muted-foreground">
                   You haven&apos;t placed any orders yet.
                 </p>
               </div>
@@ -629,62 +794,161 @@ export default function OrdersHistory({ userId }) {
                         </div>
                       </div>
 
-                      {/* Product details */}
                       {orderId === order?._id && (
-                        <div className="flex flex-col gap-3 w-full overflow-hidden">
-                          {order?.products?.map((product) => (
-                            <div
-                              key={product?._id}
-                              className=" flex flex-col  sm:items-center justify-between  sm:flex-row gap-5 p-2 rounded-md bg-gray-50 hover:bg-gray-100 cursor-pointer transition-all duration-300"
-                            >
-                              <div
-                                className="flex items-center gap-2"
-                                onClick={() =>
-                                  router.push(
-                                    `/products/${product?.product?._id}`
-                                  )
-                                }
-                              >
-                                <Image
-                                  src={
-                                    product?.product?.thumbnails ||
-                                    "/placeholder.svg"
-                                  }
-                                  alt={product?.product?.name}
-                                  width={80}
-                                  height={70}
-                                  className="rounded-md h-[70px] w-[80px] object-fill"
-                                />
-                                <div>
-                                  <p className="text-lg text-gray-900 font-medium line-clamp-1 w-full">
-                                    {product?.product?.name}
-                                  </p>
-                                  <div className="flex items-center gap-8">
-                                    <p className="text-[14px] text-gray-700 font-medium">
-                                      €{product?.price}
-                                    </p>
-                                    <p className="text-sm text-gray-500">
-                                      Qty: {product?.quantity}
-                                    </p>
-                                  </div>
-                                </div>
-                              </div>
-                              {order?.orderStatus === "Delivered" && (
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => {
-                                    setProductId(product?.product?._id);
-                                    setShow(true);
-                                  }}
-                                  className="text-xs flex  items-center gap-1 cursor-pointer group hover:text-red-700 hover:border-red-700 transition-all duration-300"
-                                >
-                                  <Star className="h-3 w-3 group-hover:text-red-700 transition-all duration-300" />
-                                  Review
-                                </Button>
-                              )}
+                        <div className="flex flex-col gap-6 w-full overflow-hidden mt-4">
+                          {/* Timeline Section */}
+                          {order?.timeline && order.timeline.length > 0 && (
+                            <div className="rounded-lg border bg-muted/30 p-4">
+                              <OrderTimeline timeline={order.timeline} />
                             </div>
-                          ))}
+                          )}
+
+                          {/* Shipping and Payment Details */}
+                          <OrderDetailsSection order={order} />
+
+                          {/* Products Section */}
+                          <div className="space-y-3">
+                            <h3 className="text-lg font-semibold text-foreground">
+                              Order Items
+                            </h3>
+                            <div className="flex flex-col gap-3">
+                              {order?.products?.map((product) => (
+                                <div
+                                  key={product?._id}
+                                  className="flex flex-col sm:items-center justify-between sm:flex-row gap-5 p-3 rounded-lg border bg-card hover:bg-accent/50 cursor-pointer transition-all duration-300"
+                                >
+                                  <div
+                                    className="flex items-center gap-3"
+                                    onClick={() =>
+                                      router.push(
+                                        `/products/${product?.product?._id}`
+                                      )
+                                    }
+                                  >
+                                    <Image
+                                      src={
+                                        product?.product?.thumbnails ||
+                                        "/placeholder.svg" ||
+                                        "/placeholder.svg"
+                                      }
+                                      alt={product?.product?.name}
+                                      width={80}
+                                      height={70}
+                                      className="rounded-md h-[70px] w-[80px] object-cover border"
+                                    />
+                                    <div>
+                                      <p className="text-base font-medium line-clamp-1 w-full text-foreground">
+                                        {product?.product?.name}
+                                      </p>
+                                      <div className="flex items-center gap-6 mt-1">
+                                        <p className="text-sm font-semibold text-primary">
+                                          €{product?.price}
+                                        </p>
+                                        <p className="text-sm text-muted-foreground">
+                                          Qty: {product?.quantity}
+                                        </p>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  {order?.orderStatus === "Delivered" && (
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      onClick={() => {
+                                        setProductId(product?.product?._id);
+                                        setShow(true);
+                                      }}
+                                      className="text-xs flex items-center gap-1 cursor-pointer group hover:text-amber-600 hover:border-amber-600 transition-all duration-300"
+                                    >
+                                      <Star className="h-3 w-3 group-hover:text-amber-600 transition-all duration-300" />
+                                      Review
+                                    </Button>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+
+                          {/* Comments Section */}
+                          {order?.comments.length > 0 && (
+                            <div className="space-y-3 rounded-lg border bg-card p-4">
+                              <h3 className="text-lg font-semibold text-foreground">
+                                Comments
+                              </h3>
+                              <div className="flex flex-col gap-4">
+                                {order?.comments?.map((comment, index) => (
+                                  <div
+                                    key={index}
+                                    className="flex flex-col gap-2 border-b border-border pb-3 last:border-0"
+                                  >
+                                    <div className="flex items-start gap-3">
+                                      <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center overflow-hidden">
+                                        <Image
+                                          src={
+                                            comment?.user?.avatar ||
+                                            "/placeholder.svg" ||
+                                            "/placeholder.svg"
+                                          }
+                                          width={40}
+                                          height={40}
+                                          alt="User avatar"
+                                          className="object-cover w-full h-full"
+                                        />
+                                      </div>
+                                      <div className="flex-1">
+                                        <div className="flex items-center justify-between">
+                                          <h4 className="text-sm font-medium text-foreground">
+                                            {comment.user?.name || "Admin"}
+                                          </h4>
+                                          <span className="text-xs text-muted-foreground">
+                                            {comment?.createdAt
+                                              ? format(
+                                                  new Date(comment?.createdAt),
+                                                  "MMM dd, yyyy • h:mm a"
+                                                )
+                                              : "N/A"}
+                                          </span>
+                                        </div>
+                                        <p className="text-sm text-muted-foreground mt-1">
+                                          {comment?.question}
+                                        </p>
+
+                                        {comment?.image && (
+                                          <div className="mt-2 group">
+                                            <div className="relative group cursor-pointer overflow-hidden w-fit">
+                                              <div className="w-full max-w-[200px] h-auto rounded-md overflow-hidden border">
+                                                <Image
+                                                  src={
+                                                    comment?.image ||
+                                                    "/placeholder.svg" ||
+                                                    "/placeholder.svg"
+                                                  }
+                                                  width={200}
+                                                  height={150}
+                                                  alt="Comment attachment"
+                                                  className="object-cover w-full h-full"
+                                                />
+                                              </div>
+                                              <a
+                                                href={comment?.image}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="absolute z-20 inset-0 rounded-lg bg-black/0 group-hover:bg-black/30 transition-all duration-300 flex items-center justify-center"
+                                              >
+                                                <span className="text-white opacity-0 group-hover:opacity-100 transition-opacity font-medium">
+                                                  View
+                                                </span>
+                                              </a>
+                                            </div>
+                                          </div>
+                                        )}
+                                      </div>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
                         </div>
                       )}
                     </div>

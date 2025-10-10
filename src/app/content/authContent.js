@@ -36,6 +36,8 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const data = localStorage.getItem("@ayoob");
     const token = Cookies.get("@ayoob");
+    const activation = localStorage.getItem("activation");
+    setActivationToken(activation);
 
     if (data) {
       const parseData = JSON.parse(data);

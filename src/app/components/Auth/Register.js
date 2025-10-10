@@ -61,6 +61,7 @@ export default function Register({ setActive }) {
 
       if (data) {
         setActivationToken(data.activationToken);
+        localStorage.setItem("activation", data.activationToken);
         router.push("/email-verification");
 
         toast.success("Please check your email to activate your account");

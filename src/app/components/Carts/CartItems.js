@@ -48,7 +48,7 @@ export default function CartItems({ products }) {
   };
 
   return (
-    <div className="w-full z-10 min-h-screen">
+    <div className="w-full z-10 min-h-screen relative">
       <h2 className={`${Style.h1}`}>Your Cart</h2>
       <div className="w-full sm:w-[50%] py-4 pb-6">
         <Separator />
@@ -166,15 +166,16 @@ export default function CartItems({ products }) {
 
         {/* 📋 Order Summary */}
 
-        <div className="py-[2rem] z-10 pb-[4rem] px-[1.5rem] rounded-sm relative cart max-h-fit min-h-[20rem] flex flex-col gap-3 border border-gray-300 bg-white/80 ">
-          <div
+        <div className="py-[2rem] z-20 pb-[4rem] px-[1.5rem] rounded-sm relative cart max-h-fit min-h-[20rem] flex flex-col gap-3 border border-gray-300 bg-white/80 ">
+          {/* <div
             className="glow-effect"
             style={{
               width: "400px",
               height: "400px",
               left: "1rem",
+              zIndex: "-1",
             }}
-          ></div>
+          ></div> */}
 
           <h3 className="text-xl font-semibold mb-4 z-10">Order Summary</h3>
           <div className="flex justify-between z-10">

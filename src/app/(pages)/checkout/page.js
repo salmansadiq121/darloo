@@ -187,7 +187,7 @@ export default function Checkout() {
         `${process.env.NEXT_PUBLIC_SERVER_URI}/api/v1/shipping/${auth?.user?.addressDetails?.country}`
       );
       if (data) {
-        setCountry(data.shipping.country || "");
+        setCountry(data?.shipping?.country || "");
         setCart((prev) => ({
           ...prev,
           shippingFee: data?.shipping?.fee ?? 0,
@@ -240,13 +240,17 @@ export default function Checkout() {
         "Your order total exceeds the limit of €150. Please adjust the quantity of items in your cart to proceed."
       );
     }
-    if (!country) {
+
+    console.log("country:", country);
+
+    if (!country || country === "" || country === undefined) {
       toast.error(
         "We’re sorry, purchases are currently unavailable in the selected country."
       );
       return;
+    } else {
+      setShowPayment(true);
     }
-    setShowPayment(true);
   };
 
   return (
@@ -501,7 +505,7 @@ export default function Checkout() {
             </div>
             <div className="flex justify-between font-semibold text-lg">
               <span className="text-red-600 uppercase">Total:</span>
-              <span>€{cart?.totalAmount}</span>
+              <span>€{Number(cart?.totalAmount || 0).toFixed(2)}</span>
             </div>
             <div className="py-2 w-full">
               <Separator className="h-px w-full bg-gray-500" />

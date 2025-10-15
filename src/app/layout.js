@@ -126,7 +126,7 @@ export default function RootLayout({ children }) {
               <NextTopLoader color="#fc030b" height={3} showSpinner={false} />
               <main className="bg-white w-full min-h-screen text-black">
                 {children}
-                <Toaster position="bottom-right" />
+                <Toaster position="bottom-center" />
                 <SocketHandler />
               </main>
             </AuthProvider>

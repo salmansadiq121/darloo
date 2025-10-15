@@ -324,7 +324,7 @@ export default function UpdateProfileModal({
                     placeholder="Enter your state"
                   />
                 </div>
-                <div className="space-y-2">
+                {/* <div className="space-y-2">
                   <Label htmlFor="country">Country</Label>
                   <Input
                     id="country"
@@ -333,7 +333,7 @@ export default function UpdateProfileModal({
                     onChange={handleChange}
                     placeholder="Enter your country"
                   />
-                </div>
+                </div> */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700">
                     Country<span className="text-red-700">*</span>

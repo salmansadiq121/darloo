@@ -18,6 +18,7 @@ import {
   MessageSquare,
   ImageIcon,
   RotateCcw,
+  Euro,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import axios from "axios";
@@ -37,7 +38,7 @@ export default function ReturnHistory({ userId }) {
       setLoading(true);
       try {
         const { data } = await axios.get(
-          `${process.env.NEXT_PUBLIC_SERVER_URI}/api/v1/order/return/products?page=1&limit=30?user=${userId}`
+          `${process.env.NEXT_PUBLIC_SERVER_URI}/api/v1/order/return/products?page=1&limit=30&user=${userId}`
         );
         setReturnHistory(data.returnProducts);
       } catch (error) {
@@ -175,32 +176,35 @@ export default function ReturnHistory({ userId }) {
                           <div className="flex items-center gap-4 flex-1">
                             {/* Product Image */}
                             <div className="relative">
-                              <img
+                              <Image
                                 src={
-                                  returnItem.product.thumbnails ||
+                                  returnItem?.product?.thumbnails ||
                                   "/placeholder.svg"
                                 }
-                                alt={returnItem.product.name}
+                                alt={returnItem?.product?.name}
+                                width={64}
+                                height={64}
                                 className="w-16 h-16 object-cover rounded-lg border-2 border-red-100"
                               />
                               <div className="absolute -top-2 -right-2 bg-red-600 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center font-semibold">
-                                {returnItem.quantity}
+                                {returnItem?.quantity}
                               </div>
                             </div>
 
                             {/* Product Info */}
                             <div className="flex-1 min-w-0">
                               <h3 className="font-semibold text-gray-900 line-clamp-1 w-full">
-                                {returnItem.product.name}
+                                {returnItem?.product?.name}
                               </h3>
                               <div className="flex items-center gap-3 mt-1">
-                                <span className="text-red-600 font-bold">
-                                  ${returnItem.product.price}
+                                <span className="text-red-600 font-bold flex items-center ">
+                                  <Euro className="h-4 w-4" />
+                                  {returnItem?.product?.price}
                                 </span>
                                 <Badge
                                   className={cn(
                                     "text-xs",
-                                    getReasonBadgeColor(returnItem.reason)
+                                    getReasonBadgeColor(returnItem?.reason)
                                   )}
                                 >
                                   {returnItem?.reason}
@@ -225,7 +229,7 @@ export default function ReturnHistory({ userId }) {
 
                           {/* Expand Icon */}
                           <div className="ml-4">
-                            {expandedItems.has(returnItem._id) ? (
+                            {expandedItems.has(returnItem?._id) ? (
                               <ChevronDown className="h-5 w-5 text-red-600" />
                             ) : (
                               <ChevronRight className="h-5 w-5 text-gray-400" />
@@ -251,7 +255,7 @@ export default function ReturnHistory({ userId }) {
                                     Name:
                                   </span>
                                   <span className="ml-2 font-medium">
-                                    {returnItem.user.name}
+                                    {returnItem?.user?.name}
                                   </span>
                                 </div>
                                 <div>
@@ -259,7 +263,7 @@ export default function ReturnHistory({ userId }) {
                                     Email:
                                   </span>
                                   <span className="ml-2 font-medium">
-                                    {returnItem.user.email}
+                                    {returnItem?.user?.email}
                                   </span>
                                 </div>
                                 <div>
@@ -267,14 +271,14 @@ export default function ReturnHistory({ userId }) {
                                     Return ID:
                                   </span>
                                   <span className="ml-2 font-mono text-sm">
-                                    #{returnItem._id.slice(-8)}
+                                    #{returnItem?._id}
                                   </span>
                                 </div>
                               </div>
                             </div>
 
                             {/* Return Comment */}
-                            {returnItem.comment && (
+                            {returnItem?.comment && (
                               <div>
                                 <h5 className="font-semibold text-gray-900 flex items-center gap-2 mb-2">
                                   <MessageSquare className="h-4 w-4 text-red-600" />
@@ -282,7 +286,7 @@ export default function ReturnHistory({ userId }) {
                                 </h5>
                                 <div className="bg-white p-4 rounded-lg border">
                                   <p className="text-gray-700 text-sm leading-relaxed">
-                                    {returnItem.comment}
+                                    {returnItem?.comment}
                                   </p>
                                 </div>
                               </div>
@@ -296,9 +300,9 @@ export default function ReturnHistory({ userId }) {
                               Return Images ({returnItem?.images?.length})
                             </h4>
                             <div className="bg-white p-4 rounded-lg border">
-                              {returnItem.images.length > 0 ? (
+                              {returnItem?.images?.length > 0 ? (
                                 <div className="grid grid-cols-2 gap-3">
-                                  {returnItem.images.map((image, index) => (
+                                  {returnItem?.images?.map((image, index) => (
                                     <div key={index} className="relative group">
                                       <Image
                                         src={image || "/placeholder.svg"}
@@ -345,12 +349,12 @@ export default function ReturnHistory({ userId }) {
                                         Return Requested
                                       </div>
                                       <div className="text-xs text-gray-500">
-                                        {formatDate(returnItem.createdAt)}
+                                        {formatDate(returnItem?.createdAt)}
                                       </div>
                                     </div>
                                   </div>
-                                  {returnItem.updatedAt !==
-                                    returnItem.createdAt && (
+                                  {returnItem?.updatedAt !==
+                                    returnItem?.createdAt && (
                                     <div className="flex items-center gap-3">
                                       <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
                                       <div className="flex-1">
@@ -358,7 +362,7 @@ export default function ReturnHistory({ userId }) {
                                           Last Updated
                                         </div>
                                         <div className="text-xs text-gray-500">
-                                          {formatDate(returnItem.updatedAt)}
+                                          {formatDate(returnItem?.updatedAt)}
                                         </div>
                                       </div>
                                     </div>

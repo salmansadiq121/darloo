@@ -77,6 +77,7 @@ export default function Profile() {
     try {
       const { data } = await axios.get(`${authUri}/userDetail/${userId}`);
       setUserDetails(data.user);
+      setAuth({ ...auth, user: data.user });
     } catch (error) {
       console.log(error);
     } finally {

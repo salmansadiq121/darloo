@@ -23,6 +23,7 @@ import {
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useAuth } from "../content/authContent";
 
 // Category configuration with icons
 const categoryConfig = {
@@ -62,6 +63,8 @@ export default function FAQPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [categories, setCategories] = useState([]);
   const [activeCategory, setActiveCategory] = useState("all");
+  const { countryCode } = useAuth();
+  const isGerman = countryCode === "DE";
 
   // Fetch FAQs from API
   const fetchFaqs = async () => {
@@ -150,7 +153,9 @@ export default function FAQPage() {
             <TabsList className="grid grid-cols-7 mb-8">
               <TabsTrigger value="all" className="flex items-center gap-2">
                 <HelpCircle className="h-4 w-4" />
-                <span className="hidden sm:inline">All</span>
+                <span className="hidden sm:inline">
+                  {isGerman ? "Alle" : "All"}
+                </span>
               </TabsTrigger>
 
               {categories
@@ -174,18 +179,22 @@ export default function FAQPage() {
 
             {!hasSearchResults && (
               <div className="text-center py-12">
-                <h3 className="text-xl font-bold mb-2">No results found</h3>
+                <h3 className="text-xl font-bold mb-2">
+                  {isGerman
+                    ? "Keine Suchergebnisse gefunden"
+                    : "No results found"}
+                </h3>
                 <p className="text-gray-600 mb-6">
-                  We couldn&apos;t find any questions matching &quot;
-                  {searchQuery}&quot;. Try using different keywords or browse
-                  through our categories.
+                  {isGerman
+                    ? "Wir konnten keine Fragen finden, die Ihren Kriterien entsprechen. Versuchen Sie, Ihre Filter oder Suchbegriffe anzupassen."
+                    : "We couldn't find any questions matching your criteria. Try using different keywords or browse through our categories."}
                 </p>
                 <Button
                   variant="outline"
                   onClick={() => setSearchQuery("")}
                   className="bg-red-700 text-white hover:bg-red-800 border-none"
                 >
-                  Clear Search
+                  {isGerman ? "Suche löschen" : "Clear Search"}
                 </Button>
               </div>
             )}
@@ -193,7 +202,9 @@ export default function FAQPage() {
             <TabsContent value="all">
               <Card>
                 <CardContent className="pt-6">
-                  <h2 className="text-2xl font-bold mb-6">All Questions</h2>
+                  <h2 className="text-2xl font-bold mb-6">
+                    {isGerman ? "Alle Fragen" : "All Questions"}
+                  </h2>
                   {hasSearchResults ? (
                     <Accordion type="single" collapsible className="space-y-4">
                       {filteredFaqs?.map((faq) => (
@@ -212,7 +223,11 @@ export default function FAQPage() {
                       ))}
                     </Accordion>
                   ) : (
-                    <p className="text-gray-500 py-4">No questions available</p>
+                    <p className="text-gray-500 py-4">
+                      {isGerman
+                        ? "Keine Fragen verfügbar"
+                        : "No questions available"}
+                    </p>
                   )}
                 </CardContent>
               </Card>
@@ -231,7 +246,7 @@ export default function FAQPage() {
                           {categoryConfig[category]?.label ||
                             category?.charAt(0).toUpperCase() +
                               category?.slice(1)}{" "}
-                          Questions
+                          {isGerman ? "Fragen" : "Questions"}
                         </h2>
 
                         {categoryFaqs?.length > 0 ? (
@@ -257,12 +272,15 @@ export default function FAQPage() {
                           </Accordion>
                         ) : searchQuery ? (
                           <p className="text-gray-500 py-4">
-                            No questions found in this category matching &quot;
-                            {searchQuery}&quot;
+                            {isGerman
+                              ? "Keine Fragen in dieser Kategorie gefunden, die Ihren Kriterien entsprechen."
+                              : "No questions found in this category matching your criteria."}
                           </p>
                         ) : (
                           <p className="text-gray-500 py-4">
-                            No questions available in this category
+                            {isGerman
+                              ? "Keine Fragen in dieser Kategorie verfügbar"
+                              : "No questions available in this category"}
                           </p>
                         )}
                       </CardContent>
@@ -277,25 +295,30 @@ export default function FAQPage() {
         <div className="max-w-4xl mx-auto mt-16 z-30 relative">
           <div className="bg-gradient-to-r from-red-700 to-red-600 rounded-lg p-8 text-white text-center">
             <h2 className="text-2xl md:text-3xl font-bold mb-4">
-              Still Need Help?
+              {isGerman ? "Noch Hilfe benötigen?" : "Still Need Help?"}
             </h2>
             <p className="mb-6 max-w-2xl mx-auto">
-              Can&apos;t find the answer you&apos;re looking for? Our customer
-              service team is here to help you with any questions or concerns.
+              {isGerman
+                ? "Können Sie die Antwort auf Ihre Frage nicht finden? Unser Kundenservice-Team ist hier, um Sie bei allen Fragen oder Bedenken zu helfen."
+                : "Can't find the answer you're looking for? Our customer service team is here to help you with any questions or concerns."}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button
                 asChild
                 className="bg-white text-red-700 px-6 py-3 rounded-md font-medium hover:bg-gray-100 transition-colors"
               >
-                <Link href="/contact">Contact Support</Link>
+                <Link href="/contact">
+                  {isGerman ? "Support kontaktieren" : "Contact Support"}
+                </Link>
               </Button>
               <Button
                 asChild
                 variant="outline"
                 className="bg-transparent border border-white px-6 py-3 rounded-md font-medium hover:bg-white/10 transition-colors"
               >
-                <Link href="/chat">Start Live Chat</Link>
+                <Link href="/chat">
+                  {isGerman ? "Live Chat starten" : "Start Live Chat"}
+                </Link>
               </Button>
             </div>
           </div>

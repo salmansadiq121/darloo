@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import RangeSlider from "react-range-slider-input";
 import "react-range-slider-input/dist/style.css";
 import { ChevronDown, ChevronRight, X, Filter, Tag } from "lucide-react";
+import { useAuth } from "@/app/content/authContent";
 
 export default function FilterProducts({
   minPrice,
@@ -18,6 +19,7 @@ export default function FilterProducts({
   selectedSubCategories,
   setSelectedSubCategories,
   setOpenFilter,
+  countryCode,
 }) {
   const [categoriesData, setCategoryData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -25,6 +27,8 @@ export default function FilterProducts({
   const [subCategories, setSubCategories] = useState({});
   const [expandedCategories, setExpandedCategories] = useState(new Set());
   const [loadingSubCategories, setLoadingSubCategories] = useState(new Set());
+
+  const isGerman = countryCode === "DE";
 
   const handleChange = (newValues) => {
     setValues(newValues);
@@ -132,7 +136,7 @@ export default function FilterProducts({
       <div className="px-4 py-3 flex items-center justify-between gap-4 border-b border-gray-200 bg-gradient-to-r from-red-50 to-yellow-50">
         <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
           <Filter className="w-5 h-5 text-red-600" />
-          Filters
+          {isGerman ? "Filter" : "Filters"}
           {selectedFiltersCount > 0 && (
             <span className="text-xs font-medium bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center">
               {selectedFiltersCount}
@@ -145,7 +149,7 @@ export default function FilterProducts({
             className="flex items-center gap-1 text-red-600 hover:text-red-700 text-sm font-medium hover:bg-red-50 px-3 py-1 rounded-md transition-all duration-200"
           >
             <X className="w-4 h-4" />
-            Clear All
+            {isGerman ? "Alle löschen" : "Clear All"}
           </button>
           <button
             onClick={() => setOpenFilter(false)}
@@ -163,7 +167,7 @@ export default function FilterProducts({
         <div className="px-4 py-3 border-b border-gray-100 bg-gray-50">
           <h4 className="text-sm font-medium text-gray-700 mb-2 flex items-center gap-1">
             <Tag className="w-4 h-4" />
-            Applied Filters
+            {isGerman ? "Angewendete Filter" : "Applied Filters"}
           </h4>
           <div className="flex flex-wrap gap-2">
             {/* Price Filter Tag */}
@@ -222,7 +226,7 @@ export default function FilterProducts({
           <div className="bg-gradient-to-br from-white to-gray-50 p-4 rounded-lg border border-gray-200 shadow-sm">
             <h3 className="text-base font-semibold text-gray-900 mb-3 flex items-center gap-2">
               <div className="w-2 h-2 bg-red-600 rounded-full"></div>
-              Price Range
+              {isGerman ? "Preis-Bereich" : "Price Range"}
             </h3>
 
             {/* Min & Max Price Display */}
@@ -260,7 +264,7 @@ export default function FilterProducts({
         <div className="space-y-4">
           <h3 className="text-base font-semibold text-gray-900 flex items-center gap-2">
             <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
-            Categories
+            {isGerman ? "Kategorien" : "Categories"}
           </h3>
 
           <div className="space-y-2">
@@ -343,7 +347,9 @@ export default function FilterProducts({
                           </div>
                         ) : (
                           <div className="p-3 text-xs text-gray-500 italic">
-                            No subcategories available
+                            {isGerman
+                              ? "Keine Unterkategorien verfügbar"
+                              : "No subcategories available"}
                           </div>
                         )}
                       </div>

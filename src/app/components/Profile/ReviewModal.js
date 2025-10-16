@@ -10,11 +10,17 @@ import { FiLoader } from "react-icons/fi";
 import axios from "axios";
 import toast from "react-hot-toast";
 
-export default function AddReviewModal({ setShow, productId, setProductId }) {
+export default function AddReviewModal({
+  setShow,
+  productId,
+  setProductId,
+  countryCode,
+}) {
   const [rating, setRating] = useState(0);
   const [review, setReview] = useState("");
   const [hoveredRating, setHoveredRating] = useState(0);
   const [loading, setLoading] = useState(false);
+  const isGerman = countryCode === "DE";
 
   // Add Review in Order
   const handleReview = async (e) => {
@@ -54,7 +60,9 @@ export default function AddReviewModal({ setShow, productId, setProductId }) {
     <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-gray-200/70">
       <div className="relative w-full max-w-lg max-h-[95vh] mt-[4rem] overflow-y-auto shidden rounded-sm border border-red-800 bg-gray-50 p-6 shadow-lg">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-semibold text-black">Add Review</h2>
+          <h2 className="text-xl font-semibold text-black">
+            {isGerman ? "Bewertung" : "Add Review"}
+          </h2>
           <button
             onClick={() => {
               setShow(false);
@@ -73,7 +81,7 @@ export default function AddReviewModal({ setShow, productId, setProductId }) {
               htmlFor="rating"
               className="block mb-2 text-sm font-medium text-gray-600"
             >
-              Rating
+              {isGerman ? "Bewertung" : "Rating"}
             </Label>
             <div className="flex gap-1">
               {[1, 2, 3, 4, 5].map((star) => (
@@ -103,7 +111,7 @@ export default function AddReviewModal({ setShow, productId, setProductId }) {
               htmlFor="review"
               className="block mb-2 text-sm font-medium text-gray-600"
             >
-              Review
+              {isGerman ? "Bewertung" : "Review"}
             </Label>
 
             <Textarea
@@ -127,16 +135,16 @@ export default function AddReviewModal({ setShow, productId, setProductId }) {
               }}
               className="border-gray-700 text-gray-600 cursor-pointer hover:bg-gray-800 hover:text-white"
             >
-              Cancel
+              {isGerman ? "Abbrechen" : "Cancel"}
             </Button>
             <Button
               type="submit"
-              className={`bg-red-600 hover:bg-red-700 cursor-pointer text-white ${
+              className={`bg-red-600 hover:bg-red-700 cursor-pointer text-white flex items-center ${
                 loading && "opacity-50 cursor-not-allowed"
               }`}
               disabled={loading || review === ""}
             >
-              Submit Review{" "}
+              {isGerman ? "Bewerten" : "Submit Review"}{" "}
               {loading && (
                 <FiLoader className="h-5 w-5 animate-spin text-white" />
               )}

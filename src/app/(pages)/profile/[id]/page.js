@@ -56,9 +56,10 @@ import NotificationSection from "@/app/components/Profile/NotificationSection";
 import OrdersTracking from "@/app/components/Profile/OrdersTracking";
 import { TbTruckReturn } from "react-icons/tb";
 import ReturnHistory from "@/app/components/Profile/ReturnHistory";
+import CountrySelector from "@/components/ui/country-selector";
 
 export default function Profile() {
-  const { auth, setAuth } = useAuth();
+  const { auth, setAuth, countryCode } = useAuth();
   const { id: userId } = useParams();
   const [userDetails, setUserDetails] = useState({});
   const [isLoading, setIsLoading] = useState(false);
@@ -66,6 +67,7 @@ export default function Profile() {
   const [activeTab, setActiveTab] = useState("profile");
   const router = useRouter();
   const tab = useSearchParams().get("tab");
+  const isGerman = countryCode === "DE";
 
   useEffect(() => {
     setActiveTab(tab);
@@ -172,13 +174,13 @@ export default function Profile() {
                           className="bg-[#C6080A] hover:bg-[#a50709] cursor-pointer"
                           onClick={() => setIsUpdateModalOpen(true)}
                         >
-                          Update Profile
+                          {isGerman ? "Profil aktualisieren" : "Update Profile"}
                         </Button>
                         <Button
                           className="bg-[#C6080A] hover:bg-[#a50709] flex items-center gap-1 cursor-pointer"
                           onClick={() => handleLogout()}
                         >
-                          Logout
+                          {isGerman ? "Abmelden" : "Logout"}
                           <RiLogoutCircleRFill className="h-5 w-5 text-white" />
                         </Button>
                       </div>
@@ -187,14 +189,18 @@ export default function Profile() {
                       <div className="flex items-center gap-2">
                         <User className="h-5 w-5 text-[#C6080A]" />
                         <div>
-                          <p className="text-sm text-gray-500">Member Since</p>
+                          <p className="text-sm text-gray-500">
+                            {isGerman ? "Mitglied seit" : "Member Since"}
+                          </p>
                           <p className="font-medium">{joinDate}</p>
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
                         <Globe className="h-5 w-5 text-[#C6080A]" />
                         <div>
-                          <p className="text-sm text-gray-500">Location</p>
+                          <p className="text-sm text-gray-500">
+                            {isGerman ? "Standort" : "Location"}
+                          </p>
                           <p className="font-medium">
                             {userDetails?.addressDetails?.city},{" "}
                             {userDetails?.addressDetails?.country}
@@ -205,9 +211,11 @@ export default function Profile() {
                         <CreditCard className="h-5 w-5 text-[#C6080A]" />
                         <div>
                           <p className="text-sm text-gray-500">
-                            Payment Method
+                            {isGerman ? "Zahlungsmethode" : "Payment Method"}
                           </p>
-                          <p className="font-medium">Bank Account</p>
+                          <p className="font-medium">
+                            {isGerman ? "Bankverbindung" : "Bank Account"}
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -220,73 +228,84 @@ export default function Profile() {
             <div className="md:col-span-1">
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle>Account</CardTitle>
+                  <CardTitle>{isGerman ? "Konto" : "Account"}</CardTitle>
                 </CardHeader>
                 <CardContent className="p-0">
                   <nav className="flex flex-col">
                     {[
                       {
                         icon: <User className="h-5 w-5" />,
-                        label: "Profile Information",
+                        label: isGerman
+                          ? "Profilinformationen"
+                          : "Profile Information",
                         value: "profile",
                       },
                       {
                         icon: <ShoppingBag className="h-5 w-5" />,
-                        label: "Orders History",
+                        label: isGerman ? "Bestellverlauf" : "Orders History",
                         value: "orders",
                       },
                       {
                         icon: <TbTruckReturn className="h-5 w-5" />,
-                        label: "Return History",
+                        label: isGerman ? "Rückgabeverlauf" : "Return History",
                         value: "returns",
                       },
                       // {
                       //   icon: <FiTruck className="h-5 w-5" />,
-                      //   label: "Orders Tracking",
+                      //   label: isGerman ? "Sendungsverfolgung" : "Orders Tracking",
                       //   value: "tracking",
                       // },
                       {
                         icon: <Heart className="h-5 w-5" />,
-                        label: "Favorites",
+                        label: isGerman ? "Favoriten" : "Favorites",
                         value: "favorites",
                       },
                       {
                         icon: <History className="h-5 w-5" />,
-                        label: "Recently Viewed",
+                        label: isGerman
+                          ? "Zuletzt angesehen"
+                          : "Recently Viewed",
                         value: "recently-viewed",
                       },
                       {
                         icon: <Bell className="h-5 w-5" />,
-                        label: "Notifications",
+                        label: isGerman
+                          ? "Benachrichtigungen"
+                          : "Notifications",
                         value: "notifications",
-
                         // badge: notificationCount,
                       },
                       {
                         icon: <Percent className="h-5 w-5" />,
-                        label: "Coupons",
+                        label: isGerman ? "Gutscheine" : "Coupons",
                         value: "coupons",
                       },
                       {
                         icon: <Gift className="h-5 w-5" />,
-                        label: "Refer & Earn",
+                        label: isGerman
+                          ? "Empfehlen & Verdienen"
+                          : "Refer & Earn",
                         value: "refer",
                       },
                       {
                         icon: <Users className="h-5 w-5" />,
-                        label: "Affiliated Program",
+                        label: isGerman
+                          ? "Partnerprogramm"
+                          : "Affiliated Program",
                         value: "affiliate",
                         href: "https://affiliates.darloo.com",
                       },
                       {
                         icon: <MessageSquare className="h-5 w-5" />,
-                        label: "Chat with Support",
-                        // badge: 3,
+                        label: isGerman
+                          ? "Mit Support chatten"
+                          : "Chat with Support",
                         value: "chat",
+                        // badge: 3,
                       },
                       {
                         icon: <Mail className="h-5 w-5" />,
-                        label: "Support",
+                        label: isGerman ? "Support" : "Support",
                         value: "support",
                       },
                     ].map((item, index) => (
@@ -322,23 +341,32 @@ export default function Profile() {
 
               <Card className="mt-6">
                 <CardHeader className="pb-2">
-                  <CardTitle>Settings</CardTitle>
+                  <CardTitle>
+                    {isGerman ? "Einstellungen" : "Settings"}
+                  </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div>
-                    <h3 className="text-sm font-medium mb-2">Region</h3>
+                    <h3 className="text-sm font-medium mb-2">
+                      {isGerman ? "Region" : "Region"}
+                    </h3>
                     <RegionSelector
                       defaultRegion={userDetails?.addressDetails?.country}
                     />
                   </div>
                   <div>
-                    <h3 className="text-sm font-medium mb-2">Language</h3>
-                    <LanguageSelector defaultLanguage="English" />
+                    <h3 className="text-sm font-medium mb-2">
+                      {isGerman ? "Sprache" : "Language"}
+                    </h3>
+                    {/* <LanguageSelector defaultLanguage="English" /> */}
+                    <CountrySelector />
                   </div>
-                  <div>
-                    <h3 className="text-sm font-medium mb-2">Currency</h3>
+                  {/* <div>
+                    <h3 className="text-sm font-medium mb-2">
+                      {isGerman ? "Währung" : "Currency"}
+                    </h3>
                     <CurrencySelector defaultCurrency="EUR" />
-                  </div>
+                  </div> */}
                 </CardContent>
               </Card>
             </div>
@@ -348,61 +376,67 @@ export default function Profile() {
               <Tabs value={activeTab} onValueChange={setActiveTab}>
                 <TabsList className="grid grid-cols-4 mb-6">
                   <TabsTrigger value="profile" className={"cursor-pointer"}>
-                    Profile
+                    {isGerman ? "Profil" : "Profile"}
                   </TabsTrigger>
                   <TabsTrigger value="orders" className={"cursor-pointer"}>
-                    Orders
+                    {isGerman ? "Bestellungen" : "Orders"}
                   </TabsTrigger>
                   <TabsTrigger value="favorites" className={"cursor-pointer"}>
-                    Favorites
+                    {isGerman ? "Favoriten" : "Favorites"}
                   </TabsTrigger>
                   <TabsTrigger value="chat" className={"cursor-pointer"}>
-                    Chat
+                    {isGerman ? "Chat" : "Chat"}
                   </TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="orders" className="space-y-6">
-                  <OrdersHistory userId={userId} />
+                  <OrdersHistory userId={userId} countryCode={countryCode} />
                 </TabsContent>
 
                 <TabsContent value="tracking" className="space-y-6">
-                  <OrdersTracking userId={userId} />
+                  <OrdersTracking userId={userId} countryCode={countryCode} />
                 </TabsContent>
                 <TabsContent value="returns" className="space-y-6">
-                  <ReturnHistory userId={userId} />
+                  <ReturnHistory userId={userId} countryCode={countryCode} />
                 </TabsContent>
 
                 <TabsContent value="profile">
                   <Card>
                     <CardHeader>
-                      <CardTitle>Profile Information</CardTitle>
+                      <CardTitle>
+                        {isGerman
+                          ? "Profilinformationen"
+                          : "Profile Information"}
+                      </CardTitle>
                       <CardDescription>
-                        Your personal and contact information
+                        {isGerman
+                          ? "Persönliche und Kontaktinformationen"
+                          : "Your personal and contact information"}
                       </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-6">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                           <h3 className="text-sm font-medium text-gray-500 mb-1">
-                            Full Name
+                            {isGerman ? "Vollständiger Name" : "Full Name"}
                           </h3>
                           <p className="font-medium">{userDetails?.name}</p>
                         </div>
                         <div>
                           <h3 className="text-sm font-medium text-gray-500 mb-1">
-                            Email
+                            {isGerman ? "E-Mail" : "Email"}
                           </h3>
                           <p className="font-medium">{userDetails?.email}</p>
                         </div>
                         <div>
                           <h3 className="text-sm font-medium text-gray-500 mb-1">
-                            Phone
+                            {isGerman ? "Telefon" : "Phone"}
                           </h3>
                           <p className="font-medium">{userDetails?.number}</p>
                         </div>
                         <div>
                           <h3 className="text-sm font-medium text-gray-500 mb-1">
-                            Role
+                            {isGerman ? "Rolle" : "Role"}
                           </h3>
                           <p className="font-medium capitalize">
                             {userDetails?.role}
@@ -414,12 +448,14 @@ export default function Profile() {
 
                       <div>
                         <h3 className="text-lg font-medium mb-3">
-                          Address Information
+                          {isGerman
+                            ? "Adressinformationen"
+                            : "Address Information"}
                         </h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                           <div>
                             <h3 className="text-sm font-medium text-gray-500 mb-1">
-                              Address
+                              {isGerman ? "Adresse" : "Address"}
                             </h3>
                             <p className="font-medium">
                               {userDetails?.addressDetails?.address}
@@ -427,7 +463,7 @@ export default function Profile() {
                           </div>
                           <div>
                             <h3 className="text-sm font-medium text-gray-500 mb-1">
-                              City
+                              {isGerman ? "Stadt" : "City"}
                             </h3>
                             <p className="font-medium">
                               {userDetails?.addressDetails?.city}
@@ -435,7 +471,7 @@ export default function Profile() {
                           </div>
                           <div>
                             <h3 className="text-sm font-medium text-gray-500 mb-1">
-                              State
+                              {isGerman ? "Bundesland" : "State"}
                             </h3>
                             <p className="font-medium">
                               {userDetails?.addressDetails?.state}
@@ -443,7 +479,7 @@ export default function Profile() {
                           </div>
                           <div>
                             <h3 className="text-sm font-medium text-gray-500 mb-1">
-                              Country
+                              {isGerman ? "Land" : "Country"}
                             </h3>
                             <p className="font-medium">
                               {userDetails?.addressDetails?.country}
@@ -451,7 +487,7 @@ export default function Profile() {
                           </div>
                           <div>
                             <h3 className="text-sm font-medium text-gray-500 mb-1">
-                              Postal Code
+                              {isGerman ? "Postleitzahl" : "Postal Code"}
                             </h3>
                             <p className="font-medium">
                               {userDetails?.addressDetails?.pincode}
@@ -517,7 +553,7 @@ export default function Profile() {
                 </TabsContent>
 
                 <TabsContent value="favorites">
-                  <FavoritesSection />
+                  <FavoritesSection countryCode={countryCode} />
                 </TabsContent>
 
                 <TabsContent value="activity">
@@ -588,30 +624,33 @@ export default function Profile() {
                 </TabsContent>
 
                 <TabsContent value="recently-viewed">
-                  <RecentlyViewedSection />
+                  <RecentlyViewedSection countryCode={countryCode} />
                 </TabsContent>
 
                 <TabsContent value="coupons">
-                  <CouponsSection />
+                  <CouponsSection countryCode={countryCode} />
                 </TabsContent>
 
                 <TabsContent value="refer">
-                  <ReferEarnSection />
+                  <ReferEarnSection countryCode={countryCode} />
                 </TabsContent>
 
                 <TabsContent value="affiliate">
-                  <AffiliateSection />
+                  <AffiliateSection countryCode={countryCode} />
                 </TabsContent>
 
                 <TabsContent value="chat">
-                  <ChatSection user={userDetails} />
+                  <ChatSection user={userDetails} countryCode={countryCode} />
                 </TabsContent>
 
                 <TabsContent value="support">
-                  <SupportSection />
+                  <SupportSection countryCode={countryCode} />
                 </TabsContent>
                 <TabsContent value="notifications">
-                  <NotificationSection user={userDetails} />
+                  <NotificationSection
+                    user={userDetails}
+                    countryCode={countryCode}
+                  />
                 </TabsContent>
               </Tabs>
             </div>
@@ -624,6 +663,7 @@ export default function Profile() {
           onClose={() => setIsUpdateModalOpen(false)}
           user={userDetails}
           getUserDetails={getUserDetails}
+          countryCode={countryCode}
         />
       </div>
     </MainLayout>

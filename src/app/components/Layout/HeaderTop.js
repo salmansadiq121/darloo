@@ -1,3 +1,4 @@
+import CountrySelector from "@/components/ui/country-selector";
 import {
   ShoppingBag,
   Truck,
@@ -7,12 +8,32 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 
-export default function PromoBannerPage() {
+const countryList = [
+  { code: "US", value: "USD", label: "English (United States)", symbol: "$" },
+  { code: "DE", value: "EUR", label: "Germany (Deutschland)", symbol: "€" },
+];
+
+export default function PromoBannerPage({ countryCode }) {
+  // Determine if user is in Germany
+  const isGerman = countryCode === "DE";
+
+  // Translations
+  const t = {
+    getApp: isGerman ? "Hol dir unsere Mobile App" : "Get our Mobile App",
+    insider: isGerman ? "FASHIONINSIDER" : "FASHIONINSIDER",
+    subscribe: isGerman ? "Abonnieren & Sparen" : "Subscribe & Save",
+    shipping: isGerman ? "Kostenloser Versand" : "Free Shipping",
+    returns: isGerman ? "Kostenlose Rücksendungen" : "Free Returns",
+  };
+
   return (
-    <div className=" bg-gray-50 flex flex-col">
+    <div className="bg-gray-50 flex flex-col">
       <div className="bg-red-50/80 border-b border-red-100 sticky top-0 z-10">
-        <div className="container mx-auto px-4">
-          <div className="flex  overflow-x-auto shidden items-start justify-between text-red-700 text-xs sm:text-sm">
+        <div className="container mx-auto px-4 ">
+          <div className="flex overflow-x-auto shidden items-start justify-between text-red-700 text-xs sm:text-sm">
+            {/* <div className="w-[5.5rem]">
+              <CountrySelector />
+            </div> */}
             {/* Mobile App */}
             <Link
               href="#download-app"
@@ -22,7 +43,7 @@ export default function PromoBannerPage() {
                 size={16}
                 className="group-hover:scale-110 transition-transform duration-200"
               />
-              <span>Get our Mobile App</span>
+              <span>{t.getApp}</span>
             </Link>
 
             {/* Divider */}
@@ -37,7 +58,7 @@ export default function PromoBannerPage() {
                 size={16}
                 className="group-hover:scale-110 transition-transform duration-200"
               />
-              <span>FASHIONINSIDER</span>
+              <span>{t.insider}</span>
             </Link>
 
             {/* Divider */}
@@ -52,7 +73,7 @@ export default function PromoBannerPage() {
                 size={16}
                 className="group-hover:scale-110 transition-transform duration-200"
               />
-              <span>Subscribe & Save</span>
+              <span>{t.subscribe}</span>
             </Link>
 
             {/* Divider */}
@@ -67,7 +88,7 @@ export default function PromoBannerPage() {
                 size={16}
                 className="group-hover:scale-110 transition-transform duration-200"
               />
-              <span>Free Shipping</span>
+              <span>{t.shipping}</span>
             </Link>
 
             {/* Divider */}
@@ -83,10 +104,7 @@ export default function PromoBannerPage() {
                 className="group-hover:scale-110 transition-transform duration-200"
               />
               <span className="flex flex-col">
-                <span>Free Returns</span>
-                {/* <span className="text-[10px] text-red-500">
-                  *US & Canada only
-                </span> */}
+                <span>{t.returns}</span>
               </span>
             </Link>
           </div>

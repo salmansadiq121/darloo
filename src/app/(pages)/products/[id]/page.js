@@ -25,16 +25,7 @@ import {
   Feather,
   ArrowLeft,
 } from "lucide-react";
-const defaultHighlights = [
-  { text: "High-quality materials for durability", icon: ShieldCheck },
-  { text: "Ergonomic design for comfort", icon: Feather },
-  { text: "Lightweight and portable", icon: Package },
-  { text: "Easy to clean and maintain", icon: RefreshCw },
-  { text: "Compatible with most standard accessories", icon: Settings },
-  { text: "Eco-friendly and sustainable manufacturing", icon: Leaf },
-  { text: "Sleek and modern aesthetics", icon: Star },
-  { text: "Reliable performance with long lifespan", icon: Check },
-];
+
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -57,7 +48,7 @@ import toast from "react-hot-toast";
 import ShareData from "@/app/utils/Share";
 
 export default function ProductDetail() {
-  const { setSelectedProduct, setOneClickBuyProduct } = useAuth();
+  const { setSelectedProduct, setOneClickBuyProduct, countryCode } = useAuth();
   const { id: productId } = useParams();
   const [product, setProduct] = useState({});
   const [loading, setLoading] = useState(true);
@@ -76,6 +67,76 @@ export default function ProductDetail() {
   const [currentUrl, setCurrentUrl] = useState("");
   const [returnPolicy, setReturnPolicy] = useState("");
   const [varientPrice, setVarientPrice] = useState(0);
+  const {} = useAuth();
+
+  // Determine language based on country code
+  const isGerman = countryCode === "DE";
+
+  const defaultHighlights = isGerman
+    ? [
+        {
+          text: "Hochwertige Materialien für Langlebigkeit",
+          icon: ShieldCheck,
+        },
+        { text: "Ergonomisches Design für Komfort", icon: Feather },
+        { text: "Leicht und tragbar", icon: Package },
+        { text: "Einfach zu reinigen und zu pflegen", icon: RefreshCw },
+        {
+          text: "Kompatibel mit den meisten Standardzubehörteilen",
+          icon: Settings,
+        },
+        { text: "Umweltfreundliche und nachhaltige Herstellung", icon: Leaf },
+        { text: "Elegantes und modernes Design", icon: Star },
+        { text: "Zuverlässige Leistung mit langer Lebensdauer", icon: Check },
+      ]
+    : [
+        { text: "High-quality materials for durability", icon: ShieldCheck },
+        { text: "Ergonomic design for comfort", icon: Feather },
+        { text: "Lightweight and portable", icon: Package },
+        { text: "Easy to clean and maintain", icon: RefreshCw },
+        { text: "Compatible with most standard accessories", icon: Settings },
+        { text: "Eco-friendly and sustainable manufacturing", icon: Leaf },
+        { text: "Sleek and modern aesthetics", icon: Star },
+        { text: "Reliable performance with long lifespan", icon: Check },
+      ];
+
+  // Translations
+  const t = {
+    productDetail: isGerman ? "Produktdetails" : "Product Details",
+    shippingReturns: isGerman ? "Versand & Rückgabe" : "Shipping & Returns",
+    review: isGerman ? "Bewertungen" : "Reviews",
+    description: isGerman ? "Beschreibung" : "Description",
+    productHighlights: isGerman ? "Produkt-Highlights" : "Product Highlights",
+    addToWishlist: isGerman ? "Zur Wunschliste hinzufügen" : "Add to Wishlist",
+    shareProduct: isGerman ? "Produkt teilen" : "Share Product",
+    buyNow: isGerman ? "Jetzt kaufen" : "Buy Now",
+    oneClickBuy: isGerman ? "Mit einem Klick kaufen" : "One Click Buy",
+    checkout: isGerman ? "Zur Kasse" : "Checkout",
+    quantity: isGerman ? "Menge" : "Quantity",
+    color: isGerman ? "Farbe" : "Color",
+    size: isGerman ? "Größe" : "Size",
+    price: isGerman ? "Preis" : "Price",
+    estimatedPrice: isGerman ? "Geschätzter Preis" : "Estimated Price",
+    addToCart: isGerman ? "In den Warenkorb" : "Add to Cart",
+    product: isGerman ? "Produkt" : "Product",
+
+    productInformation: isGerman
+      ? "Produktinformationen"
+      : "Product Information",
+    category: isGerman ? "Kategorie" : "Category",
+    availableColors: isGerman ? "Verfügbare Farben" : "Available Colors",
+    availableSizes: isGerman ? "Verfügbare Größen" : "Available Sizes",
+    shippingFee: isGerman ? "Versandkosten" : "Shipping Fee",
+    customerReviews: isGerman ? "Kundenbewertungen" : "Customer Reviews",
+    customersSaying: isGerman
+      ? "Was unsere Kunden sagen"
+      : "See What Our Customers Are Saying",
+    rating: isGerman ? "Bewertung" : "Rating",
+    returnPolicy: isGerman ? "Rückgaberecht" : "Return Policy",
+    shippingInformation: isGerman
+      ? "Versandinformationen"
+      : "Shipping Information",
+  };
 
   const router = useRouter();
 
@@ -701,14 +762,15 @@ export default function ProductDetail() {
                       href="#reviews"
                       className="text-sm text-primary hover:underline"
                     >
-                      {product?.reviews?.length} reviews
+                      {product?.reviews?.length}{" "}
+                      {isGerman ? "Bewertungen" : "Reviews"}
                     </Link>
                   </div>
                   <div className="text-sm text-gray-500">
                     <span className="font-medium text-gray-700">
                       {product?.purchased}
                     </span>{" "}
-                    sold
+                    {isGerman ? "verkauft" : "sold"}
                   </div>
                 </div>
               </div>
@@ -730,32 +792,42 @@ export default function ProductDetail() {
                   <div className="mt-3 bg-red-100 rounded p-3 border border-red-200">
                     <div className="flex items-center gap-2 text-sm font-medium text-red-600 mb-2">
                       <Clock className="h-4 w-4" />
-                      <span>Sale ends in:</span>
+                      <span>
+                        {isGerman ? "Verkauf endet in:" : "Sale ends in:"}
+                      </span>
                     </div>
                     <div className="grid grid-cols-4 gap-2">
                       <div className="bg-white rounded-md p-2 text-center shadow-sm">
                         <div className="text-xl font-bold text-gray-900">
                           {timeLeft?.days}
                         </div>
-                        <div className="text-xs text-gray-500">Days</div>
+                        <div className="text-xs text-gray-500">
+                          {isGerman ? "Tage" : "Days"}
+                        </div>
                       </div>
                       <div className="bg-white rounded-md p-2 text-center shadow-sm">
                         <div className="text-xl font-bold text-gray-900">
                           {timeLeft?.hours}
                         </div>
-                        <div className="text-xs text-gray-500">Hours</div>
+                        <div className="text-xs text-gray-500">
+                          {isGerman ? "Stunden" : "Hours"}
+                        </div>
                       </div>
                       <div className="bg-white rounded-md p-2 text-center shadow-sm">
                         <div className="text-xl font-bold text-gray-900">
                           {timeLeft?.minutes}
                         </div>
-                        <div className="text-xs text-gray-500">Mins</div>
+                        <div className="text-xs text-gray-500">
+                          {isGerman ? "Minuten" : "Mins"}
+                        </div>
                       </div>
                       <div className="bg-white rounded-md p-2 text-center shadow-sm">
                         <div className="text-xl font-bold text-gray-900">
                           {timeLeft?.seconds}
                         </div>
-                        <div className="text-xs text-gray-500">Secs</div>
+                        <div className="text-xs text-gray-500">
+                          {isGerman ? "Sekunden" : "Secs"}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -763,14 +835,16 @@ export default function ProductDetail() {
                 <div className="flex items-center gap-2 mt-3">
                   <Truck className="h-4 w-4 text-gray-500" />
                   <p className="text-sm text-gray-500">
-                    Shipping: Free
+                    {isGerman ? "Versand: Kostenlos" : "Shipping: Free"}
                     {/* Delivery in 3-5 business days */}
                   </p>
                 </div>
                 <div className="flex items-center gap-2 mt-1">
                   <Check className="h-4 w-4 text-green-500" />
                   <p className="text-sm text-gray-500">
-                    In stock: {product?.quantity} available
+                    {isGerman
+                      ? "In den Warenkorb: {product?.quantity} verfügbar"
+                      : "In stock: {product?.quantity} available"}
                   </p>
                 </div>
               </div>
@@ -911,7 +985,9 @@ export default function ProductDetail() {
                 )} */}
                 {product?.sizes?.length > 0 && product?.sizes[0] !== "" && (
                   <div className="space-y-3">
-                    <div className="font-medium text-gray-900">Size</div>
+                    <div className="font-medium text-gray-900">
+                      {isGerman ? "Größe" : "Size"}
+                    </div>
                     <div className="flex flex-wrap gap-3">
                       {product?.sizes?.map((size) => (
                         <button
@@ -931,13 +1007,15 @@ export default function ProductDetail() {
                       href="#"
                       className="text-sm text-primary hover:underline inline-flex items-center"
                     >
-                      Size guide
+                      {isGerman ? "Größen-Richtlinie" : "Size guide"}
                       <ChevronRight className="h-4 w-4 ml-1" />
                     </Link>
                   </div>
                 )}
                 <div className="space-y-3">
-                  <div className="font-medium text-gray-900">Quantity</div>
+                  <div className="font-medium text-gray-900">
+                    {isGerman ? "Menge" : "Quantity"}
+                  </div>
                   <div className="flex items-center">
                     <Button
                       variant="outline"
@@ -975,7 +1053,7 @@ export default function ProductDetail() {
                   onClick={() => handleAddToCart(product)}
                 >
                   <ShoppingCart className="mr-2 h-5 w-5" />
-                  Add to Cart
+                  {isGerman ? "In den Warenkorb" : "Add to Cart"}
                 </Button>
                 <Button
                   variant="secondary"
@@ -989,7 +1067,7 @@ export default function ProductDetail() {
                     setShowStickyBar(false);
                   }}
                 >
-                  Buy Now
+                  {isGerman ? "Jetzt kaufen" : "Buy Now"}
                 </Button>
                 <div className="flex items-center gap-4">
                   <Button
@@ -1010,7 +1088,7 @@ export default function ProductDetail() {
                         isWishlisted ? "fill-primary text-primary" : ""
                       }`}
                     />
-                    <span className="sr-only">Add to wishlist</span>
+                    <span className="sr-only">{t.addToWishlist}</span>
                   </Button>
                   <Button
                     variant="outline"
@@ -1019,13 +1097,13 @@ export default function ProductDetail() {
                     className="h-12 w-12 rounded-xl border-sky-200 cursor-pointer hover:bg-sky-100 hover:text-sky-900"
                   >
                     <Share2 className="h-6 w-6" />
-                    <span className="sr-only">Share product</span>
+                    <span className="sr-only">Share</span>
                   </Button>
                 </div>
               </div>
               <div className="mt-6 bg-gray-100 rounded-xl p-4 border border-gray-200">
                 <h3 className="font-medium text-gray-900 mb-3">
-                  ✨ Product Highlights
+                  ✨ {t.productHighlights}
                 </h3>
                 <ul className="space-y-3">
                   {(product?.features?.length > 0
@@ -1054,19 +1132,19 @@ export default function ProductDetail() {
                 value="details"
                 className="rounded cursor-pointer px-4 min-w-fit  data-[state=active]:bg-red-600 data-[state=active]:text-white data-[state=active]:shadow-sm transition-all duration-300"
               >
-                Product Details
+                {t.productDetail}
               </TabsTrigger>
               <TabsTrigger
                 value="reviews"
                 className="rounded cursor-pointer px-4 min-w-fit mx-6 sm:mx-0 data-[state=active]:bg-red-600 data-[state=active]:text-white data-[state=active]:shadow-sm transition-all duration-300"
               >
-                Reviews ({product?.reviews?.length})
+                {t.review} ({product?.reviews?.length})
               </TabsTrigger>
               <TabsTrigger
                 value="shipping"
                 className="rounded cursor-pointer px-4 min-w-fit mx-6 sm:mx-0 data-[state=active]:bg-red-600 data-[state=active]:text-white data-[state=active]:shadow-sm transition-all duration-300"
               >
-                Shipping & Returns
+                {t.shippingReturns}
               </TabsTrigger>
             </TabsList>
             <TabsContent value="details" className="mt-6 animate-fadeIn">
@@ -1074,16 +1152,18 @@ export default function ProductDetail() {
                 <div className="space-y-6">
                   <div className="w-full">
                     <h3 className="text-xl font-semibold text-gray-900">
-                      Description
+                      {t.description}
                     </h3>
-                    <Image
-                      src={product?.size_chart}
-                      alt="size chart"
-                      width={400}
-                      height={500}
-                      priority
-                      className="rounded-lg object-contain"
-                    />
+                    {product?.size_chart && (
+                      <Image
+                        src={product?.size_chart}
+                        alt="size chart"
+                        width={400}
+                        height={500}
+                        priority
+                        className="rounded-lg object-contain"
+                      />
+                    )}
                     <div className=" w-full flex items-center justify-center">
                       <div
                         className="mt-3 text-sm text-gray-600  w-full leading-relaxed"
@@ -1096,12 +1176,12 @@ export default function ProductDetail() {
                   <Separator />
                   <div>
                     <h3 className="text-xl font-semibold text-gray-900">
-                      Product Information
+                      {t.productInformation}
                     </h3>
                     <dl className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">
                       <div className="bg-gray-200 p-3 rounded">
                         <dt className="text-sm font-medium text-gray-500">
-                          Category
+                          {t.category}
                         </dt>
                         <dd className="mt-1 text-sm font-medium text-gray-900">
                           {product?.category?.name}
@@ -1109,7 +1189,7 @@ export default function ProductDetail() {
                       </div>
                       <div className="bg-gray-200 p-3 rounded">
                         <dt className="text-sm font-medium text-gray-500">
-                          Available Colors
+                          {t.availableColors}
                         </dt>
                         <dd className="mt-1 text-sm font-medium text-gray-900">
                           {product?.colors?.map((c) => c.name).join(", ")}
@@ -1117,7 +1197,7 @@ export default function ProductDetail() {
                       </div>
                       <div className="bg-gray-200 p-3 rounded">
                         <dt className="text-sm font-medium text-gray-500">
-                          Available Sizes
+                          {t.availableSizes}
                         </dt>
                         <dd className="mt-1 text-sm font-medium text-gray-900">
                           {product?.sizes?.join(", ")}
@@ -1125,7 +1205,7 @@ export default function ProductDetail() {
                       </div>
                       <div className="bg-gray-200 p-3 rounded">
                         <dt className="text-sm font-medium text-gray-500">
-                          Shipping Fee
+                          {t.shippingFee}
                         </dt>
                         <dd className="mt-1 text-sm font-medium text-gray-900">
                           €{product?.shipping?.toLocaleString()}
@@ -1147,10 +1227,10 @@ export default function ProductDetail() {
                   <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
                     <div>
                       <h3 className="text-xl font-semibold text-gray-900">
-                        Customer Reviews
+                        {t.CustomerReviews}
                       </h3>
                       <p className="text-sm text-gray-500 mt-1">
-                        See what our customers are saying
+                        {t.customerssaying}
                       </p>
                     </div>
                     <div className="bg-gray-50 p-4 rounded-xl border border-gray-100 flex flex-col sm:flex-row items-center gap-4">
@@ -1304,7 +1384,9 @@ export default function ProductDetail() {
                                 )}
                               </div>
                               <Badge variant="outline" className="text-xs">
-                                Verified Purchase
+                                {isGerman
+                                  ? "Verifiziertes Kauf"
+                                  : "Verified Purchase"}
                               </Badge>
                             </div>
                             <p className="text-gray-700 leading-relaxed">
@@ -1314,7 +1396,9 @@ export default function ProductDetail() {
                               review?.commentReplies?.length > 0 && (
                                 <div className="ml-12 mt-4 rounded bg-white p-4 border border-gray-100">
                                   <p className="text-xs font-medium text-gray-900">
-                                    Seller Response
+                                    {isGerman
+                                      ? "Verkäufer-Antwort"
+                                      : "Seller Response"}
                                   </p>
                                   {review?.commentReplies?.map(
                                     (reply, index) => (
@@ -1366,7 +1450,9 @@ export default function ProductDetail() {
                         variant="outline"
                         className="rounded-xl border-gray-200 text-gray-700 hover:bg-gray-50 bg-transparent"
                       >
-                        Load More Reviews
+                        {isGerman
+                          ? "Mehr Bewertungen laden"
+                          : "Load More Reviews"}
                       </Button>
                     </div>
                   )}
@@ -1378,7 +1464,7 @@ export default function ProductDetail() {
                 <div className="space-y-6">
                   <div>
                     <h3 className="text-xl font-semibold text-gray-900">
-                      Shipping Information
+                      {t.shippingInformation}
                     </h3>
                     {/* <div className="mt-4 space-y-4">
                       <div className="flex gap-4 p-4 bg-gray-50 rounded border border-gray-100">
@@ -1420,7 +1506,7 @@ export default function ProductDetail() {
                       className=" px-2 py-2"
                     ></div>
                     {/* <h3 className="text-xl font-semibold text-gray-900">
-                      Return Policy
+                      {t.returnPolicy}
                     </h3> */}
                     {/* <p className="mt-3 text-gray-600 leading-relaxed">
                       We accept returns within 14 days of delivery. Items must
@@ -1455,7 +1541,7 @@ export default function ProductDetail() {
           {relatedProducts && relatedProducts.length > 0 && (
             <div className="mt-16">
               <h2 className="text-2xl font-bold text-gray-900 mb-6">
-                You May Also Like
+                {isGerman ? "Könnten Sie auch gerne" : "You May Also Like"}
               </h2>
               <div className="w-full">
                 <ProductCarousel products={relatedProducts} />
@@ -1489,7 +1575,7 @@ export default function ProductDetail() {
                   className="flex-1 bg-primary hover:bg-primary/90"
                 >
                   <ShoppingBag className="mr-2 h-5 w-5" />
-                  Add to Cart
+                  {isGerman ? "In den Warenkorb" : "Add to Cart"}
                 </Button>
               </div>
             </motion.div>

@@ -25,11 +25,12 @@ import axios from "axios";
 import Image from "next/image";
 import { GiReturnArrow } from "react-icons/gi";
 
-export default function ReturnHistory({ userId }) {
+export default function ReturnHistory({ userId, countryCode }) {
   const [returnHistory, setReturnHistory] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [expandedItems, setExpandedItems] = useState(new Set());
+  const isGerman = countryCode === "DE";
 
   // Mock data for demonstration since API might not be available
   useEffect(() => {
@@ -92,9 +93,13 @@ export default function ReturnHistory({ userId }) {
           <div className="bg-red-600 text-white p-6 rounded-t-lg">
             <h1 className="text-3xl font-bold flex items-center gap-3">
               <RotateCcw className="h-8 w-8" />
-              Return History
+              {isGerman ? "Rückgabeverlauf" : "Return History"}
             </h1>
-            <p className="text-red-100 mt-2">Loading your return requests...</p>
+            <p className="text-red-100 mt-2">
+              {isGerman
+                ? "Laden Sie Ihre Rückgabeanfragen..."
+                : "Loading your return requests..."}
+            </p>
           </div>
           <Card className="rounded-t-none border-t-0">
             <CardContent className="p-8">
@@ -119,7 +124,9 @@ export default function ReturnHistory({ userId }) {
           <Card className="border-red-200">
             <CardContent className="p-8 text-center">
               <div className="text-red-600 text-xl font-semibold">
-                Error loading return history
+                {isGerman
+                  ? "Fehler beim Laden des Rückgabeverlaufs"
+                  : "Error loading return history"}
               </div>
               <p className="text-gray-600 mt-2">{error}</p>
             </CardContent>
@@ -136,15 +143,20 @@ export default function ReturnHistory({ userId }) {
         <div className="bg-red-600 text-white p-6 rounded-t-lg">
           <h1 className="text-3xl font-bold flex items-center gap-3">
             <RotateCcw className="h-8 w-8" />
-            Return History
+            {isGerman ? "Rückgabeverlauf" : "Return History"}
           </h1>
           <p className="text-red-100 mt-2">
-            Manage and track all your product return requests
+            {isGerman
+              ? "Verwalten und verfolgen Sie alle Ihre Produktrückgabeanfragen"
+              : "Manage and track all your product return requests"}
           </p>
           <div className="mt-4 flex items-center gap-4 text-sm">
             <div className="flex items-center gap-2">
               <Package className="h-4 w-4" />
-              <span>{returnHistory.length} Total Returns</span>
+              <span>
+                {returnHistory.length}
+                {isGerman ? "Gesamtanfragen" : "Total Returns"}
+              </span>
             </div>
           </div>
         </div>
@@ -156,10 +168,12 @@ export default function ReturnHistory({ userId }) {
               <div className="p-12 text-center">
                 <RotateCcw className="h-16 w-16 text-gray-300 mx-auto mb-4" />
                 <h3 className="text-xl font-semibold text-gray-600 mb-2">
-                  No Return History
+                  {isGerman ? "Kein Rückgabeverlauf" : "No Return History"}
                 </h3>
                 <p className="text-gray-500">
-                  You haven&apos;t made any return requests yet.
+                  {isGerman
+                    ? "Sie haben noch keine Rückgabeanfragen gemacht."
+                    : "You haven&apos;t made any return requests yet."}
                 </p>
               </div>
             ) : (
@@ -246,13 +260,15 @@ export default function ReturnHistory({ userId }) {
                           <div className="space-y-4">
                             <h4 className="font-semibold text-gray-900 flex items-center gap-2">
                               <User className="h-4 w-4 text-red-600" />
-                              Customer Information
+                              {isGerman
+                                ? "Kundeninformationen"
+                                : "Customer Information"}
                             </h4>
                             <div className="bg-white p-4 rounded-lg border">
                               <div className="space-y-2">
                                 <div>
                                   <span className="text-sm text-gray-500">
-                                    Name:
+                                    {isGerman ? "Name:" : "Name:"}
                                   </span>
                                   <span className="ml-2 font-medium">
                                     {returnItem?.user?.name}
@@ -260,7 +276,7 @@ export default function ReturnHistory({ userId }) {
                                 </div>
                                 <div>
                                   <span className="text-sm text-gray-500">
-                                    Email:
+                                    {isGerman ? "E-Mail:" : "Email:"}
                                   </span>
                                   <span className="ml-2 font-medium">
                                     {returnItem?.user?.email}
@@ -268,7 +284,7 @@ export default function ReturnHistory({ userId }) {
                                 </div>
                                 <div>
                                   <span className="text-sm text-gray-500">
-                                    Return ID:
+                                    {isGerman ? "Rückgabe-ID:" : "Return ID:"}
                                   </span>
                                   <span className="ml-2 font-mono text-sm">
                                     #{returnItem?._id}
@@ -282,7 +298,9 @@ export default function ReturnHistory({ userId }) {
                               <div>
                                 <h5 className="font-semibold text-gray-900 flex items-center gap-2 mb-2">
                                   <MessageSquare className="h-4 w-4 text-red-600" />
-                                  Customer Comment
+                                  {isGerman
+                                    ? "Kundenkommentar"
+                                    : "Customer Comment"}
                                 </h5>
                                 <div className="bg-white p-4 rounded-lg border">
                                   <p className="text-gray-700 text-sm leading-relaxed">
@@ -296,8 +314,9 @@ export default function ReturnHistory({ userId }) {
                           {/* Return Images */}
                           <div className="space-y-4">
                             <h4 className="font-semibold text-gray-900 flex items-center gap-2">
-                              <ImageIcon className="h-4 w-4 text-red-600" />
-                              Return Images ({returnItem?.images?.length})
+                              <ImageIcon className="h-4 w-4 text-red-600 flex items-center gap-1" />
+                              {isGerman ? "Rückgabe-Bilder" : "Return Images"}
+                              {returnItem?.images?.length}
                             </h4>
                             <div className="bg-white p-4 rounded-lg border">
                               {returnItem?.images?.length > 0 ? (
@@ -321,7 +340,7 @@ export default function ReturnHistory({ userId }) {
                                             window.open(image, "_blank");
                                           }}
                                         >
-                                          View
+                                          {isGerman ? "Ansehen" : "View"}
                                         </Button>
                                       </div>
                                     </div>
@@ -330,7 +349,11 @@ export default function ReturnHistory({ userId }) {
                               ) : (
                                 <div className="text-center py-8 text-gray-500">
                                   <ImageIcon className="h-8 w-8 mx-auto mb-2 text-gray-300" />
-                                  <p className="text-sm">No images provided</p>
+                                  <p className="text-sm">
+                                    {isGerman
+                                      ? "Keine Bilder vorhanden"
+                                      : "No images provided"}
+                                  </p>
                                 </div>
                               )}
                             </div>
@@ -338,7 +361,7 @@ export default function ReturnHistory({ userId }) {
                             {/* Timeline */}
                             <div>
                               <h5 className="font-semibold text-gray-900 mb-2">
-                                Timeline
+                                {isGerman ? "Zeitleiste" : "Timeline"}
                               </h5>
                               <div className="bg-white p-4 rounded-lg border">
                                 <div className="space-y-3">
@@ -346,7 +369,9 @@ export default function ReturnHistory({ userId }) {
                                     <div className="w-2 h-2 bg-red-600 rounded-full"></div>
                                     <div className="flex-1">
                                       <div className="text-sm font-medium">
-                                        Return Requested
+                                        {isGerman
+                                          ? "Rückgabeanfrage"
+                                          : "Return Requested"}
                                       </div>
                                       <div className="text-xs text-gray-500">
                                         {formatDate(returnItem?.createdAt)}
@@ -359,7 +384,9 @@ export default function ReturnHistory({ userId }) {
                                       <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
                                       <div className="flex-1">
                                         <div className="text-sm font-medium">
-                                          Last Updated
+                                          {isGerman
+                                            ? "Zuletzt aktualisiert"
+                                            : "Last Updated"}
                                         </div>
                                         <div className="text-xs text-gray-500">
                                           {formatDate(returnItem?.updatedAt)}
@@ -375,11 +402,17 @@ export default function ReturnHistory({ userId }) {
                           <div className="space-y-4">
                             <h4 className="font-semibold text-gray-900 flex items-center gap-2">
                               <GiReturnArrow className="h-4 w-4 text-red-600" />
-                              Return Instructions
+                              {isGerman
+                                ? "Rückgabeinstruktionen"
+                                : "Return Instructions"}
                             </h4>
                             {returnItem?.return_label && (
                               <div className="bg-white p-4 rounded-lg border">
-                                <strong>Return Label:</strong>
+                                <strong>
+                                  {isGerman
+                                    ? "Rückgabebeschreibung:"
+                                    : "Return Label:"}
+                                </strong>
                                 {returnItem?.return_label
                                   ? returnItem?.return_label
                                   : "No return label provided"}
@@ -387,7 +420,11 @@ export default function ReturnHistory({ userId }) {
                             )}
                             {returnItem?.return_instructions && (
                               <div className="bg-white p-4 rounded-lg border">
-                                <strong>Return Instruction:</strong>
+                                <strong>
+                                  {isGerman
+                                    ? "Rückgabeinstruktionen:"
+                                    : "Return Instruction:"}
+                                </strong>
                                 {returnItem?.return_instructions
                                   ? returnItem?.return_instructions
                                   : "No return instructions provided"}
@@ -395,7 +432,11 @@ export default function ReturnHistory({ userId }) {
                             )}
                             {returnItem?.reject_reason && (
                               <div className="bg-white p-4 rounded-lg border">
-                                <strong>Return Reject Reason:</strong>
+                                <strong>
+                                  {isGerman
+                                    ? "Rückgabe abgelehnt:"
+                                    : "Return Reject Reason:"}
+                                </strong>
                                 {returnItem?.reject_reason
                                   ? returnItem?.reject_reason
                                   : "No rejection reason provided"}

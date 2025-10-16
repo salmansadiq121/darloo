@@ -1,5 +1,6 @@
 "use client";
 
+import { useAuth } from "@/app/content/authContent";
 import { Style } from "@/app/utils/CommonStyle";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -12,6 +13,7 @@ export default function AdvancedDualMarqueeCategories({
   const [products, setProducts] = useState(categoriesData || []);
   const observer = useRef();
   const router = useRouter();
+  const { countryCode } = useAuth();
 
   useEffect(() => {
     setProducts(categoriesData);
@@ -62,6 +64,19 @@ export default function AdvancedDualMarqueeCategories({
   // Filter By Category
   const handleCategoryClick = (id) => {
     router.push(`/products?category=${id}`);
+  };
+
+  // Determine language based on country code
+  const isGerman = countryCode === "DE";
+
+  // Translations
+  const t = {
+    explorePopularCategories: isGerman
+      ? "Beliebte Kategorien erkunden"
+      : "Explore Popular Categories",
+    firstMarquee: isGerman ? "Erstes Marquee" : "First Marquee",
+    secondMarquee: isGerman ? "Zweites Marquee" : "Second Marquee",
+    loading: isGerman ? "Wird geladen..." : "Loading...",
   };
 
   // Loading skeleton component
@@ -132,7 +147,7 @@ export default function AdvancedDualMarqueeCategories({
         <h1
           className={`${Style.h1} text-center bg-gradient-to-r from-red-600 to-pink-600 bg-clip-text text-transparent`}
         >
-          Explore Popular Categories
+          {t.explorePopularCategories}
         </h1>
         <div className="w-24 h-1 bg-gradient-to-r from-red-400 to-pink-400 mx-auto mt-4 rounded-full"></div>
       </div>

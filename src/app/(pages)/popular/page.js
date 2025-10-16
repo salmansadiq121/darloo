@@ -1,6 +1,7 @@
 "use client";
 import MainLayout from "@/app/components/Layout/Layout";
 import ProductCard from "@/app/components/ProductCard";
+import { useAuth } from "@/app/content/authContent";
 import { Style } from "@/app/utils/CommonStyle";
 import { productsURI } from "@/app/utils/ServerURI";
 import axios from "axios";
@@ -10,6 +11,9 @@ import React, { useEffect, useState } from "react";
 export default function Popular() {
   const [products, setProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const { countryCode } = useAuth();
+
+  const isGerman = countryCode === "DE";
 
   const fetchProducts = async () => {
     setIsLoading(true);
@@ -34,7 +38,8 @@ export default function Popular() {
           className={`${Style.h1} text-start text-black flex items-center gap-2 min-w-fit`}
         >
           <TrendingUp className="h-6 sm:h-7 w-6 sm:w-7 text-green-500" />
-          Top Trending Products
+
+          {isGerman ? "Top Trending Produkte" : "Top Trending Products"}
         </h1>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-3">
           {isLoading

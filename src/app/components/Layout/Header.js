@@ -1,5 +1,5 @@
 "use client";
-import { Search, Menu, X, Check } from "lucide-react";
+import { Menu, X, Check } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -11,15 +11,30 @@ import { IoMdNotifications } from "react-icons/io";
 import { useAuth } from "@/app/content/authContent";
 import { signOut } from "next-auth/react";
 import Cookies from "js-cookie";
-import { MdOutlineClosedCaptionDisabled, MdSupportAgent } from "react-icons/md";
+import { MdSupportAgent } from "react-icons/md";
 import axios from "axios";
 import { formatDistanceToNow } from "date-fns";
 import ProductSearch from "./SearchProduct";
 import MobileProductSearch from "./MobileSearch";
 import PromoBannerPage from "./HeaderTop";
 
+const deTranslations = {
+  "Top Sale": "Top-Angebote",
+  Popular: "Beliebt",
+  Cateogry: "Kategorie",
+  Category: "Kategorie",
+  Accessories: "Zubehör",
+  Help: "Hilfe",
+  Login: "Anmelden",
+  Logout: "Abmelden",
+  Notifications: "Benachrichtigungen",
+  Profile: "Profil",
+  "Open main menu": "Hauptmenü öffnen",
+  "Just now": "Gerade eben",
+};
+
 const Header = () => {
-  const { auth, setAuth, setSearch, selectedProduct } = useAuth();
+  const { auth, setAuth, setSearch, selectedProduct, countryCode } = useAuth();
   const pathName = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -30,9 +45,8 @@ const Header = () => {
   const router = useRouter();
   const [notifications, setNotifications] = useState([]);
 
-  // ${process.env.NEXT_PUBLIC_SERVER_URI}/api/v1/products/search/:name
+  console.log("countryCode:", countryCode);
 
-  // Handle Notifications
   const fetchNotifications = async () => {
     try {
       const { data } = await axios.get(
@@ -54,7 +68,6 @@ const Header = () => {
     // eslint-disable-next-line
   }, [auth.user]);
 
-  // Handle Search
   useEffect(() => {
     const handler = setTimeout(() => {
       setSearch(debouncedSearch);
@@ -97,7 +110,6 @@ const Header = () => {
     };
   }, []);
 
-  // Logout
   const handleLogout = async () => {
     signOut();
     setAuth({ user: null, token: "" });
@@ -106,13 +118,15 @@ const Header = () => {
     router.push("/authentication");
   };
 
+  const tr = (s) => (countryCode === "DE" ? deTranslations[s] ?? s : s);
+
   return (
     <nav
       className={`relative z-50 bg-gray-50 backdrop-blur-md shadow-sm text-black transition-all duration-300  ${
         scrolled ? "border-b-2 border-red-600" : "border-b border-gray-300"
       }`}
     >
-      <PromoBannerPage />
+      <PromoBannerPage countryCode={countryCode} />
       <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 relative">
         <div className="flex justify-between h-[4.1rem]">
           <div className="flex items-center">
@@ -120,14 +134,6 @@ const Header = () => {
               href="/"
               className="flex-shrink-0 cursor-pointer flex items-center"
             >
-              {/* <Image
-                src="/logo.png"
-                alt="Logo"
-                width={80}
-                height={50}
-                className="h-[3.5rem] w-[5rem] "
-                loading="lazy"
-              /> */}
               <h1 className="text-2xl sm:text-4xl font-extrabold  font-serif text-[#c6080a] uppercase  relative shadow-custom">
                 Darloo
               </h1>
@@ -142,7 +148,7 @@ const Header = () => {
                   : "border-transparent text-gray-950"
               }  inline-flex items-center px-1 pt-1 text-sm font-medium`}
             >
-              Top Sale
+              {tr("Top Sale")}
             </Link>
             <Link
               href="/popular"
@@ -152,7 +158,7 @@ const Header = () => {
                   : "border-transparent text-gray-950"
               }  inline-flex items-center px-1 pt-1 text-sm font-medium`}
             >
-              Popular
+              {tr("Popular")}
             </Link>
             <Link
               href="/categories"
@@ -162,7 +168,7 @@ const Header = () => {
                   : "border-transparent text-gray-950"
               }  inline-flex items-center px-1 pt-1 text-sm font-medium`}
             >
-              Cateogry
+              {tr("Category")}
             </Link>
             <Link
               href="/products"
@@ -172,7 +178,7 @@ const Header = () => {
                   : "border-transparent text-gray-950"
               }  inline-flex items-center px-1 pt-1 text-sm font-medium`}
             >
-              Accessories
+              {tr("Accessories")}
             </Link>
             <Link
               href={"/contact"}
@@ -182,22 +188,10 @@ const Header = () => {
                   : "border-transparent text-gray-950"
               }  inline-flex items-center px-1 pt-1 text-sm font-medium`}
             >
-              Help
+              {tr("Help")}
             </Link>
           </div>
           <div className="hidden sm:ml-6 lg:flex sm:items-center sm:space-x-3">
-            {/* <div className="relative min-w-[18rem]">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Search className="h-4 w-4 text-gray-400" />
-              </div>
-              <input
-                type="text"
-                placeholder="Search listings..."
-                value={debouncedSearch}
-                onChange={(e) => setDebouncedSearch(e.target.value)}
-                className="block w-full pl-10 pr-3 py-2 border  border-gray-300 rounded-md leading-5  bg-gray-50 placeholder-gray-600 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-red-500 focus:border-red-500 sm:text-sm"
-              />
-            </div> */}
             <ProductSearch />
             <div
               ref={closeNotification}
@@ -215,7 +209,7 @@ const Header = () => {
                   <div className="w-full py-2 bg-red-600 text-white flex items-center justify-between px-2">
                     <h3 className="text-lg font-medium text-white flex items-center gap-1">
                       <IoMdNotifications className="h-6 w-6 text-white animate-pulse " />
-                      Notifications
+                      {tr("Notifications")}
                     </h3>
                   </div>
                   <div className="flex flex-col gap-3 px-3 py-2">
@@ -246,7 +240,7 @@ const Header = () => {
                                     addSuffix: true,
                                   }
                                 )
-                              : "Just now"}
+                              : tr("Just now")}
                           </span>
                           {notification?.read ? (
                             <Check className="h-3 w-3" />
@@ -278,14 +272,13 @@ const Header = () => {
               <MdSupportAgent className="h-6 w-6 text-gray-900 hover:text-red-600 transition-all duration-300" />
             </div>
 
-            {/* Profile */}
             {!auth?.user ? (
               <div className="">
                 <button
                   onClick={() => router.push("/authentication")}
                   className="px-7 py-[.45rem] cursor-pointer bg-[#c6080a] hover:bg-red-800 transition-all duration-300 text-white rounded-[2rem]"
                 >
-                  Login
+                  {tr("Login")}
                 </button>
               </div>
             ) : (
@@ -297,7 +290,7 @@ const Header = () => {
               >
                 <Image
                   src={auth?.user?.avatar || "/profile.png"}
-                  alt="Profile"
+                  alt={tr("Profile")}
                   width={70}
                   height={70}
                   className={`h-12 w-12 rounded-full ${
@@ -330,7 +323,7 @@ const Header = () => {
                     <div className="w-full py-2 bg-red-600 text-white flex items-center justify-between px-2">
                       <h3 className="text-lg font-medium text-white flex items-center gap-1">
                         <IoMdNotifications className="h-6 w-6 text-white animate-pulse " />
-                        Notifications
+                        {tr("Notifications")}
                       </h3>
                     </div>
                     <div className="flex flex-col gap-3 px-3 py-2">
@@ -361,7 +354,7 @@ const Header = () => {
                                       addSuffix: true,
                                     }
                                   )
-                                : "Just now"}
+                                : tr("Just now")}
                             </span>
                             {notification?.read ? (
                               <Check className="h-3 w-3" />
@@ -397,7 +390,7 @@ const Header = () => {
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               className="inline-flex items-center justify-center p-2 rounded-md text-gray-600 hover:text-gray-800 hover:bg-gray-100 outline-none"
             >
-              <span className="sr-only">Open main menu</span>
+              <span className="sr-only">{tr("Open main menu")}</span>
               {isMenuOpen ? (
                 <X className="block h-6 w-6" />
               ) : (
@@ -413,14 +406,13 @@ const Header = () => {
       {isMenuOpen && (
         <div className="lg:hidden">
           <div className="pt-2 pb-3 space-y-1">
-            {/* Profile */}
             {!auth?.user ? (
               <div className=" ml-3">
                 <button
                   onClick={() => router.push("/authentication")}
                   className="px-7 py-[.45rem] cursor-pointer bg-[#c6080a] hover:bg-red-800 transition-all duration-300 text-white rounded-[2rem]"
                 >
-                  Login
+                  {tr("Login")}
                 </button>
               </div>
             ) : (
@@ -432,7 +424,7 @@ const Header = () => {
               >
                 <Image
                   src={auth?.user?.avatar || "/profile.png"}
-                  alt="Profile"
+                  alt={tr("Profile")}
                   width={70}
                   height={70}
                   className={`h-12 w-12 rounded-full ${
@@ -459,7 +451,7 @@ const Header = () => {
                   : "text-gray-950  "
               }   pl-3 pr-4 py-2 text-base font-medium`}
             >
-              Top Sale
+              {tr("Top Sale")}
             </Link>
             <Link
               href="/popular"
@@ -469,7 +461,7 @@ const Header = () => {
                   : "text-gray-950  "
               }   pl-3 pr-4 py-2 text-base font-medium`}
             >
-              Popular
+              {tr("Popular")}
             </Link>
             <Link
               href="/categories"
@@ -479,7 +471,7 @@ const Header = () => {
                   : "text-gray-950  "
               }   pl-3 pr-4 py-2 text-base font-medium`}
             >
-              Category
+              {tr("Category")}
             </Link>
             <Link
               href="/products"
@@ -489,7 +481,7 @@ const Header = () => {
                   : "text-gray-950  "
               }   pl-3 pr-4 py-2 text-base font-medium`}
             >
-              Accessories
+              {tr("Accessories")}
             </Link>
             <Link
               href={"/contact"}
@@ -499,15 +491,14 @@ const Header = () => {
                   : "text-gray-950  "
               }   pl-3 pr-4 py-2 text-base font-medium`}
             >
-              Help
+              {tr("Help")}
             </Link>
-            {/* Logout */}
             {auth?.user && (
               <button
                 onClick={() => handleLogout()}
                 className={`flex items-center gap-2  text-red-700 pl-3 pr-4 py-2 text-base font-medium`}
               >
-                Logout
+                {tr("Logout")}
               </button>
             )}
           </div>

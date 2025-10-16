@@ -8,12 +8,12 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import ProductCarousel from "../ProductCarousel";
+import { useAuth } from "@/app/content/authContent";
 
 export default function SalesProducts() {
   const [products, setProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-
-  console.log(products);
+  const { countryCode } = useAuth();
 
   const fetchProducts = async () => {
     setIsLoading(true);
@@ -30,6 +30,18 @@ export default function SalesProducts() {
   useEffect(() => {
     fetchProducts();
   }, []);
+
+  // Determine language based on country code
+  const isGerman = countryCode === "DE";
+
+  // Translations
+  const t = {
+    flashSale: isGerman ? "Blitzverkauf" : "Flash Sale",
+    limitedTimeOffer: isGerman ? "Begrenztes Angebot" : "Limited Time Offer",
+    limitedTimeOnlyText: isGerman
+      ? "Verpassen Sie nicht unseren größten Verkauf des Jahres. Nur für kurze Zeit!"
+      : "Don't miss out on our biggest sale of the year. Limited time only!",
+  };
   return (
     <div className="flex flex-col gap-4 z-10 py-4">
       <div
@@ -39,17 +51,16 @@ export default function SalesProducts() {
         <div className="inline-flex items-center w-fit px-4 py-2 bg-red-600/10 border border-red-600/20 rounded-full">
           <div className="w-2 h-2 bg-red-600 rounded-full animate-pulse mr-2"></div>
           <span className="text-red-400 text-sm  font-medium uppercase tracking-wider">
-            Limited Time Offer
+            {t.limitedTimeOffer}
           </span>
         </div>
         <h1 className=" text-2xl sm:text-4xl  font-semibold text-white ">
           <span className="bg-gradient-to-r from-red-400 to-red-600 bg-clip-text text-transparent">
-            Flash Sale
+            {t.flashSale}
           </span>
         </h1>
         <p className="text-xs text-gray-600 max-w-2xl  ">
-          Don&apos;t miss out on our biggest sale of the year. Limited time
-          only!
+          {t.limitedTimeOnlyText}
         </p>
         <div className="w-full min-h-[10vh] flex items-center justify-center ">
           <Timer />

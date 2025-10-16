@@ -16,7 +16,7 @@ import toast from "react-hot-toast";
 import axios from "axios";
 
 const Footer = () => {
-  const { auth } = useAuth();
+  const { auth, countryCode } = useAuth();
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
@@ -31,18 +31,85 @@ const Footer = () => {
         setIsLoading(false);
         setEmail("");
         toast.success(
-          "Thank you for subscribing!. We will send you a confirmation email."
+          countryCode === "DE"
+            ? "Danke für dein Abonnement! Wir senden dir eine Bestätigungs-E-Mail."
+            : "Thank you for subscribing!. We will send you a confirmation email."
         );
       }
     } catch (error) {
       console.log(error);
       toast.error(
         error?.response?.data?.message ||
-          "Something went wrong. Please try again later."
+          (countryCode === "DE"
+            ? "Etwas ist schiefgelaufen. Bitte versuche es später erneut."
+            : "Something went wrong. Please try again later.")
       );
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // ✅ Language dictionary
+  const t = (key) => {
+    const translations = {
+      en: {
+        companyDesc:
+          "Your one-stop online marketplace for the latest fashion, electronics, home essentials, and more—secure shopping with fast delivery.",
+        company: "Company",
+        topSale: "Top Sale",
+        popularProducts: "Popular Products",
+        categories: "Categories",
+        aboutUs: "About Us",
+        support: "Support",
+        helpCenter: "Help Center",
+        faqs: "FAQs",
+        refundPolicy: "Escrow & Refund Policy",
+        privacyPolicy: "Privacy Policy",
+        accountSecurity: "Account Security",
+        contactUs: "Contact Us",
+        downloadApp: "Download Our App",
+        newsletter: "Newsletter",
+        newsletterText:
+          "Get the latest updates and exclusive offers straight to your inbox.",
+        subscribe: "Subscribe",
+        placeholder: "Enter your email address",
+        secureEscrow: "Secure Escrow Service",
+        rights: "© 2025 Darloo. All rights reserved.",
+        androidAppOn: "Android App on",
+        googlePlay: "Google Play",
+        downloadOn: "Download on the",
+        appStore: "App Store",
+      },
+      de: {
+        companyDesc:
+          "Dein One-Stop-Online-Marktplatz für aktuelle Mode, Elektronik, Haushaltsartikel und mehr – sicheres Einkaufen mit schneller Lieferung.",
+        company: "Unternehmen",
+        topSale: "Top Angebot",
+        popularProducts: "Beliebte Produkte",
+        categories: "Kategorien",
+        aboutUs: "Über uns",
+        support: "Support",
+        helpCenter: "Hilfezentrum",
+        faqs: "Häufig gestellte Fragen",
+        refundPolicy: "Treuhand- & Rückerstattungsrichtlinie",
+        privacyPolicy: "Datenschutzrichtlinie",
+        accountSecurity: "Kontosicherheit",
+        contactUs: "Kontaktieren Sie uns",
+        downloadApp: "Lade unsere App herunter",
+        newsletter: "Newsletter",
+        newsletterText:
+          "Erhalte die neuesten Updates und exklusiven Angebote direkt in dein Postfach.",
+        subscribe: "Abonnieren",
+        placeholder: "Gib deine E-Mail-Adresse ein",
+        secureEscrow: "Sicherer Treuhandservice",
+        rights: "© 2025 Darloo. Alle Rechte vorbehalten.",
+        androidAppOn: "Android-App auf",
+        googlePlay: "Google Play",
+        downloadOn: "Herunterladen im",
+        appStore: "App Store",
+      },
+    };
+    return translations[countryCode === "DE" ? "de" : "en"][key];
   };
 
   return (
@@ -52,13 +119,6 @@ const Footer = () => {
           {/* Company Info */}
           <div>
             <div className="flex items-center mb-4">
-              {/* <Image
-                src="/logo1.png"
-                alt="Darloo"
-                width={100}
-                height={100}
-                className="h-[6rem] w-[6rem] w-auto rounded-full"
-              /> */}
               <div className="h-8 w-8 rounded-full bg-gradient-to-r from-[#c6080a] to-[#ac0205] flex items-center justify-center">
                 <span className="text-white font-bold font-serif text-xl ">
                   D
@@ -68,15 +128,11 @@ const Footer = () => {
                 Darloo
               </span>
             </div>
-            <p className=" text-gray-800 text-sm mb-4">
-              Your one-stop online marketplace for the latest fashion,
-              electronics, home essentials, and more—secure shopping with fast
-              delivery.
-            </p>
+            <p className=" text-gray-800 text-sm mb-4">{t("companyDesc")}</p>
             <div className="flex space-x-3">
               <Link
                 href="#"
-                className="dark:  text-gray-800 hover:text-red-600 transition-colors duration-200"
+                className=" text-gray-800 hover:text-red-600 transition-colors duration-200"
               >
                 <Twitter size={18} />
               </Link>
@@ -109,32 +165,24 @@ const Footer = () => {
 
           {/* Company */}
           <div>
-            <h3 className="text-black font-medium text-[17px] mb-4">Company</h3>
+            <h3 className="text-black font-medium text-[17px] mb-4">
+              {t("company")}
+            </h3>
             <ul className="space-y-2">
               <li>
                 <Link
                   href="top-sale"
                   className=" text-gray-800 hover:text-red-600 transition-colors duration-200 text-sm"
                 >
-                  Top Sale
+                  {t("topSale")}
                 </Link>
               </li>
-
-              {/* <li>
-                <a
-                  href="blogs"
-                  className=" text-gray-800 hover:text-red-600 transition-colors duration-200 text-sm"
-                >
-                  Blog
-                </a>
-              </li> */}
-
               <li>
                 <Link
                   href="/popular"
                   className=" text-gray-800 hover:text-red-600 transition-colors duration-200 text-sm"
                 >
-                  Popular Products
+                  {t("popularProducts")}
                 </Link>
               </li>
               <li>
@@ -142,7 +190,7 @@ const Footer = () => {
                   href="/categories"
                   className=" text-gray-800 hover:text-red-600 transition-colors duration-200 text-sm"
                 >
-                  Categories
+                  {t("categories")}
                 </Link>
               </li>
               <li>
@@ -150,7 +198,7 @@ const Footer = () => {
                   href="/about-us"
                   className=" text-gray-800 hover:text-red-600 transition-colors duration-200 text-sm"
                 >
-                  About Us
+                  {t("aboutUs")}
                 </Link>
               </li>
             </ul>
@@ -158,7 +206,9 @@ const Footer = () => {
 
           {/* Support */}
           <div>
-            <h3 className="text-black font-medium text-[17px] mb-4">Support</h3>
+            <h3 className="text-black font-medium text-[17px] mb-4">
+              {t("support")}
+            </h3>
             <ul className="space-y-2">
               <li>
                 <Link
@@ -169,7 +219,7 @@ const Footer = () => {
                   }
                   className=" text-gray-800 hover:text-red-600 transition-colors duration-200 text-sm"
                 >
-                  Help Center
+                  {t("helpCenter")}
                 </Link>
               </li>
               <li>
@@ -177,7 +227,7 @@ const Footer = () => {
                   href="/faq"
                   className=" text-gray-800 hover:text-red-600 transition-colors duration-200 text-sm"
                 >
-                  FAQs
+                  {t("faqs")}
                 </Link>
               </li>
               <li>
@@ -185,7 +235,7 @@ const Footer = () => {
                   href="/refund-policy"
                   className=" text-gray-800 hover:text-red-600 transition-colors duration-200 text-sm"
                 >
-                  Escrow & Refund Policy
+                  {t("refundPolicy")}
                 </Link>
               </li>
               <li>
@@ -193,7 +243,7 @@ const Footer = () => {
                   href="/privacy-policy"
                   className=" text-gray-800 hover:text-red-600 transition-colors duration-200 text-sm"
                 >
-                  Privacy Policy
+                  {t("privacyPolicy")}
                 </Link>
               </li>
               <li>
@@ -201,7 +251,7 @@ const Footer = () => {
                   href="/account-security"
                   className=" text-gray-800 hover:text-red-600 transition-colors duration-200 text-sm"
                 >
-                  Account Security
+                  {t("accountSecurity")}
                 </Link>
               </li>
               <li>
@@ -209,7 +259,7 @@ const Footer = () => {
                   href={`/contact`}
                   className=" text-gray-800 hover:text-red-600 transition-colors duration-200 text-sm"
                 >
-                  Contact Us
+                  {t("contactUs")}
                 </Link>
               </li>
             </ul>
@@ -218,7 +268,7 @@ const Footer = () => {
           {/* Legal */}
           <div>
             <h3 className="text-black font-medium text-[17px] mb-4">
-              Download Our App
+              {t("downloadApp")}
             </h3>
             <div className="flex flex-col gap-4">
               <Link
@@ -234,10 +284,10 @@ const Footer = () => {
                 />
                 <div className="flex flex-col gap-1">
                   <span className="text-[13px] text-gray-100">
-                    Android App on
+                    {t("androidAppOn")}
                   </span>
                   <h3 className="text-white font-semibold text-[18px]">
-                    Google Play
+                    {t("googlePlay")}
                   </h3>
                 </div>
               </Link>
@@ -254,10 +304,10 @@ const Footer = () => {
                 />
                 <div className="flex flex-col gap-1">
                   <span className="text-[13px] text-gray-100">
-                    Download on the
+                    {t("downloadOn")}
                   </span>
                   <h3 className="text-white font-semibold text-[18px]">
-                    App Store
+                    {t("appStore")}
                   </h3>
                 </div>
               </Link>
@@ -268,27 +318,22 @@ const Footer = () => {
         <div className="mt-12 pt-8 border-t border-gray-800">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="mb-4 md:mb-0">
-              <p className=" text-gray-800 text-sm">
-                © 2025 Darloo. All rights reserved.
-              </p>
+              <p className=" text-gray-800 text-sm">{t("rights")}</p>
             </div>
 
             <div className="flex items-center space-x-4">
               <div className="flex flex-col gap-2">
                 <div className="flex flex-col gap-1">
                   <h3 className="text-black font-medium text-[17px]">
-                    Newsletter
+                    {t("newsletter")}
                   </h3>
-                  <p className="text-sm text-gray-500">
-                    Get the latest updates and exclusive offers straight to your
-                    inbox.
-                  </p>
+                  <p className="text-sm text-gray-500">{t("newsletterText")}</p>
                 </div>
 
                 <form className="flex" onSubmit={handleSubmit}>
                   <input
                     type="email"
-                    placeholder="Enter your email address"
+                    placeholder={t("placeholder")}
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="px-4 py-2 rounded-l bg-white border border-gray-400 focus:border-red-500  text-sm focus:outline-none focus:ring-2 focus:ring-red-600 min-w-[200px]"
@@ -297,7 +342,7 @@ const Footer = () => {
                     type={"submit"}
                     className="px-4 py-2 rounded-r bg-red-500 text-white text-sm font-medium hover:bg-red-600 transition-colors duration-200 flex items-center gap-1"
                   >
-                    Subscribe{" "}
+                    {t("subscribe")}{" "}
                     {isLoading && (
                       <Loader2 className="animate-spin text-white" size={18} />
                     )}
@@ -330,13 +375,6 @@ const Footer = () => {
                 height={50}
                 className="h-8 bg-white rounded px-2"
               />
-              {/* <Image
-                src="https://upload.wikimedia.org/wikipedia/commons/4/46/Bitcoin.svg"
-                alt="Bitcoin"
-                width={50}
-                height={50}
-                className="h-8 bg-white rounded px-2"
-              /> */}
             </div>
             <div className="dark:bg-[#1E293B] w-fit bg-slate-300/80 px-3 py-1 rounded flex items-center">
               <svg
@@ -356,7 +394,7 @@ const Footer = () => {
                 <path d="M12 16h.01"></path>
               </svg>
               <span className="text-xs dark:text-white text-black">
-                Secure Escrow Service
+                {t("secureEscrow")}
               </span>
             </div>
           </div>

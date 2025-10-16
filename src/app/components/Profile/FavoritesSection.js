@@ -15,8 +15,9 @@ import { productsURI } from "@/app/utils/ServerURI";
 import ProductCard from "../ProductCard";
 import { motion, AnimatePresence } from "framer-motion";
 
-export default function FavoritesSection() {
+export default function FavoritesSection({ countryCode }) {
   const [favorites, setFavorites] = useState([]);
+  const isGerman = countryCode === "DE";
 
   useEffect(() => {
     const fetchFavorites = async () => {
@@ -58,13 +59,12 @@ export default function FavoritesSection() {
         className="w-64 h-64 opacity-50"
       />
       <h3 className="text-xl font-semibold mt-6 text-gray-700 text-center">
-        No favorite products found
+        {isGerman ? "Keine Favoriten gefunden" : "No favorites found"}
       </h3>
       <p className="text-gray-500 mt-2 text-center max-w-md mx-auto">
-        We couldn&apos;t find any favorite products in your list. It looks like
-        you haven&apos;t added any items to your favorites yet. Start browsing
-        and tap the heart icon on products you like to save them here for quick
-        access later.
+        {isGerman
+          ? "Sie haben noch keine Produkte in Ihrem Favoriten-Bereich gespeichert."
+          : "You haven't saved any products to your favorites yet."}
       </p>
     </motion.div>
   );
@@ -72,9 +72,11 @@ export default function FavoritesSection() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Favorites</CardTitle>
+        <CardTitle>{isGerman ? "Favoriten" : "Favorites"}</CardTitle>
         <CardDescription>
-          Products you&apos;ve saved to your wishlist
+          {isGerman
+            ? "Speichern Sie Ihre Lieblingsprodukte hier"
+            : "Save your favorite products here"}
         </CardDescription>
       </CardHeader>
       <CardContent>

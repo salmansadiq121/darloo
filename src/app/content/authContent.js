@@ -27,8 +27,8 @@ export const AuthProvider = ({ children }) => {
     maxPrice: "",
     sortBy: "price_asc",
   });
-
-  console.log("selectedProduct:", selectedProduct);
+  const [country, setCountry] = useState("USD");
+  const [countryCode, setCountryCode] = useState("US");
 
   //   Token Check
   axios.defaults.headers.common["Authorization"] = auth?.token;
@@ -46,6 +46,12 @@ export const AuthProvider = ({ children }) => {
         user: parseData?.user,
         token: token,
       }));
+    }
+    const country = localStorage.getItem("country");
+    const countryCode = localStorage.getItem("countryCode");
+    if (country) {
+      setCountry(country);
+      setCountryCode(countryCode);
     }
   }, []);
 
@@ -209,6 +215,10 @@ export const AuthProvider = ({ children }) => {
         setOneClickBuyProduct,
         filters,
         setFilters,
+        country,
+        setCountry,
+        countryCode,
+        setCountryCode,
       }}
     >
       {children}

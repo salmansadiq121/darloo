@@ -4,15 +4,28 @@ import ProductCard from "../ProductCard";
 import axios from "axios";
 import { Style } from "@/app/utils/CommonStyle";
 import { TrendingUp } from "lucide-react";
+import { useAuth } from "@/app/content/authContent";
 
 export default function TrendingProducts({ products, loading }) {
+  const { countryCode } = useAuth();
+
+  // Determine language based on country code
+  const isGerman = countryCode === "DE";
+
+  // Translations
+  const t = {
+    topTrendingProducts: isGerman
+      ? "Top-Trending-Produkte"
+      : "Top Trending Products",
+  };
+
   return (
     <div className="py-5 bg-transparent text-black z-10 w-full min-h-[50vh] flex flex-col gap-5 px-0">
       <div className="container mx-auto px-4 mb-8">
         <h1
           className={`${Style.h1} flex items-center gap-1 text-center bg-gradient-to-r from-red-600 to-pink-600 bg-clip-text text-transparent`}
         >
-          Top Trending Products
+          {t.topTrendingProducts}
           <TrendingUp className="h-6 sm:h-7 w-6 sm:w-7 text-green-500" />
         </h1>
         <div className="w-24 h-1 bg-gradient-to-r from-red-400 to-pink-400 mx-auto mt-4 rounded-full"></div>

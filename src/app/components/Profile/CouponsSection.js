@@ -14,9 +14,11 @@ import { format } from "date-fns";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
-export default function CouponsSection() {
+export default function CouponsSection({ countryCode }) {
   const [coupons, setCoupons] = useState([]);
   const router = useRouter();
+  const isGerman = countryCode === "DE";
+
   const fetchAllCoupons = async () => {
     try {
       const { data } = await axios.get(
@@ -84,9 +86,11 @@ export default function CouponsSection() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Coupons</CardTitle>
+        <CardTitle>{isGerman ? "Gutscheine" : "Coupons"}</CardTitle>
         <CardDescription>
-          Available discount coupons for your purchases
+          {isGerman
+            ? "Verfügbare Rabatt-Gutscheine für Ihre Käufe"
+            : "Available discount coupons for your purchases"}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -105,7 +109,8 @@ export default function CouponsSection() {
                   </p>
                   <div className="h-px w-full bg-white/30 my-2"></div>
                   <p className="text-sm text-center">
-                    Min. purchase: €{coupon?.minPurchase}
+                    {isGerman ? "Mindestbestellung:" : "Min. purchase:"} €
+                    {coupon?.minPurchase}
                   </p>
                 </div>
                 <div className="p-6 flex-1 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
@@ -116,7 +121,7 @@ export default function CouponsSection() {
                     </h3>
                     <div className="flex items-center mt-2">
                       <p className="text-sm text-gray-500 mr-2">
-                        Code:{" "}
+                        {isGerman ? "Gutscheincode:" : "Code:"}{" "}
                         <span className="font-mono font-bold">
                           {coupon?.code?.slice(0, 4)}****
                           {coupon?.code.slice(-4)}
@@ -129,17 +134,18 @@ export default function CouponsSection() {
                         onClick={() => copyToClipboard(coupon?.code)}
                         disabled={!coupon?.isActive}
                       >
-                        Copy
+                        {isGerman ? "Kopieren" : "Copy"}
                       </Button>
                     </div>
                     <p className="text-xs text-gray-500 mt-1">
-                      Expires: {format(new Date(coupon?.endDate), "dd/MM/yyyy")}
+                      {isGerman ? "Gültig bis:" : "Expires:"} :{" "}
+                      {format(new Date(coupon?.endDate), "dd/MM/yyyy")}
                     </p>
                   </div>
                   <div>
                     {coupon.isUsed ? (
                       <Badge variant="outline" className="text-gray-500">
-                        Used
+                        {isGerman ? "Verwendet" : "Used"}
                       </Badge>
                     ) : (
                       <Button
@@ -147,7 +153,7 @@ export default function CouponsSection() {
                         className="bg-[#C6080A] hover:bg-[#a50709] cursor-pointer"
                         onClick={() => router.push("/products")}
                       >
-                        Use Now
+                        {isGerman ? "Jetzt verwenden" : "Use Now"}
                       </Button>
                     )}
                   </div>
@@ -167,7 +173,9 @@ export default function CouponsSection() {
                 className="object-contain animate-pulse"
               />
               <p className="text-center text-gray-500 text-sm">
-                No discount coupons available at the moment.
+                {isGerman
+                  ? "Keine Rabatt-Gutscheine verfügbar"
+                  : "No discount coupons available at the moment."}
               </p>
             </div>
           )}

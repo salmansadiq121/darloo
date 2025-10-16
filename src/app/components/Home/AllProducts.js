@@ -11,6 +11,7 @@ import { productsURI } from "@/app/utils/ServerURI";
 import axios from "axios";
 import { Loader2, RefreshCw, WifiOff } from "lucide-react";
 import ProductCard from "../ProductCard";
+import { useAuth } from "@/app/content/authContent";
 
 export default function AllProducts() {
   const [products, setProducts] = useState([]);
@@ -129,6 +130,26 @@ export default function AllProducts() {
     fetchProducts(1, false);
   }, []);
 
+  const { countryCode } = useAuth();
+
+  // Determine language based on country code
+  const isGerman = countryCode === "DE";
+
+  // Translations
+  const t = {
+    justForYou: isGerman ? "Nur für Sie" : "Just for You",
+    viewAllProducts: isGerman ? "Alle Produkte anzeigen" : "View All Products",
+    viewAll: isGerman ? "Alle ansehen" : "View All",
+    noProducts: isGerman ? "Keine Produkte gefunden" : "No Products Found",
+    tryAgain: isGerman ? "Erneut versuchen" : "Try Again",
+    adjustFilters: isGerman
+      ? "Passen Sie Ihre Filter an oder versuchen Sie es später erneut."
+      : "Try adjusting your filters or check back later.",
+    loadingMore: isGerman
+      ? "Weitere Produkte werden geladen..."
+      : "Loading more products...",
+  };
+
   // Load more products when scrolling to bottom
   const loadMoreProducts = useCallback(() => {
     if (isLoadingMore || !hasNextPage || error) return;
@@ -232,7 +253,7 @@ export default function AllProducts() {
             <h1
               className={`${Style.h1} flex items-center gap-1 text-center bg-gradient-to-r from-red-600 to-pink-600 bg-clip-text text-transparent`}
             >
-              Just for you
+              {t.justForYou}
             </h1>
             <div className="w-24 h-1 bg-gradient-to-r from-red-400 to-pink-400 mx-auto mt-4 rounded-full"></div>
           </div>
@@ -254,7 +275,7 @@ export default function AllProducts() {
           onClick={() => router.push("/products")}
           className="text-black font-medium text-[17px] cursor-pointer flex items-center gap-1 hover:gap-2 transition-all duration-300"
         >
-          View All
+          {t.viewAll}
           <span className="p-1 rounded-full bg-gray-500 hover:bg-gray-900 transition-all duration-300 cursor-pointer">
             <FaArrowRight size={17} className="text-white" />
           </span>
@@ -281,7 +302,7 @@ export default function AllProducts() {
             <RefreshCw
               className={`w-4 h-4 ${isLoading ? "animate-spin" : ""}`}
             />
-            {isLoading ? "Retrying..." : "Try Again"}
+            {isLoading ? "Retrying..." : t.tryAgain}
           </button>
         </motion.div>
       )}
@@ -302,11 +323,9 @@ export default function AllProducts() {
             className="w-64 h-64 opacity-50"
           />
           <h3 className="text-lg font-semibold mt-4 text-gray-600">
-            No products found!
+            {t.noProducts}
           </h3>
-          <p className="text-gray-500">
-            Try adjusting your filters or check back later.
-          </p>
+          <p className="text-gray-500">{t.adjustFilters}</p>
         </motion.div>
       )}
 
@@ -325,9 +344,7 @@ export default function AllProducts() {
         >
           <div className="flex items-center gap-3 bg-white rounded-full px-6 py-3 shadow-lg border">
             <Loader2 className="w-5 h-5 animate-spin text-orange-500" />
-            <span className="text-gray-600 font-medium">
-              Loading more products...
-            </span>
+            <span className="text-gray-600 font-medium">{t.loadingMore}</span>
           </div>
         </motion.div>
       )}

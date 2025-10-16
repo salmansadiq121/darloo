@@ -35,7 +35,7 @@ import AddReviewModal from "./ReviewModal";
 import ReturnModal from "./return-modal";
 import { Separator } from "@/components/ui/separator";
 
-export default function OrdersHistory({ userId }) {
+export default function OrdersHistory({ userId, countryCode }) {
   const [orders, setOrders] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
@@ -53,13 +53,22 @@ export default function OrdersHistory({ userId }) {
     images: [],
     comment: "",
   });
-  const returnReasons = [
-    "product is damaged",
-    "wrong item received",
-    "wrong size",
-    " changed mind",
-    "other",
-  ];
+  const isGerman = countryCode === "DE";
+
+  const returnReasons = isGerman
+    ? [
+        "Falscher Artikel erhalten",
+        "Falsche Größe",
+        "Meinung geändert",
+        "Sonstiges",
+      ]
+    : [
+        "product is damaged",
+        "wrong item received",
+        "wrong size",
+        "changed mind",
+        "other",
+      ];
 
   const [showReturnModal, setShowReturnModal] = useState(false);
   const [selectedReturnOrder, setSelectedReturnOrder] = useState(null);
@@ -246,7 +255,7 @@ export default function OrdersHistory({ userId }) {
     return (
       <div className="space-y-4">
         <h3 className="text-lg font-semibold text-foreground">
-          Order Timeline
+          {isGerman ? "Zeitleiste" : "Order Timeline"}
         </h3>
         <div className="relative space-y-6 pl-6">
           {/* Timeline line */}
@@ -291,7 +300,9 @@ export default function OrdersHistory({ userId }) {
         <div className="space-y-3 rounded-lg border bg-card p-4">
           <div className="flex items-center gap-2">
             <MapPin className="h-5 w-5 text-primary" />
-            <h3 className="font-semibold text-foreground">Shipping Address</h3>
+            <h3 className="font-semibold text-foreground">
+              {isGerman ? "Lieferadresse" : "Shipping Address"}
+            </h3>
           </div>
           <div className="space-y-1 text-sm text-muted-foreground">
             <p className="font-medium text-foreground">{order?.user?.name}</p>
@@ -303,7 +314,7 @@ export default function OrdersHistory({ userId }) {
             <p>{order?.shippingAddress?.country}</p>
             {order?.user?.number && (
               <p className="pt-1 font-medium text-foreground">
-                Phone: {order?.user?.number}
+                {isGerman ? "Telefonnummer" : "Phone"}: {order?.user?.number}
               </p>
             )}
           </div>
@@ -313,17 +324,23 @@ export default function OrdersHistory({ userId }) {
         <div className="space-y-3 rounded-lg border bg-card p-4">
           <div className="flex items-center gap-2">
             <CreditCard className="h-5 w-5 text-primary" />
-            <h3 className="font-semibold text-foreground">Payment Details</h3>
+            <h3 className="font-semibold text-foreground">
+              {isGerman ? "Zahlungsdetails" : "Payment Details"}
+            </h3>
           </div>
           <div className="space-y-2 text-sm">
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Payment Method:</span>
+              <span className="text-muted-foreground">
+                {isGerman ? "Zahlungsmethode" : "Payment Method"}:
+              </span>
               <span className="font-medium text-foreground">
                 {order?.paymentMethod}
               </span>
             </div>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Payment Status:</span>
+              <span className="text-muted-foreground">
+                {isGerman ? "Zahlungsstatus" : "Payment Status"}:
+              </span>
               <Badge
                 variant={
                   order?.paymentStatus === "Completed" ? "default" : "secondary"
@@ -334,7 +351,9 @@ export default function OrdersHistory({ userId }) {
             </div>
             <Separator className="my-2" />
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Subtotal:</span>
+              <span className="text-muted-foreground">
+                {isGerman ? "Zwischentotal" : "Subtotal"}:
+              </span>
               <span className="font-medium text-foreground">
                 €
                 {(
@@ -344,14 +363,18 @@ export default function OrdersHistory({ userId }) {
               </span>
             </div>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Shipping Fee:</span>
+              <span className="text-muted-foreground">
+                {isGerman ? "Versandkosten" : "Shipping Fee"}:
+              </span>
               <span className="font-medium text-foreground">
                 €{order?.shippingFee || "0.00"}
               </span>
             </div>
             <Separator className="my-2" />
             <div className="flex justify-between text-base">
-              <span className="font-semibold text-foreground">Total:</span>
+              <span className="font-semibold text-foreground">
+                {isGerman ? "Gesamt" : "Total"}:
+              </span>
               <span className="font-bold text-primary">
                 €{order?.totalAmount}
               </span>
@@ -365,13 +388,15 @@ export default function OrdersHistory({ userId }) {
             <div className="flex items-center gap-2">
               <Hash className="h-5 w-5 text-primary" />
               <h3 className="font-semibold text-foreground">
-                Tracking Information
+                {isGerman ? "Tracking Information" : "Tracking Information"}
               </h3>
             </div>
             <div className="grid gap-2 text-sm md:grid-cols-2">
               {order?.trackingId && (
                 <div className="flex flex-col gap-1">
-                  <span className="text-muted-foreground">Tracking ID:</span>
+                  <span className="text-muted-foreground">
+                    {isGerman ? "Tracking ID" : "Tracking ID"}:
+                  </span>
                   <span className="font-mono font-medium text-foreground">
                     {order?.trackingId}
                   </span>
@@ -379,7 +404,9 @@ export default function OrdersHistory({ userId }) {
               )}
               {order?.shippingCarrier && (
                 <div className="flex flex-col gap-1">
-                  <span className="text-muted-foreground">Carrier:</span>
+                  <span className="text-muted-foreground">
+                    {isGerman ? "Lieferant" : "Carrier"}:
+                  </span>
                   <span className="font-medium text-foreground">
                     {order?.shippingCarrier}
                   </span>
@@ -395,8 +422,12 @@ export default function OrdersHistory({ userId }) {
   return (
     <Card className="relative">
       <CardHeader>
-        <CardTitle>Orders History</CardTitle>
-        <CardDescription>View and manage your orders</CardDescription>
+        <CardTitle>{isGerman ? "Bestellverlauf" : "Orders History"}</CardTitle>
+        <CardDescription>
+          {isGerman
+            ? "Zeigen Sie Ihre Bestellungen und Verlauf an"
+            : "View and manage your orders"}
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <Tabs defaultValue="all">
@@ -405,55 +436,55 @@ export default function OrdersHistory({ userId }) {
               value="all"
               className="text-xs md:text-sm min-w-fit cursor-pointer"
             >
-              All
+              {isGerman ? "Alle" : "All"}
             </TabsTrigger>
             <TabsTrigger
               value="Pending"
               className="text-xs md:text-sm min-w-fit px-2 cursor-pointer"
             >
-              Pending
+              {isGerman ? "Ausstehend" : "Pending"}
             </TabsTrigger>
             <TabsTrigger
               value="Processing"
               className="text-xs md:text-sm min-w-fit px-2 cursor-pointer"
             >
-              Processing
+              {isGerman ? "In Bearbeitung" : "Processing"}
             </TabsTrigger>
             <TabsTrigger
               value="Packing"
               className="text-xs md:text-sm min-w-fit px-2 cursor-pointer"
             >
-              Packing
+              {isGerman ? "Verpacken" : "Packing"}
             </TabsTrigger>
             <TabsTrigger
               value="Shipped"
               className="text-xs md:text-sm min-w-fit px-2 cursor-pointer"
             >
-              Shipped
+              {isGerman ? "Versendet" : "Shipped"}
             </TabsTrigger>
             <TabsTrigger
               value="Delivered"
               className="text-xs md:text-sm min-w-fit px-2 cursor-pointer"
             >
-              Delivered
+              {isGerman ? "Liefert" : "Delivered"}
             </TabsTrigger>
             <TabsTrigger
               value="Cancelled"
               className="text-xs md:text-sm min-w-fit px-2 cursor-pointer"
             >
-              Cancelled
+              {isGerman ? "Abgebrochen" : "Cancelled"}
             </TabsTrigger>
             <TabsTrigger
               value="Returned"
               className="text-xs md:text-sm min-w-fit px-2 cursor-pointer"
             >
-              Returned
+              {isGerman ? "Zurückgegeben" : "Returned"}
             </TabsTrigger>
             <TabsTrigger
               value="Reviewed"
               className="text-xs md:text-sm min-w-fit px-2 cursor-pointer"
             >
-              Review
+              {isGerman ? "Bewertet" : "Review"}
             </TabsTrigger>
           </TabsList>
 
@@ -496,7 +527,7 @@ export default function OrdersHistory({ userId }) {
                         size="sm"
                         className="text-xs cursor-pointer"
                       >
-                        View Details
+                        {isGerman ? "Details anzeigen" : "View Details"}
                       </Button>
 
                       {order?.orderStatus === "Delivered" && (
@@ -507,7 +538,7 @@ export default function OrdersHistory({ userId }) {
                           onClick={() => handleReturnClick(order)}
                         >
                           <Package className="h-3 w-3" />
-                          Return
+                          {isGerman ? "Rückerstattung" : "Return"}
                         </Button>
                       )}
                       {(order?.orderStatus === "Pending" ||
@@ -524,7 +555,7 @@ export default function OrdersHistory({ userId }) {
                           }
                         >
                           <XCircle className="h-3 w-3" />
-                          Cancel
+                          {isGerman ? "Abbrechen" : "Cancel"}
                         </Button>
                       )}
                     </div>
@@ -544,7 +575,7 @@ export default function OrdersHistory({ userId }) {
                       {/* Products Section */}
                       <div className="space-y-3">
                         <h3 className="text-lg font-semibold text-foreground">
-                          Order Items
+                          {isGerman ? "Artikel" : "Order Items"}
                         </h3>
                         <div className="flex flex-col gap-3">
                           {order?.products?.map((product) => (
@@ -596,7 +627,7 @@ export default function OrdersHistory({ userId }) {
                                   className="text-xs flex items-center gap-1 cursor-pointer group hover:text-amber-600 hover:border-amber-600 transition-all duration-300"
                                 >
                                   <Star className="h-3 w-3 group-hover:text-amber-600 transition-all duration-300" />
-                                  Review
+                                  {isGerman ? "Bewerten" : "Review"}
                                 </Button>
                               )}
                             </div>
@@ -608,7 +639,7 @@ export default function OrdersHistory({ userId }) {
                       {order?.comments.length > 0 && (
                         <div className="space-y-3 rounded-lg border bg-card p-4">
                           <h3 className="text-lg font-semibold text-foreground">
-                            Comments
+                            {isGerman ? "Kommentare" : "Comments"}
                           </h3>
                           <div className="flex flex-col gap-4">
                             {order?.comments?.map((comment, index) => (
@@ -671,7 +702,7 @@ export default function OrdersHistory({ userId }) {
                                             className="absolute z-20 inset-0 rounded-lg bg-black/0 group-hover:bg-black/30 transition-all duration-300 flex items-center justify-center"
                                           >
                                             <span className="text-white opacity-0 group-hover:opacity-100 transition-opacity font-medium">
-                                              View
+                                              {isGerman ? "Ansehen" : "View"}
                                             </span>
                                           </a>
                                         </div>
@@ -698,7 +729,9 @@ export default function OrdersHistory({ userId }) {
                   muted
                 />
                 <p className="text-center text-muted-foreground">
-                  You haven&apos;t placed any orders yet.
+                  {isGerman
+                    ? "Sie haben noch keine Bestellungen aufgegeben."
+                    : "You haven&apos;t placed any orders yet."}
                 </p>
               </div>
             )}
@@ -760,7 +793,7 @@ export default function OrdersHistory({ userId }) {
                             size="sm"
                             className="text-xs cursor-pointer"
                           >
-                            View Details
+                            {isGerman ? "Details anzeigen" : "View Details"}
                           </Button>
 
                           {order?.orderStatus === "Delivered" && (
@@ -771,7 +804,7 @@ export default function OrdersHistory({ userId }) {
                               onClick={() => handleReturnClick(order)}
                             >
                               <Package className="h-3 w-3" />
-                              Return
+                              {isGerman ? "Rückerstattung" : "Return"}
                             </Button>
                           )}
                           {(order?.orderStatus === "Pending" ||
@@ -788,7 +821,7 @@ export default function OrdersHistory({ userId }) {
                               }
                             >
                               <XCircle className="h-3 w-3" />
-                              Cancel
+                              {isGerman ? "Abbrechen" : "Cancel"}
                             </Button>
                           )}
                         </div>
@@ -809,7 +842,7 @@ export default function OrdersHistory({ userId }) {
                           {/* Products Section */}
                           <div className="space-y-3">
                             <h3 className="text-lg font-semibold text-foreground">
-                              Order Items
+                              {isGerman ? "Artikel" : "Order Items"}
                             </h3>
                             <div className="flex flex-col gap-3">
                               {order?.products?.map((product) => (
@@ -861,7 +894,7 @@ export default function OrdersHistory({ userId }) {
                                       className="text-xs flex items-center gap-1 cursor-pointer group hover:text-amber-600 hover:border-amber-600 transition-all duration-300"
                                     >
                                       <Star className="h-3 w-3 group-hover:text-amber-600 transition-all duration-300" />
-                                      Review
+                                      {isGerman ? "Bewerten" : "Review"}
                                     </Button>
                                   )}
                                 </div>
@@ -873,7 +906,7 @@ export default function OrdersHistory({ userId }) {
                           {order?.comments.length > 0 && (
                             <div className="space-y-3 rounded-lg border bg-card p-4">
                               <h3 className="text-lg font-semibold text-foreground">
-                                Comments
+                                {isGerman ? "Kommentare" : "Comments"}
                               </h3>
                               <div className="flex flex-col gap-4">
                                 {order?.comments?.map((comment, index) => (
@@ -936,7 +969,9 @@ export default function OrdersHistory({ userId }) {
                                                 className="absolute z-20 inset-0 rounded-lg bg-black/0 group-hover:bg-black/30 transition-all duration-300 flex items-center justify-center"
                                               >
                                                 <span className="text-white opacity-0 group-hover:opacity-100 transition-opacity font-medium">
-                                                  View
+                                                  {isGerman
+                                                    ? "Ansehen"
+                                                    : "View"}
                                                 </span>
                                               </a>
                                             </div>
@@ -965,6 +1000,7 @@ export default function OrdersHistory({ userId }) {
           setShow={setShow}
           productId={productId}
           setProductId={setProductId}
+          countryCode={countryCode}
         />
       )}
 
@@ -991,6 +1027,7 @@ export default function OrdersHistory({ userId }) {
             selectedReturnProduct?.thumbnails ||
             selectedReturnOrder.products[0]?.product?.thumbnails
           }
+          countryCode={countryCode}
         />
       )}
     </Card>

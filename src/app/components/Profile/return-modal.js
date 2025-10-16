@@ -29,6 +29,7 @@ export default function ReturnModal({
   productId,
   productName = "Product",
   productImage,
+  countryCode,
 }) {
   const [returnData, setReturnData] = useState({
     order: orderId,
@@ -38,16 +39,27 @@ export default function ReturnModal({
     comment: "",
   });
   const [loading, setLoading] = useState(false);
+  const isGerman = countryCode === "DE";
 
-  const returnReasons = [
-    "Product is damaged",
-    "Wrong item received",
-    "Wrong size",
-    "Changed mind",
-    "Quality issues",
-    "Not as described",
-    "Other",
-  ];
+  const returnReasons = isGerman
+    ? [
+        "Produkt ist beschädigt",
+        "Falscher Artikel erhalten",
+        "Falsche Größe",
+        "Meinung geändert",
+        "Qualitätsprobleme",
+        "Nicht wie beschrieben",
+        "Sonstiges",
+      ]
+    : [
+        "Product is damaged",
+        "Wrong item received",
+        "Wrong size",
+        "Changed mind",
+        "Quality issues",
+        "Not as described",
+        "Other",
+      ];
 
   const handleImageUpload = (event) => {
     const file = event.target.files[0];
@@ -97,11 +109,12 @@ export default function ReturnModal({
       <DialogContent className="sm:max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            Return Request
+            {isGerman ? "Rückgabeanfrage" : "Return Request"}
           </DialogTitle>
           <DialogDescription>
-            Please provide details for your return request. We&apos;ll process
-            it as soon as possible.
+            {isGerman
+              ? "Bitte geben Sie Details für Ihre Rückgabeanfrage an. Wir werden sie so schnell wie möglich bearbeiten."
+              : "Please provide details for your return request. We&apos;ll process it as soon as possible."}
           </DialogDescription>
         </DialogHeader>
 
@@ -119,14 +132,16 @@ export default function ReturnModal({
             )}
             <div>
               <p className="font-medium text-sm">{productName}</p>
-              <p className="text-xs text-gray-500">Order ID: {orderId}</p>
+              <p className="text-xs text-gray-500">
+                {isGerman ? "Bestellnummer" : "Order ID"}: {orderId}
+              </p>
             </div>
           </div>
 
           {/* Return Reason */}
           <div className="space-y-2">
             <Label htmlFor="reason" className="text-sm font-medium">
-              Reason for Return *
+              {isGerman ? "Grund für Rückgabe" : "Reason for Return"} *
             </Label>
             <Select
               value={returnData.reason}
@@ -150,7 +165,7 @@ export default function ReturnModal({
           {/* Additional Comments */}
           <div className="space-y-2">
             <Label htmlFor="comment" className="text-sm font-medium">
-              Additional Comments
+              {isGerman ? "Zusätzliche Kommentare" : "Additional Comments"}
             </Label>
             <Textarea
               id="comment"
@@ -166,10 +181,14 @@ export default function ReturnModal({
           {/* Image Upload */}
           <div className="space-y-2">
             <Label className="text-sm font-medium">
-              Upload Images (Minimum 1 image required)
+              {isGerman
+                ? "Bilder hochladen (Mindestens 1 Bild erforderlich)"
+                : "Upload Images (Minimum 1 image required)"}
             </Label>
             <p className="text-xs text-gray-500 mb-2">
-              Upload up to 5 images to support your return request
+              {isGerman
+                ? "Hochladen Sie bis zu 5 Bilder, um Ihre Rückgabeanfrage zu unterstützen"
+                : "Upload up to 5 images to support your return request"}
             </p>
 
             <div className="space-y-3">
@@ -193,7 +212,7 @@ export default function ReturnModal({
                   className="flex items-center gap-2"
                 >
                   <Upload className="h-4 w-4" />
-                  Upload Images
+                  {isGerman ? "Bilder hochladen" : "Upload Images"}
                   {loading && <Loader2 className="h-4 w-4 animate-spin" />}
                 </Button>
                 <span className="text-xs text-gray-500">
@@ -239,14 +258,14 @@ export default function ReturnModal({
               onClick={handleClose}
               className="flex-1 bg-transparent"
             >
-              Cancel
+              {isGerman ? "Abbrechen" : "Cancel"}
             </Button>
             <Button
               type="submit"
               className="flex-1"
               disabled={!returnData.reason}
             >
-              Submit Return Request
+              {isGerman ? "Rückgabeanfrage absenden" : "Submit Return Request"}
             </Button>
           </div>
         </form>

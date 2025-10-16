@@ -30,6 +30,7 @@ export default function UpdateProfileModal({
   onClose,
   user,
   getUserDetails,
+  countryCode,
 }) {
   const [activeTab, setActiveTab] = useState("personal");
   const [avatar, setAvatar] = useState("");
@@ -49,6 +50,7 @@ export default function UpdateProfileModal({
   const [loading, setLoading] = useState(false);
   const [phoneCode, setPhoneCode] = useState("+1");
   const [number, setNumber] = useState(user?.number);
+  const isGerman = countryCode === "DE";
 
   useEffect(() => {
     setAvatar(user?.avatar);
@@ -166,9 +168,13 @@ export default function UpdateProfileModal({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-3xl sm:min-w-[45rem] max-h-[95vh] overflow-y-auto shidden">
         <DialogHeader>
-          <DialogTitle className="text-2xl">Update Profile</DialogTitle>
+          <DialogTitle className="text-2xl">
+            {isGerman ? "Profil aktualisieren" : "Update Profile"}
+          </DialogTitle>
           <DialogDescription>
-            Make changes to your profile information here.
+            {isGerman
+              ? "Ändern Sie hier Ihre Profilinformationen."
+              : "Make changes to your profile information here."}
           </DialogDescription>
         </DialogHeader>
 
@@ -184,14 +190,14 @@ export default function UpdateProfileModal({
               className="px-4 min-w-fit mr-5 sm:mr-0 rounded-md data-[state=active]:bg-red-700 data-[state=active]:text-white text-black"
               onClick={() => setActiveTab("personal")}
             >
-              Personal Info
+              {isGerman ? "Persönliche Info" : "Personal Info"}
             </TabsTrigger>
             <TabsTrigger
               value="address"
               className="px-4 min-w-fit ml-5 sm:ml-0  rounded-md data-[state=active]:bg-red-700 data-[state=active]:text-white text-black"
               onClick={() => setActiveTab("address")}
             >
-              Address
+              {isGerman ? "Adresse" : "Address"}
             </TabsTrigger>
             {/* <TabsTrigger
               value="bank"
@@ -234,7 +240,7 @@ export default function UpdateProfileModal({
                   }  border border-gray-400 rounded-md px-4 py-2 text-sm text-gray-500 hover:text-white hover:bg-[#C6080A] transition-all duration-300`}
                 >
                   <Upload className="h-4 w-4" />
-                  Upload Photo
+                  {isGerman ? "Foto hochladen" : "Upload Photo"}
                   {loading && (
                     <ImSpinner2 className="ml-1 h-4 w-4 animate-spin" />
                   )}
@@ -243,7 +249,9 @@ export default function UpdateProfileModal({
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <Label htmlFor="name">Full Name</Label>
+                  <Label htmlFor="name">
+                    {isGerman ? "Vollständiger Name" : "Full Name"}
+                  </Label>
                   <Input
                     id="name"
                     name="name"
@@ -253,7 +261,7 @@ export default function UpdateProfileModal({
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
+                  <Label htmlFor="email">{isGerman ? "E-Mail" : "Email"}</Label>
                   <Input
                     id="email"
                     name="email"
@@ -264,7 +272,9 @@ export default function UpdateProfileModal({
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="number">Phone Number</Label>
+                  <Label htmlFor="number">
+                    {isGerman ? "Telefonnummer" : "Phone Number"}
+                  </Label>
                   {/* <Input
                     id="number"
                     name="number"
@@ -294,7 +304,9 @@ export default function UpdateProfileModal({
             <TabsContent value="address" className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2 md:col-span-2">
-                  <Label htmlFor="address">Address</Label>
+                  <Label htmlFor="address">
+                    {isGerman ? "Adresse" : "Address"}
+                  </Label>
                   <Textarea
                     id="address"
                     name="address"
@@ -305,7 +317,7 @@ export default function UpdateProfileModal({
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="city">City</Label>
+                  <Label htmlFor="city">{isGerman ? "Stadt" : "City"}</Label>
                   <Input
                     id="city"
                     name="city"
@@ -315,7 +327,9 @@ export default function UpdateProfileModal({
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="state">State/Province</Label>
+                  <Label htmlFor="state">
+                    {isGerman ? "Bundesland" : "State/Province"}
+                  </Label>
                   <Input
                     id="state"
                     name="state"
@@ -336,7 +350,8 @@ export default function UpdateProfileModal({
                 </div> */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700">
-                    Country<span className="text-red-700">*</span>
+                    {isGerman ? "Land" : "Country"}
+                    <span className="text-red-700">*</span>
                   </label>
                   <Select
                     options={countryOptions}
@@ -358,7 +373,9 @@ export default function UpdateProfileModal({
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="pincode">Postal Code</Label>
+                  <Label htmlFor="pincode">
+                    {isGerman ? "Postleitzahl" : "Postal Code"}
+                  </Label>
                   <Input
                     id="pincode"
                     name="pincode"

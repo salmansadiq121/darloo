@@ -11,12 +11,12 @@ import axios from "axios";
 import { Badge, Bell, Check, CheckCheck, ChevronRight } from "lucide-react";
 import React, { useEffect, useState } from "react";
 
-export default function NotificationSection({ user }) {
-  const { auth } = useAuth();
+export default function NotificationSection({ user, countryCode }) {
   const [notifications, setNotifications] = useState([]);
 
   const [isLoading, setIsLoading] = useState(true);
   const [selectedNotification, setSelectedNotification] = useState(null);
+  const isGerman = countryCode === "DE";
 
   // Handle Notifications
   const fetchNotifications = async () => {
@@ -125,9 +125,13 @@ export default function NotificationSection({ user }) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Notifications</CardTitle>
+        <CardTitle>
+          {isGerman ? "Benachrichtigungen" : "Notifications"}
+        </CardTitle>
         <CardDescription>
-          Stay updated with important information and alerts
+          {isGerman
+            ? "Bleiben Sie auf dem Laufenden mit wichtigen Informationen und Warnungen"
+            : "Stay updated with important information and alerts"}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -141,7 +145,9 @@ export default function NotificationSection({ user }) {
                 className="flex items-center gap-1"
               >
                 <ChevronRight className="h-4 w-4 rotate-180" />
-                Back to notifications
+                {isGerman
+                  ? "Zurück zu Benachrichtigungen"
+                  : "Back to notifications"}
               </Button>
               <div className="text-sm text-gray-500">
                 {formatDate(selectedNotification.createdAt)}
@@ -179,10 +185,12 @@ export default function NotificationSection({ user }) {
               <div className="text-center py-12">
                 <Bell className="h-12 w-12 mx-auto text-gray-300 mb-3" />
                 <h3 className="text-lg font-medium text-gray-500">
-                  No notifications
+                  {isGerman ? "Keine Benachrichtigungen" : "No notifications"}
                 </h3>
                 <p className="text-sm text-gray-400 mt-1">
-                  You&apos;re all caught up!
+                  {isGerman
+                    ? "Sie sind alle auf dem Laufenden!"
+                    : "You're all caught up!"}
                 </p>
               </div>
             ) : (
@@ -232,7 +240,7 @@ export default function NotificationSection({ user }) {
                           }}
                         >
                           <Check className="h-3 w-3" />
-                          Mark as read
+                          {isGerman ? "Als gelesen markieren" : "Mark as read"}
                         </Button>
                       )}
                     </div>

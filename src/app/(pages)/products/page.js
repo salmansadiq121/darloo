@@ -18,39 +18,7 @@ import FilterProducts from "@/app/components/Product/FilterProducts";
 import ProductCard from "@/app/components/ProductCard";
 import Pagination from "@/app/utils/Pagination";
 import axios from "axios";
-
-const sortingOptions = [
-  {
-    label: "Price: Low to High",
-    value: "price_asc",
-    icon: <FaSortAmountDown />,
-  },
-  {
-    label: "Price: High to Low",
-    value: "price_desc",
-    icon: <FaSortAmountUp />,
-  },
-  {
-    label: "Alphabetical (A-Z)",
-    value: "name_asc",
-    icon: <FaSortAlphaDown />,
-  },
-  {
-    label: "Alphabetical (Z-A)",
-    value: "name_desc",
-    icon: <FaSortAlphaUp />,
-  },
-  {
-    label: "Newest First",
-    value: "createdAt_desc",
-    icon: <FaSortAmountDown />,
-  },
-  {
-    label: "Most Popular",
-    value: "purchased_desc",
-    icon: <FaSortAmountUp />,
-  },
-];
+import { useAuth } from "@/app/content/authContent";
 
 // Loading skeleton component
 const ProductSkeleton = () => (
@@ -79,7 +47,7 @@ const ProductSkeleton = () => (
 );
 
 // Empty state component
-const EmptyState = ({ onClearFilters }) => (
+const EmptyState = ({ onClearFilters, isGerman }) => (
   <motion.div
     initial={{ opacity: 0, scale: 0.8 }}
     animate={{ opacity: 1, scale: 1 }}
@@ -88,23 +56,24 @@ const EmptyState = ({ onClearFilters }) => (
   >
     <Image
       src="/9960436.jpg?height=200&width=200"
-      alt="No products found"
+      alt={isGerman ? "Keine Produkte gefunden" : "No products found"}
       width={200}
       height={200}
       className="w-64 h-64 opacity-50"
     />
     <h3 className="text-xl font-semibold mt-6 text-gray-700">
-      No products found!
+      {isGerman ? "Keine Produkte gefunden!" : "No Products Found!"}
     </h3>
     <p className="text-gray-500 mt-2 text-center max-w-md">
-      We couldn&apos;t find any products matching your criteria. Try adjusting
-      your filters or search terms.
+      {isGerman
+        ? "Wir konnten keine Produkte finden, die Ihren Kriterien entsprechen. Versuchen Sie, Ihre Filter oder Suchbegriffe anzupassen."
+        : "We couldn't find any products matching your criteria. Try adjusting your filters or search terms."}
     </p>
     <button
       onClick={onClearFilters}
       className="mt-4 px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
     >
-      Clear All Filters
+      {isGerman ? "Alle Filter löschen" : "Clear All Filters"}
     </button>
   </motion.div>
 );
@@ -153,10 +122,81 @@ function ProductsContent() {
   const searchParams = useSearchParams();
   const [filtersInitialized, setFiltersInitialized] = useState(false);
   const [isPC, setIsPC] = useState(true);
+  const { countryCode } = useAuth();
+
+  const isGerman = countryCode === "DE";
 
   // Debounced search
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
 
+  // Sorting options
+  const sortingOptions = isGerman
+    ? [
+        {
+          label: "Preis: Aufsteigend",
+          value: "price_asc",
+          icon: <FaSortAmountDown />,
+        },
+        {
+          label: "Preis: Absteigend",
+          value: "price_desc",
+          icon: <FaSortAmountUp />,
+        },
+        {
+          label: "Alphabetisch (A–Z)",
+          value: "name_asc",
+          icon: <FaSortAlphaDown />,
+        },
+        {
+          label: "Alphabetisch (Z–A)",
+          value: "name_desc",
+          icon: <FaSortAlphaUp />,
+        },
+        {
+          label: "Neueste zuerst",
+          value: "createdAt_desc",
+          icon: <FaSortAmountDown />,
+        },
+        {
+          label: "Am beliebtesten",
+          value: "purchased_desc",
+          icon: <FaSortAmountUp />,
+        },
+      ]
+    : [
+        {
+          label: "Price: Low to High",
+          value: "price_asc",
+          icon: <FaSortAmountDown />,
+        },
+        {
+          label: "Price: High to Low",
+          value: "price_desc",
+          icon: <FaSortAmountUp />,
+        },
+        {
+          label: "Alphabetical (A–Z)",
+          value: "name_asc",
+          icon: <FaSortAlphaDown />,
+        },
+        {
+          label: "Alphabetical (Z–A)",
+          value: "name_desc",
+          icon: <FaSortAlphaUp />,
+        },
+        {
+          label: "Newest First",
+          value: "createdAt_desc",
+          icon: <FaSortAmountDown />,
+        },
+        {
+          label: "Most Popular",
+          value: "purchased_desc",
+          icon: <FaSortAmountUp />,
+        },
+      ];
+
+  // Filtering options
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearchTerm(searchTerm);
@@ -185,8 +225,6 @@ function ProductsContent() {
     trending,
     onSale,
   ]);
-
-  console.log("products", products);
 
   useEffect(() => {
     const cat = searchParams.get("category");
@@ -362,6 +400,7 @@ function ProductsContent() {
               selectedSubCategories={selectedSubCategories}
               setSelectedSubCategories={setSelectedSubCategories}
               setOpenFilter={setOpenFilter}
+              countryCode={countryCode}
             />
           </div>
 
@@ -388,6 +427,7 @@ function ProductsContent() {
                     selectedSubCategories={selectedSubCategories}
                     setSelectedSubCategories={setSelectedSubCategories}
                     setOpenFilter={setOpenFilter}
+                    countryCode={countryCode}
                   />
                 </div>
               </motion.div>
@@ -444,11 +484,15 @@ function ProductsContent() {
                       <div className="h-5 w-32 bg-gray-200 rounded animate-pulse"></div>
                     ) : (
                       <span>
-                        Showing {products.length} of {totalProducts} products
+                        {isGerman
+                          ? ` ${products.length} von ${totalProducts} Produkte angezeigt`
+                          : `Showing ${products.length} of ${totalProducts} products`}
                         {selectedFiltersCount > 0 && (
                           <span className="ml-2 px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs">
-                            {selectedFiltersCount} filter
-                            {selectedFiltersCount > 1 ? "s" : ""} applied
+                            {selectedFiltersCount}{" "}
+                            {isGerman ? "Filter" : "filter"}
+                            {selectedFiltersCount > 1 ? "s" : ""}{" "}
+                            {isGerman ? "angewendet" : "applied"}
                           </span>
                         )}
                       </span>
@@ -510,19 +554,21 @@ function ProductsContent() {
                 <div className="flex flex-col items-center justify-center py-12">
                   <div className="text-red-500 text-center">
                     <h3 className="text-lg font-semibold mb-2">
-                      Error Loading Products
+                      {isGerman
+                        ? "Fehler beim Laden der Produkte"
+                        : "Error Loading Products"}
                     </h3>
                     <p className="text-sm mb-4">{error}</p>
                     <button
                       onClick={fetchProducts}
                       className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
                     >
-                      Try Again
+                      {isGerman ? "Erneut versuchen" : "Try Again"}
                     </button>
                   </div>
                 </div>
               ) : products.length === 0 && !isLoading ? (
-                <EmptyState onClearFilters={clearFilters} />
+                <EmptyState onClearFilters={clearFilters} isGerman={isGerman} />
               ) : (
                 <div className="grid  max-[350px]:grid-cols-1 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6 sm:gap-3 gap-4">
                   {isLoading

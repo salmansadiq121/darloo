@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+"use client";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -7,7 +8,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -17,7 +17,13 @@ import toast from "react-hot-toast";
 import { Separator } from "@/components/ui/separator";
 import Link from "next/link";
 
-export default function SupportSection() {
+const countryList = [
+  { code: "US", value: "USD", label: "English (United States)", symbol: "$" },
+  { code: "DE", value: "EUR", label: "Germany (Deutschland)", symbol: "€" },
+];
+
+export default function SupportSection({ countryCode = "US" }) {
+  const [isGerman, setIsGerman] = useState(false);
   const [formData, setFormData] = useState({
     subject: "",
     message: "",
@@ -25,12 +31,15 @@ export default function SupportSection() {
   });
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    setIsGerman(countryCode === "DE");
+  }, [countryCode]);
+
+  const t = (en, de) => (isGerman ? de : en);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
@@ -47,100 +56,195 @@ export default function SupportSection() {
       );
       if (data) {
         toast.success(
-          "Your support request has been submitted. We'll get back to you soon!"
+          t(
+            "Your support request has been submitted. We'll get back to you soon!",
+            "Ihre Supportanfrage wurde eingereicht. Wir melden uns in Kürze bei Ihnen!"
+          )
         );
-        setFormData({
-          subject: "",
-          message: "",
-          orderNumber: "",
-        });
+        setFormData({ subject: "", message: "", orderNumber: "" });
       }
     } catch (error) {
       console.log(error);
-      toast.error(error.response?.data?.message || "Something went wrong.");
+      toast.error(
+        error.response?.data?.message ||
+          t("Something went wrong.", "Etwas ist schiefgelaufen.")
+      );
     } finally {
       setLoading(false);
     }
   };
 
+  const templates = isGerman
+    ? [
+        {
+          title: "Bestellstatus-Anfrage",
+          subject: "Anfrage zum Bestellstatus",
+          message:
+            "Hallo, ich habe am [Bestelldatum] eine Bestellung aufgegeben und möchte den aktuellen Status erfahren.\nBestellnummer: [#12345]\nKönnten Sie mir bitte ein Update geben? Vielen Dank im Voraus.",
+        },
+        {
+          title: "Produktverfügbarkeit",
+          subject: "Anfrage zur Produktverfügbarkeit",
+          message:
+            "Hallo, ich habe auf Ihrer Website ein Produkt gesehen, das mich interessiert. Wird es bald wieder verfügbar sein? Vielen Dank!",
+        },
+        {
+          title: "Rückgabe oder Umtausch",
+          subject: "Anfrage zur Rückgabe/Umtausch meiner Bestellung",
+          message:
+            "Hallo, ich möchte eine Rückgabe oder einen Umtausch für die gekauften Artikel anfordern.\nBestellnummer: [#12345]\nGrund: [zu klein, entspricht nicht den Erwartungen usw.]\nWie gehe ich vor?",
+        },
+      ]
+    : [
+        {
+          title: "Order Status Inquiry",
+          subject: "Order Status Update Request",
+          message:
+            "Hello, I placed an order on [Order Date], and I’d like to check the status.\nOrder ID: [#12345]\nCould you please provide an update? Thanks in advance.",
+        },
+        {
+          title: "Product Availability",
+          subject: "Inquiry About Product Availability",
+          message:
+            "Hi, I came across a product on your website that I’m interested in, but I’d like to know if it will be restocked soon. Could you please let me know about its availability?\nThank you!",
+        },
+        {
+          title: "Return or Exchange",
+          subject: "Request to Return/Exchange My Order",
+          message:
+            "Hello, I’d like to request a return/exchange for the item(s) I purchased.\nOrder ID: [#12345]\nThe reason for return/exchange is: [too small, not as expected, etc.]\nPlease let me know how to proceed.",
+        },
+      ];
+
+  const faqs = isGerman
+    ? [
+        {
+          question: "Wie kann ich meine Bestellung verfolgen?",
+          answer:
+            "Sie können Ihre Bestellung im Bereich 'Bestellverlauf' verfolgen. Klicken Sie auf 'Details anzeigen', um die Sendungsverfolgung einzusehen, sobald Ihre Bestellung versandt wurde.",
+        },
+        {
+          question: "Was ist Ihre Rückgaberichtlinie?",
+          answer:
+            "Wir akzeptieren Rücksendungen innerhalb von 14 Tagen nach Lieferung. Die Artikel müssen sich im Originalzustand mit Etiketten befinden. Um eine Rücksendung zu starten, klicken Sie in den Bestelldetails auf 'Rückgabe'.",
+        },
+        {
+          question: "Wie löse ich einen Gutschein ein?",
+          answer:
+            "Sie können Gutscheincodes während des Bezahlvorgangs eingeben. Geben Sie den Code im vorgesehenen Feld ein und klicken Sie auf 'Anwenden'.",
+        },
+        {
+          question: "Wann erhalte ich meine Rückerstattung?",
+          answer:
+            "Rückerstattungen werden in der Regel innerhalb von 5–7 Werktagen bearbeitet, nachdem wir den Artikel erhalten haben. Je nach Bank kann es weitere 3–5 Tage dauern, bis das Geld sichtbar ist.",
+        },
+      ]
+    : [
+        {
+          question: "How do I track my order?",
+          answer:
+            "You can track your order by going to the Orders History section and clicking on 'View Details' for the specific order. You'll find tracking information there once your order has been shipped.",
+        },
+        {
+          question: "What is your return policy?",
+          answer:
+            "We accept returns within 14 days of delivery. Items must be in original condition with tags attached. To initiate a return, go to your order details and click the 'Return' button.",
+        },
+        {
+          question: "How do I redeem a coupon?",
+          answer:
+            "You can apply coupon codes during checkout. Simply enter the code in the designated field and click 'Apply' to see the discount reflected in your total.",
+        },
+        {
+          question: "When will I receive my refund?",
+          answer:
+            "Refunds are typically processed within 5-7 business days after we receive your returned item. The funds may take an additional 3-5 business days to appear in your account, depending on your bank.",
+        },
+      ];
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Support</CardTitle>
-        <CardDescription>Get help with your orders or account</CardDescription>
+        <CardTitle>{t("Support", "Support")}</CardTitle>
+        <CardDescription>
+          {t(
+            "Get help with your orders or account",
+            "Erhalten Sie Hilfe zu Ihren Bestellungen oder Ihrem Konto"
+          )}
+        </CardDescription>
       </CardHeader>
+
       <CardContent className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {/* Left side */}
           <div>
-            <h3 className="text-lg font-medium mb-4">Contact Support</h3>
+            <h3 className="text-lg font-medium mb-4">
+              {t("Contact Support", "Support kontaktieren")}
+            </h3>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="subject">Subject</Label>
+                <Label htmlFor="subject">{t("Subject", "Betreff")}</Label>
                 <Input
                   id="subject"
                   name="subject"
                   value={formData.subject}
                   onChange={handleChange}
                   required
-                  placeholder="What do you need help with?"
+                  placeholder={t(
+                    "What do you need help with?",
+                    "Wobei benötigen Sie Hilfe?"
+                  )}
                 />
               </div>
+
               <div className="space-y-2">
-                <Label htmlFor="orderNumber">Order ID (Optional)</Label>
+                <Label htmlFor="orderNumber">
+                  {t("Order ID (Optional)", "Bestellnummer (optional)")}
+                </Label>
                 <Input
                   id="orderNumber"
                   name="orderNumber"
                   value={formData.orderNumber}
                   onChange={handleChange}
-                  placeholder="If related to an order"
+                  placeholder={t(
+                    "If related to an order",
+                    "Falls es sich auf eine Bestellung bezieht"
+                  )}
                 />
               </div>
+
               <div className="space-y-2">
-                <Label htmlFor="message">Message</Label>
+                <Label htmlFor="message">{t("Message", "Nachricht")}</Label>
                 <Textarea
                   id="message"
                   name="message"
                   value={formData.message}
                   onChange={handleChange}
                   required
-                  placeholder="Please describe your issue in detail"
+                  placeholder={t(
+                    "Please describe your issue in detail",
+                    "Bitte beschreiben Sie Ihr Anliegen im Detail"
+                  )}
                   className="min-h-[150px]"
                 />
               </div>
+
               <Button
                 type="submit"
                 className="w-full bg-[#C6080A] hover:bg-[#a50709] flex items-center gap-1 cursor-pointer"
               >
-                Submit Request{" "}
+                {t("Submit Request", "Anfrage absenden")}
                 {loading && <ImSpinner2 className="h-5 w-5 animate-spin" />}
               </Button>
             </form>
-            {/*  */}
+
             <Separator className="my-6" />
             <h3 className="text-lg font-medium mb-4 mt-8">
-              Select Message Template
+              {t("Select Message Template", "Nachrichtenvorlage auswählen")}
             </h3>
+
             <div className="flex flex-col gap-4">
-              {[
-                {
-                  title: "Order Status Inquiry",
-                  subject: "Order Status Update Request",
-                  message:
-                    "Hello, I placed an order on [Order Date], and I’d like to check the status.\nOrder ID: [#12345]\nCould you please provide an update? Thanks in advance.",
-                },
-                {
-                  title: "Product Availability",
-                  subject: "Inquiry About Product Availability",
-                  message:
-                    "Hi, I came across a product on your website that I’m interested in, but I’d like to know if it will be restocked soon. Could you please let me know about its availability?\nThank you!",
-                },
-                {
-                  title: "Return or Exchange",
-                  subject: "Request to Return/Exchange My Order",
-                  message:
-                    "Hello, I’d like to request a return/exchange for the item(s) I purchased.\nOrder ID: [#12345]\nThe reason for return/exchange is: [too small, not as expected, etc.]\nPlease let me know how to proceed.",
-                },
-              ].map((template, index) => (
+              {templates.map((template, index) => (
                 <button
                   key={index}
                   className="bg-white text-black rounded-xl cursor-pointer px-4 py-3 text-left hover:bg-red-100 border-2 border-red-700 transition-all duration-200 shadow-md"
@@ -161,33 +265,13 @@ export default function SupportSection() {
             </div>
           </div>
 
+          {/* Right side */}
           <div>
             <h3 className="text-lg font-medium mb-4">
-              Frequently Asked Questions
+              {t("Frequently Asked Questions", "Häufig gestellte Fragen")}
             </h3>
             <div className="space-y-4">
-              {[
-                {
-                  question: "How do I track my order?",
-                  answer:
-                    "You can track your order by going to the Orders History section and clicking on 'View Details' for the specific order. You'll find tracking information there once your order has been shipped.",
-                },
-                {
-                  question: "What is your return policy?",
-                  answer:
-                    "We accept returns within 14 days of delivery. Items must be in original condition with tags attached. To initiate a return, go to your order details and click the 'Return' button.",
-                },
-                {
-                  question: "How do I redeem a coupon?",
-                  answer:
-                    "You can apply coupon codes during checkout. Simply enter the code in the designated field and click 'Apply' to see the discount reflected in your total.",
-                },
-                {
-                  question: "When will I receive my refund?",
-                  answer:
-                    "Refunds are typically processed within 5-7 business days after we receive your returned item. The funds may take an additional 3-5 business days to appear in your account, depending on your bank.",
-                },
-              ].map((faq, index) => (
+              {faqs.map((faq, index) => (
                 <div key={index} className="border rounded-lg p-4">
                   <h4 className="font-medium flex items-center">
                     <svg
@@ -229,20 +313,21 @@ export default function SupportSection() {
                     d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
                   />
                 </svg>
-                Contact Information
+                {t("Contact Information", "Kontaktinformationen")}
               </h4>
               <div className="mt-2 pl-7 space-y-2 flex flex-col gap-1">
                 <Link href="tel:+447888865833" className="text-sm">
-                  Customer Service: +44 7888 865833‬
+                  {t("Customer Service", "Kundendienst")}: +44 7888 865833‬
                 </Link>
-                <Link
-                  href="mailto:support@darloo.com 
-"
-                  className="text-sm"
-                >
+                <Link href="mailto:support@darloo.com" className="text-sm">
                   Email: support@darloo.com
                 </Link>
-                <p className="text-sm">Hours: Monday-Friday, 9am-10pm EST</p>
+                <p className="text-sm">
+                  {t(
+                    "Hours: Monday-Friday, 9am-10pm EST",
+                    "Öffnungszeiten: Montag–Freitag, 9–22 Uhr (EST)"
+                  )}
+                </p>
               </div>
             </div>
           </div>

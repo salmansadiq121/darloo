@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Search, Grid3X3, ArrowRight } from "lucide-react";
 import MainLayout from "@/app/components/Layout/Layout";
+import { useAuth } from "@/app/content/authContent";
 
 export default function Categories() {
   const [categoriesData, setCategoryData] = useState([]);
@@ -17,6 +18,9 @@ export default function Categories() {
   const [subCategoryData, setSubCategoryData] = useState([]);
   const [isLoadingSubCategory, setIsLoadingSubCategory] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const { countryCode } = useAuth();
+
+  const isGerman = countryCode === "DE";
 
   // Fetch All Categories
   const fetchCategories = async () => {
@@ -86,9 +90,13 @@ export default function Categories() {
           {/* Header */}
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              Categories
+              {isGerman ? "Kategorien" : "Categories"}
             </h1>
-            <p className="text-gray-600 mb-6">Browse our product categories</p>
+            <p className="text-gray-600 mb-6">
+              {isGerman
+                ? "Durchsuchen Sie unsere Produktkategorien"
+                : "Browse our product categories"}
+            </p>
 
             {/* Search */}
             <div className="relative max-w-md">
@@ -107,7 +115,7 @@ export default function Categories() {
           <div className="mb-8">
             <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center gap-2">
               <Grid3X3 className="w-5 h-5 text-red-600" />
-              All Categories
+              {isGerman ? "Alle Kategorien" : "All Categories"}
             </h2>
 
             {isLoading ? (
@@ -174,13 +182,14 @@ export default function Categories() {
               <div className="flex items-center  gap-4 justify-between mb-4">
                 <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
                   <span className="w-2 h-2 bg-red-600 rounded-full"></span>
-                  Subcategories
+                  {isGerman ? "Unterkategorien" : "Subcategories"}
                 </h3>
                 <button
                   onClick={() => handleViewAllProducts()}
                   className="text-sm text-red-600 hover:text-red-700  font-medium flex items-center gap-1 hover:gap-2 transition-all duration-200"
                 >
-                  View All <ArrowRight className="w-3 h-3" />
+                  {isGerman ? "Alle  anzeigen" : "View All"}
+                  <ArrowRight className="w-3 h-3" />
                 </button>
               </div>
 
@@ -230,7 +239,9 @@ export default function Categories() {
                     <Grid3X3 className="w-5 h-5 text-gray-400" />
                   </div>
                   <p className="text-sm text-gray-500">
-                    No subcategories available
+                    {isGerman
+                      ? "Keine Unterkategorien verfügbar"
+                      : "No subcategories available"}
                   </p>
                 </div>
               )}

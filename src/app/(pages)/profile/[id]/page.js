@@ -628,7 +628,7 @@ export default function Profile() {
                 </TabsContent>
 
                 <TabsContent value="coupons">
-                  <CouponsSection countryCode={countryCode} />
+                  <CouponsSection countryCode={countryCode} auth={auth} />
                 </TabsContent>
 
                 <TabsContent value="refer">

@@ -14,7 +14,7 @@ import { format } from "date-fns";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
-export default function CouponsSection({ countryCode }) {
+export default function CouponsSection({ countryCode, auth }) {
   const [coupons, setCoupons] = useState([]);
   const router = useRouter();
   const isGerman = countryCode === "DE";
@@ -22,7 +22,7 @@ export default function CouponsSection({ countryCode }) {
   const fetchAllCoupons = async () => {
     try {
       const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_SERVER_URI}/api/v1/coupon/active`
+        `${process.env.NEXT_PUBLIC_SERVER_URI}/api/v1/coupon/active/${auth.user._id}`
       );
       if (data) {
         setCoupons(data?.coupons);
@@ -34,7 +34,7 @@ export default function CouponsSection({ countryCode }) {
 
   useEffect(() => {
     fetchAllCoupons();
-  }, []);
+  }, [auth.user._id]);
 
   const copyToClipboard = (code) => {
     navigator.clipboard

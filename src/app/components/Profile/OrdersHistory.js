@@ -521,7 +521,9 @@ export default function OrdersHistory({ userId, countryCode }) {
                           setOrderId((prev) =>
                             prev === order?._id ? "" : order?._id
                           );
-                          setTrackingNumber(order?.trackingId);
+                          setTrackingNumber(
+                            order?.tracking[0]?.trackingId || ""
+                          );
                         }}
                         variant="outline"
                         size="sm"

@@ -20,6 +20,7 @@ export default function PromoBannerPage({ countryCode }) {
   // Translations
   const t = {
     getApp: isGerman ? "Hol dir unsere Mobile App" : "Get our Mobile App",
+    getIphone: isGerman ? "Iphone App" : "Iphone App",
     insider: isGerman ? "FASHIONINSIDER" : "FASHIONINSIDER",
     subscribe: isGerman ? "Abonnieren & Sparen" : "Subscribe & Save",
     shipping: isGerman ? "Kostenloser Versand" : "Free Shipping",
@@ -36,7 +37,8 @@ export default function PromoBannerPage({ countryCode }) {
             </div> */}
             {/* Mobile App */}
             <Link
-              href="#download-app"
+              href="https://play.google.com/store/apps/details?id=com.animmza.ayoob"
+              target="_blank"
               className="flex items-center min-w-fit gap-1.5 py-2 px-2 hover:bg-red-100/50 transition-colors duration-200 group"
             >
               <Smartphone
@@ -44,6 +46,19 @@ export default function PromoBannerPage({ countryCode }) {
                 className="group-hover:scale-110 transition-transform duration-200"
               />
               <span>{t.getApp}</span>
+            </Link>
+
+            {/* App Store */}
+            <Link
+              href="https://apps.apple.com/us/app/darloo/id6747489472"
+              target="_blank"
+              className="flex items-center min-w-fit gap-1.5 py-2 px-2 hover:bg-red-100/50 transition-colors duration-200 group"
+            >
+              <Smartphone
+                size={16}
+                className="group-hover:scale-110 transition-transform duration-200"
+              />
+              <span>{t.getIphone}</span>
             </Link>
 
             {/* Divider */}

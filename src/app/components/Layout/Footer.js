@@ -272,7 +272,8 @@ const Footer = () => {
             </h3>
             <div className="flex flex-col gap-4">
               <Link
-                href="https://play.google.com/store/apps/details?id=com.solutionshub.app"
+                href="https://play.google.com/store/apps/details?id=com.animmza.ayoob"
+                target="_blank"
                 className="text-white hover:text-gray-100 transition-colors duration-200 text-sm bg-black rounded-md px-4 py-3 flex  items-center gap-1 max-w-fit"
               >
                 <Image
@@ -292,7 +293,8 @@ const Footer = () => {
                 </div>
               </Link>
               <Link
-                href="https://apps.apple.com/in/app/solutions-hub/id1605778691"
+                href="https://apps.apple.com/us/app/darloo/id6747489472"
+                target="_blank"
                 className="text-white hover:text-gray-100 transition-colors duration-200 text-sm bg-black rounded-md px-4 py-3 flex items-center gap-1 max-w-fit"
               >
                 <Image

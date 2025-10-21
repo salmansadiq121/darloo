@@ -33,19 +33,19 @@ export default function TopSale() {
 
   return (
     <MainLayout title="Darloo - Top Sale">
-      <div className="py-5 bg-transparent text-black z-10 w-full min-h-[50vh] flex flex-col gap-5 relative px-4 sm:px-[3rem] ">
+      <div className="py-5 bg-transparent max-w-7xl mx-auto text-black z-10 w-full min-h-[50vh] flex flex-col gap-5 relative px-4 sm:px-[3rem] ">
         <h1
           className={`${Style.h1} text-start text-black flex items-center gap-2 min-w-fit`}
         >
           <Flame className="h-6 sm:h-7 w-6 sm:w-7 text-orange-600" />
           {isGerman ? "Top-Verkaufsprodukte" : "Top Sale Products"}
         </h1>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-4 sm:gap-3">
           {isLoading
             ? Array.from({ length: 8 }).map((_, index) => (
                 <div
                   key={index}
-                  className="w-[230px] min-w-[280px] h-[280px] bg-gray-600 animate-pulse rounded-lg"
+                  className="w-full  h-[320px] bg-gray-600 animate-pulse rounded-lg"
                 ></div>
               ))
             : products?.map((product) => (

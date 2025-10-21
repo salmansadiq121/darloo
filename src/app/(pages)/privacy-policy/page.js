@@ -373,11 +373,11 @@ export default function PrivacyPolicy() {
                     : "Security Contact Information:"}
                 </p>
                 <p>Email: security@darloo.com</p>
-                <p>
+                {/* <p>
                   {isGerman
                     ? "Telefon: +1 (555) 987-6543"
                     : "Phone: +1 (555) 987-6543"}
-                </p>
+                </p> */}
                 <p>
                   {isGerman
                     ? "Rund um die Uhr verfügbar für Sicherheitsnotfälle"

@@ -214,7 +214,7 @@ export default function AccountSecurity() {
                     : "Darloo Security Support"}
                 </p>
                 <p>Email: security@darloo.com</p>
-                <p>
+                {/* <p>
                   {isGerman
                     ? "Telefon: +1 (555) 123-4567"
                     : "Phone: +1 (555) 123-4567"}
@@ -223,7 +223,7 @@ export default function AccountSecurity() {
                   {isGerman
                     ? "Arbeitszeiten: Montag–Freitag, 9–18 Uhr MEZ"
                     : "Hours: Monday–Friday, 9am–6pm EST"}
-                </p>
+                </p> */}
               </div>
             </CardContent>
           </Card>

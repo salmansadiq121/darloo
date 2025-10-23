@@ -18,7 +18,9 @@ export default function TopSale() {
   const fetchProducts = async () => {
     setIsLoading(true);
     try {
-      const { data } = await axios.get(`${productsURI}/trending/products`);
+      const { data } = await axios.get(
+        `${productsURI}/sales/products?isPC=true`
+      );
       setProducts(data.products);
     } catch (error) {
       console.log(error);

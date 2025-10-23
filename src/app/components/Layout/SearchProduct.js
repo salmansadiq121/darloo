@@ -21,7 +21,7 @@ export default function ProductSearch() {
         setLoading(true);
         try {
           const { data } = await axios.get(
-            `${process.env.NEXT_PUBLIC_SERVER_URI}/api/v1/products/search/${searchTerm}`
+            `${process.env.NEXT_PUBLIC_SERVER_URI}/api/v1/products/search/${searchTerm}?isPC=true`
           );
           setSearchResults(data.products || []);
           setShowResults(true);

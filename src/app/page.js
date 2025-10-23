@@ -36,7 +36,9 @@ export default function Home() {
   const fetchProducts = async () => {
     setLoading(true);
     try {
-      const { data } = await axios.get(`${productsURI}/trending/products`);
+      const { data } = await axios.get(
+        `${productsURI}/trending/products?isPC=true`
+      );
       setProducts(data.products);
     } catch (error) {
       console.log(error);

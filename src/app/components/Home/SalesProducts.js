@@ -18,7 +18,9 @@ export default function SalesProducts() {
   const fetchProducts = async () => {
     setIsLoading(true);
     try {
-      const { data } = await axios.get(`${productsURI}/sales/products`);
+      const { data } = await axios.get(
+        `${productsURI}/sales/products?isPC=true`
+      );
       setProducts(data.products);
     } catch (error) {
       console.log(error);

@@ -175,7 +175,7 @@ const TrendingProducts = ({ products, loading, countryCode }) => {
 
   // Format price (symbol based on country)
   const formatPrice = (price) =>
-    `${countryCode === "DE" ? "€" : "$"}${price.toFixed(2)}`;
+    `${countryCode === "DE" ? "€" : "€"}${price.toFixed(2)}`;
 
   const getTrendingStatus = (product) => {
     if (!product) return { text: t.new, color: "text-blue-500" };

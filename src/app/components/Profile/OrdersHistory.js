@@ -638,7 +638,7 @@ export default function OrdersHistory({ userId, countryCode }) {
                       </div>
 
                       {/* Comments Section */}
-                      {order?.comments.length > 0 && (
+                      {/* {order?.comments.length > 0 && (
                         <div className="space-y-3 rounded-lg border bg-card p-4">
                           <h3 className="text-lg font-semibold text-foreground">
                             {isGerman ? "Kommentare" : "Comments"}
@@ -716,7 +716,7 @@ export default function OrdersHistory({ userId, countryCode }) {
                             ))}
                           </div>
                         </div>
-                      )}
+                      )} */}
                     </div>
                   )}
                 </div>

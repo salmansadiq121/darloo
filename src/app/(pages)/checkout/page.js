@@ -208,7 +208,11 @@ export default function Checkout() {
     setCart({
       user: auth?.user?._id,
       products: selectedProduct,
-      totalAmount: (getTotal?.() || 0) - (discount || 0) + (shippingFee || 0),
+      totalAmount:
+        (getTotal?.() || 0) -
+        (discount || 0) +
+        (shippingFee || 0) +
+        ((getTotal?.() || 0) - (discount || 0)) * 0.01,
       shippingAddress: {
         address: auth?.user?.addressDetails?.address || "",
         country: auth?.user?.addressDetails?.country || "",
@@ -240,8 +244,6 @@ export default function Checkout() {
         "Your order total exceeds the limit of €150. Please adjust the quantity of items in your cart to proceed."
       );
     }
-
-    console.log("country:", country);
 
     if (!country || country === "" || country === undefined) {
       toast.error(

@@ -843,8 +843,8 @@ export default function ProductDetail() {
                   <Check className="h-4 w-4 text-green-500" />
                   <p className="text-sm text-gray-500">
                     {isGerman
-                      ? "In den Warenkorb: {product?.quantity} verfügbar"
-                      : "In stock: {product?.quantity} available"}
+                      ? `In den Warenkorb: ${product?.quantity} verfügbar`
+                      : `In stock: ${product?.quantity} available`}
                   </p>
                 </div>
               </div>
@@ -852,11 +852,11 @@ export default function ProductDetail() {
               <div className="space-y-6">
                 {/* Image */}
                 {/* All Images Thumbnails - show all available images */}
-                {getAllImages.length > 1 && (
+                {getAllImages?.length > 1 && (
                   <div className="space-y-3">
                     <div className="flex items-center flex-wrap gap-2  pb-2">
-                      {getAllImages.map((imageObj, index) => {
-                        const isVariationImage = !!imageObj.colorCode;
+                      {getAllImages?.map((imageObj, index) => {
+                        const isVariationImage = !!imageObj?.colorCode;
                         return (
                           <button
                             key={index}
@@ -1158,7 +1158,7 @@ export default function ProductDetail() {
                       <Image
                         src={product?.size_chart}
                         alt="size chart"
-                        width={400}
+                        width={500}
                         height={500}
                         priority
                         className="rounded-lg object-contain"
@@ -1191,8 +1191,8 @@ export default function ProductDetail() {
                         <dt className="text-sm font-medium text-gray-500">
                           {t.availableColors}
                         </dt>
-                        <dd className="mt-1 text-sm font-medium text-gray-900">
-                          {product?.colors?.map((c) => c.name).join(", ")}
+                        <dd className="mt-1 text-sm font-medium text-gray-900 capitalize">
+                          {product?.variations?.map((c) => c?.title).join(", ")}
                         </dd>
                       </div>
                       <div className="bg-gray-200 p-3 rounded">

@@ -32,7 +32,7 @@ export default function RootLayout({ children }) {
         function () {
           (window.gaf.q = window.gaf.q || []).push(arguments);
         };
-      window.gaf("init", "axualetemf");
+      window.gaf("init", "dpgxhiidrf");
       window.gaf("track");
     };
     document.body.appendChild(gafScript);

@@ -13,10 +13,6 @@ export default function CheckoutElement({ carts, setpayment, shippingFee }) {
   const [clientSecret, setClientSecret] = useState("");
   const [open, setOpen] = useState(false);
 
-  console.log("publicKey:", publicKey);
-  console.log("stripePromise:", stripePromise);
-  console.log("clientSecret:", clientSecret);
-
   // Get Stripe Public Key
   const getPublicKey = async () => {
     try {

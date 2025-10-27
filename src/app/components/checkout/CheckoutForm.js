@@ -31,10 +31,12 @@ const CheckOutForm = ({ setOpen, carts, setpayment, shippingFee }) => {
       if (data) {
         localStorage.removeItem("cart");
         setSelectedProduct([]);
-        router.push("/order-success");
-        toast.success("Order successfully!");
+
         setAmount(data.order.totalAmount);
         setOrderId(data.order._id);
+
+        router.push("/order-success");
+        toast.success("Order successfully!");
 
         // setOpen(false);
         // setpayment(false);
@@ -45,15 +47,39 @@ const CheckOutForm = ({ setOpen, carts, setpayment, shippingFee }) => {
     }
   };
 
+  // useEffect(() => {
+  //   if (typeof window !== "undefined" && orderId && amount) {
+  //     window.goaffpro_order = {
+  //       number: orderId,
+  //       total: parseFloat(amount),
+  //     };
+  //     if (typeof window.goaffproTrackConversion !== "undefined") {
+  //       window.goaffproTrackConversion(window.goaffpro_order);
+  //     }
+  //   }
+  // }, [orderId, amount]);
+
+  // ✅ Trigger GoAffPro Conversion Tracking
   useEffect(() => {
     if (typeof window !== "undefined" && orderId && amount) {
-      window.goaffpro_order = {
-        number: orderId,
-        total: parseFloat(amount),
+      // Create a script dynamically (equivalent to <script> before </body>)
+      const script = document.createElement("script");
+      script.type = "text/javascript";
+      script.innerHTML = `
+        window.goaffpro_order = {
+          number: "${orderId}",
+          total: ${parseFloat(amount)}
+        };
+        if (typeof window.goaffproTrackConversion !== "undefined") {
+          window.goaffproTrackConversion(window.goaffpro_order);
+        }
+      `;
+      document.body.appendChild(script);
+
+      // Cleanup when component unmounts
+      return () => {
+        document.body.removeChild(script);
       };
-      if (typeof window.goaffproTrackConversion !== "undefined") {
-        window.goaffproTrackConversion(window.goaffpro_order);
-      }
     }
   }, [orderId, amount]);
 
@@ -75,6 +101,8 @@ const CheckOutForm = ({ setOpen, carts, setpayment, shippingFee }) => {
       createOrder(carts, paymentIntent);
     }
   };
+
+  //
 
   return (
     <form

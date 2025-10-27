@@ -47,6 +47,8 @@ export default function CartItems({ products }) {
       ?.toFixed(2);
   };
 
+  console.log("getTotal:", getTotal);
+
   return (
     <div className="w-full z-10 min-h-screen relative">
       <h2 className={`${Style.h1}`}>Your Cart</h2>
@@ -222,7 +224,7 @@ export default function CartItems({ products }) {
           </div>
           <div className="flex justify-between font-semibold text-lg">
             <span>Total:</span>
-            <span>€{(parseFloat(getTotal()) + 10).toFixed(2)}</span>
+            <span>€{parseFloat(getTotal()).toFixed(2)}</span>
           </div>
           <div className="py-2 w-full">
             <Separator className="h-px w-full bg-gray-500" />

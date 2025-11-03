@@ -68,6 +68,7 @@ export default function ProductDetail() {
   const [returnPolicy, setReturnPolicy] = useState("");
   const [varientPrice, setVarientPrice] = useState(0);
   const {} = useAuth();
+  const [selectedImage, setSelectedImage] = useState("");
 
   // Determine language based on country code
   const isGerman = countryCode === "DE";
@@ -259,6 +260,7 @@ export default function ProductDetail() {
           product: product._id,
           quantity,
           price: varientPrice > 0 ? varientPrice : product.price,
+          image: selectedImage || product.thumbnails,
           colors: [selectedColor],
           sizes: [selectedSize],
           image: getCurrentImage,
@@ -278,6 +280,7 @@ export default function ProductDetail() {
       product: product._id,
       quantity,
       price: varientPrice > 0 ? varientPrice : product.price,
+      image: selectedImage || product.thumbnails,
       colors: [selectedColor],
       sizes: [selectedSize],
       image: getCurrentImage,
@@ -867,6 +870,7 @@ export default function ProductDetail() {
                             }`}
                             onClick={() => {
                               setActiveImageIndex(index);
+                              setSelectedImage(imageObj.url);
                               setVarientPrice(imageObj?.price);
                               setSelectedColor(imageObj?.title);
                             }}

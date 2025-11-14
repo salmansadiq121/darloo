@@ -32,10 +32,23 @@ export default function RootLayout({ children }) {
         function () {
           (window.gaf.q = window.gaf.q || []).push(arguments);
         };
-      window.gaf("init", "dpgxhiidrf");
+      // Initialize GoAffPro with shop ID
+      const shopId = process.env.NEXT_PUBLIC_GOAFFPRO_SHOP_ID || "dpgxhiidrf";
+      window.gaf("init", shopId);
       window.gaf("track");
+      
+      // Global function for tracking conversions
+      window.goaffproTrackConversion = function (orderData) {
+        if (typeof window.gaf !== "undefined") {
+          window.gaf("track", "order", orderData);
+        }
+      };
     };
-    document.body.appendChild(gafScript);
+    
+    // Only append if not already present
+    if (!document.querySelector('script[src*="goaffpro.com"]')) {
+      document.body.appendChild(gafScript);
+    }
 
     /** ✅ ChatBot.com script loader (ChatBot widget before </body>) */
     // const chatbotScript = document.createElement("script");

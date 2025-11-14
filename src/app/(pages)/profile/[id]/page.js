@@ -636,7 +636,7 @@ export default function Profile() {
                 </TabsContent>
 
                 <TabsContent value="affiliate">
-                  <AffiliateSection countryCode={countryCode} />
+                  <AffiliateSection userId={userId} countryCode={countryCode} />
                 </TabsContent>
 
                 <TabsContent value="chat">

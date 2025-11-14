@@ -47,39 +47,29 @@ const CheckOutForm = ({ setOpen, carts, setpayment, shippingFee }) => {
     }
   };
 
-  // useEffect(() => {
-  //   if (typeof window !== "undefined" && orderId && amount) {
-  //     window.goaffpro_order = {
-  //       number: orderId,
-  //       total: parseFloat(amount),
-  //     };
-  //     if (typeof window.goaffproTrackConversion !== "undefined") {
-  //       window.goaffproTrackConversion(window.goaffpro_order);
-  //     }
-  //   }
-  // }, [orderId, amount]);
-
-  // ✅ Trigger GoAffPro Conversion Tracking
+  // ✅ Trigger GoAffPro Conversion Tracking (Client-side)
   useEffect(() => {
     if (typeof window !== "undefined" && orderId && amount) {
-      // Create a script dynamically (equivalent to <script> before </body>)
-      const script = document.createElement("script");
-      script.type = "text/javascript";
-      script.innerHTML = `
-        window.goaffpro_order = {
-          number: "${orderId}",
-          total: ${parseFloat(amount)}
-        };
-        if (typeof window.goaffproTrackConversion !== "undefined") {
-          window.goaffproTrackConversion(window.goaffpro_order);
-        }
-      `;
-      document.body.appendChild(script);
-
-      // Cleanup when component unmounts
-      return () => {
-        document.body.removeChild(script);
+      // Track conversion using GoAffPro global function
+      const orderData = {
+        number: orderId.toString(),
+        total: parseFloat(amount),
       };
+
+      // Method 1: Use the global goaffproTrackConversion function if available
+      if (typeof window.goaffproTrackConversion !== "undefined") {
+        window.goaffproTrackConversion(orderData);
+      }
+
+      // Method 2: Use gaf directly if available
+      if (typeof window.gaf !== "undefined") {
+        window.gaf("track", "order", orderData);
+      }
+
+      // Method 3: Set the order data for GoAffPro to pick up
+      window.goaffpro_order = orderData;
+
+      // console.log("GoAffPro conversion tracked:", orderData);
     }
   }, [orderId, amount]);
 

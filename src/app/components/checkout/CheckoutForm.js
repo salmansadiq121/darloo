@@ -26,7 +26,12 @@ const CheckOutForm = ({ setOpen, carts, setpayment, shippingFee }) => {
     try {
       const { data } = await axios.post(
         `${process.env.NEXT_PUBLIC_SERVER_URI}/api/v1/order/stripe/create-order`,
-        { ...cart, shippingFee: shippingFee, payment_info }
+        {
+          ...cart,
+          shippingFee: shippingFee,
+          payment_info,
+          paymentMethod: "Credit Card",
+        }
       );
       if (data) {
         localStorage.removeItem("cart");
@@ -98,7 +103,7 @@ const CheckOutForm = ({ setOpen, carts, setpayment, shippingFee }) => {
     <form
       id="payment-form"
       onSubmit={handleSubmit}
-      className="overflow-hidden px-2 z-[99999]"
+      className="overflow-hidden px-2 z-[9999999991]"
     >
       <LinkAuthenticationElement id="link-authentication-element" />
       <PaymentElement id="payment-element" />

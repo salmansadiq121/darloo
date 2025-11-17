@@ -14,6 +14,7 @@ import axios from "axios";
 import { FiLoader } from "react-icons/fi";
 import { useRouter } from "next/navigation";
 import TrendingProducts from "@/app/components/Home/TrendingProducts";
+import CheckoutElement from "@/app/components/checkout/CheckoutElement";
 
 const paymentMethods = [
   {
@@ -558,14 +559,22 @@ export default function Checkout() {
         </div>
 
         {/* -----------------Payment Method--------------- */}
+
         {showPayment && (
+          <CheckoutElement
+            setpayment={setShowPayment}
+            carts={cart}
+            shippingFee={shippingFee}
+          />
+        )}
+        {/* {showPayment && (
           <PaymentMethodModal
             isOpen={showPayment}
             onClose={() => setShowPayment(false)}
             product={cart}
             shippingFee={shippingFee}
           />
-        )}
+        )} */}
       </div>
     </MainLayout>
   );

@@ -23,30 +23,35 @@ const geistMono = Geist_Mono({
 export default function RootLayout({ children }) {
   useEffect(() => {
     /** ✅ GoAffPro script loader */
-    const gafScript = document.createElement("script");
-    gafScript.src = "https://cdn.goaffpro.com/js/gaf.min.js";
-    gafScript.async = true;
-    gafScript.onload = () => {
-      window.gaf =
-        window.gaf ||
-        function () {
-          (window.gaf.q = window.gaf.q || []).push(arguments);
-        };
-      // Initialize GoAffPro with shop ID
-      const shopId = process.env.NEXT_PUBLIC_GOAFFPRO_SHOP_ID || "dpgxhiidrf";
-      window.gaf("init", shopId);
-      window.gaf("track");
-      
-      // Global function for tracking conversions
-      window.goaffproTrackConversion = function (orderData) {
-        if (typeof window.gaf !== "undefined") {
-          window.gaf("track", "order", orderData);
-        }
-      };
-    };
-    
     // Only append if not already present
-    if (!document.querySelector('script[src*="goaffpro.com"]')) {
+    if (!document.querySelector("#goaffpro-script")) {
+      const gafScript = document.createElement("script");
+      gafScript.id = "goaffpro-script";
+      gafScript.async = true;
+      gafScript.type = "text/javascript";
+      const shopId = process.env.NEXT_PUBLIC_GOAFFPRO_SHOP_ID || "orqmndkrhl";
+      gafScript.src = `https://api.goaffpro.com/loader.js?shop=${shopId}`;
+
+      gafScript.onload = () => {
+        // Wait for GoAffPro to initialize and set up tracking
+        // The loader.js should handle initialization, but we'll maintain compatibility
+        if (typeof window.gaf !== "undefined") {
+          window.gaf("track");
+        }
+
+        // Global function for tracking conversions (maintained for compatibility)
+        window.goaffproTrackConversion = function (orderData) {
+          if (typeof window.gaf !== "undefined") {
+            window.gaf("track", "order", orderData);
+          }
+        };
+      };
+
+      // Also handle errors
+      gafScript.onerror = () => {
+        console.error("Failed to load GoAffPro script");
+      };
+
       document.body.appendChild(gafScript);
     }
 

@@ -59,6 +59,7 @@ const CheckOutForm = ({ setOpen, carts, setpayment, shippingFee }) => {
       const orderData = {
         number: orderId.toString(),
         total: parseFloat(amount),
+        currency: "EUR",
       };
 
       // Method 1: Use the global goaffproTrackConversion function if available

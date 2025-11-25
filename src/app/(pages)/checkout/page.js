@@ -78,6 +78,7 @@ export default function Checkout() {
     products: [],
     totalAmount: "",
     shippingFee: shippingFee,
+    discount: 0,
     shippingAddress: {
       address: "",
       country: "",
@@ -150,6 +151,9 @@ export default function Checkout() {
       return;
     }
     try {
+      // Calculate subtotal (only products, before discount, shipping, and GST)
+      const subtotal = getTotal();
+
       const { data } = await axios.post(
         `${process.env.NEXT_PUBLIC_SERVER_URI}/api/v1/coupon/apply/order`,
         {
@@ -159,7 +163,7 @@ export default function Checkout() {
             price: item.price,
             quantity: item.quantity,
           })),
-          cartTotal: cart.totalAmount,
+          cartTotal: parseFloat(subtotal || 0),
         }
       );
       if (data) {
@@ -179,41 +183,45 @@ export default function Checkout() {
   };
 
   // Add Shipping Fee
-  const getShippingFee = async () => {
-    if (!auth?.user) {
-      return;
-    }
-    try {
-      const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_SERVER_URI}/api/v1/shipping/${auth?.user?.addressDetails?.country}`
-      );
-      if (data) {
-        setCountry(data?.shipping?.country || "");
-        setCart((prev) => ({
-          ...prev,
-          shippingFee: data?.shipping?.fee ?? 0,
-        }));
-        setShippingFee(data?.shipping?.fee ?? 0);
-      }
-    } catch (error) {
-      console.error("Error getting shipping fee:", error);
-    }
-  };
-
   useEffect(() => {
+    const getShippingFee = async () => {
+      if (!auth?.user) {
+        return;
+      }
+      try {
+        const { data } = await axios.get(
+          `${process.env.NEXT_PUBLIC_SERVER_URI}/api/v1/shipping/${auth?.user?.addressDetails?.country}`
+        );
+        if (data) {
+          setCountry(data?.shipping?.country || "");
+          setCart((prev) => ({
+            ...prev,
+            shippingFee: data?.shipping?.fee ?? 0,
+          }));
+          setShippingFee(data?.shipping?.fee ?? 0);
+        }
+      } catch (error) {
+        console.error("Error getting shipping fee:", error);
+      }
+    };
+
     getShippingFee();
   }, [auth?.user]);
 
   // Cart
   useEffect(() => {
+    const subtotal = parseFloat(getTotal() || 0);
+    const discountAmount = parseFloat(discount || 0);
+    const shipping = parseFloat(shippingFee || 0);
+    const subtotalAfterDiscount = subtotal - discountAmount;
+    const gst = subtotalAfterDiscount * 0.01;
+    const finalTotal = subtotalAfterDiscount + shipping + gst;
+
     setCart({
       user: auth?.user?._id,
       products: selectedProduct,
-      totalAmount:
-        (getTotal?.() || 0) -
-        (discount || 0) +
-        (shippingFee || 0) +
-        ((getTotal?.() || 0) - (discount || 0)) * 0.01,
+      totalAmount: finalTotal.toFixed(2),
+      discount: discountAmount,
       shippingAddress: {
         address: auth?.user?.addressDetails?.address || "",
         country: auth?.user?.addressDetails?.country || "",

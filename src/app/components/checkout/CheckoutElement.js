@@ -33,7 +33,7 @@ export default function CheckoutElement({ carts, setpayment, shippingFee }) {
     setStripePromise(loadStripe(publicKey));
     const initializeStripe = async () => {
       if (carts) {
-        const amount = Math.round(carts.totalAmount);
+        const amount = Math.round(parseFloat(carts.totalAmount) || 0);
         try {
           const { data } = await axios.post(
             `${process.env.NEXT_PUBLIC_SERVER_URI}/api/v1/order/payment`,

@@ -60,11 +60,13 @@ export default function Register({ setActive }) {
       const { data } = await axios.post(`${authUri}/register`, formData);
 
       if (data) {
-        setActivationToken(data.activationToken);
-        localStorage.setItem("activation", data.activationToken);
-        router.push("/email-verification");
+        // setActivationToken(data.activationToken);
+        // localStorage.setItem("activation", data.activationToken);
+        // router.push("/email-verification");
 
-        toast.success("Please check your email to activate your account");
+        // toast.success("Please check your email to activate your account");
+        toast.success(data.message || "User registered successfully!");
+        setActive("login");
         setName("");
         setEmail("");
         setPassword("");

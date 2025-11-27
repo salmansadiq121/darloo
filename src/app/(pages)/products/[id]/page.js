@@ -237,55 +237,66 @@ export default function ProductDetail() {
     fetchProductDetail();
   }, [fetchProductDetail]);
 
-  // Handle Add to Cart
+  // Handle Add to Cart - Creates separate entries for each color/size combination
   const handleAddToCart = (product) => {
     if (!product || !product._id) return;
+
+    // Create a unique identifier for this color/size combination
+    const combinationId = `${product._id}_${selectedColor}_${selectedSize}`;
+
     setSelectedProduct((prevProducts) => {
       const updatedProducts = [...prevProducts];
-      const existingProductIndex = updatedProducts.findIndex(
-        (p) => p?.product === product?._id
-      );
-      if (existingProductIndex !== -1) {
-        const existingProduct = { ...updatedProducts[existingProductIndex] };
-        if (!existingProduct.colors.includes(selectedColor)) {
-          existingProduct.colors = [...existingProduct.colors, selectedColor];
-        }
-        if (!existingProduct.sizes.includes(selectedSize)) {
-          existingProduct.sizes = [...existingProduct.sizes, selectedSize];
-        }
+
+      // Check if exact combination (product + color + size) already exists
+      const existingCombinationIndex = updatedProducts.findIndex((p) => {
+        const pCombinationId = `${p?.product}_${p?.colors?.[0] || ""}_${
+          p?.sizes?.[0] || ""
+        }`;
+        return pCombinationId === combinationId;
+      });
+
+      if (existingCombinationIndex !== -1) {
+        // If exact combination exists, just update quantity
+        const existingProduct = {
+          ...updatedProducts[existingCombinationIndex],
+        };
         existingProduct.quantity += quantity;
-        updatedProducts[existingProductIndex] = existingProduct;
+        updatedProducts[existingCombinationIndex] = existingProduct;
+        toast.success(`Quantity updated for ${selectedColor} ${selectedSize}`);
       } else {
+        // Create a new separate entry for this color/size combination
         updatedProducts.push({
           product: product._id,
           quantity,
           price: varientPrice > 0 ? varientPrice : product.price,
-          image: selectedImage || product.thumbnails,
+          image: selectedImage || getCurrentImage || product.thumbnails,
           colors: [selectedColor],
           sizes: [selectedSize],
-          image: getCurrentImage,
           title: product.name,
-          _id: product._id,
+          _id: `${product._id}_${Date.now()}`, // Unique ID for this combination
+          combinationId: combinationId, // Store combination ID for easy lookup
         });
+        toast.success(`Added ${selectedColor} ${selectedSize} to cart`);
       }
+
       localStorage.setItem("cart", JSON.stringify(updatedProducts));
       return updatedProducts;
     });
-    toast.success("Product added to cart");
   };
 
   // One Click Buy Now
   const handleOneClickBuy = async (product) => {
+    const combinationId = `${product._id}_${selectedColor}_${selectedSize}`;
     const productData = {
       product: product._id,
       quantity,
       price: varientPrice > 0 ? varientPrice : product.price,
-      image: selectedImage || product.thumbnails,
+      image: selectedImage || getCurrentImage || product.thumbnails,
       colors: [selectedColor],
       sizes: [selectedSize],
-      image: getCurrentImage,
       title: product.name,
-      _id: product._id,
+      _id: `${product._id}_${Date.now()}`,
+      combinationId: combinationId,
     };
     localStorage.setItem("oneClickBuyProduct", JSON.stringify(productData));
     setOneClickBuyProduct(productData);
@@ -1055,6 +1066,11 @@ export default function ProductDetail() {
                     backgroundColor: "var(--primary)",
                   }}
                   onClick={() => handleAddToCart(product)}
+                  title={
+                    isGerman
+                      ? "Jede Farbe/Größe-Kombination wird als separates Produkt hinzugefügt"
+                      : "Each color/size combination will be added as a separate item"
+                  }
                 >
                   <ShoppingCart className="mr-2 h-5 w-5" />
                   {isGerman ? "In den Warenkorb" : "Add to Cart"}

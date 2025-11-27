@@ -119,15 +119,18 @@ export default function Checkout() {
     fetchTrendingProducts();
   }, []);
 
-  // 🔹 Update Quantity
+  // 🔹 Update Quantity - Handle both _id and combinationId
   const updateQuantity = (id, change) => {
     console.log("selectedProduct:", id, change);
     setSelectedProduct((prevCart) => {
-      const updatedCart = prevCart.map((item) =>
-        item._id === id
-          ? { ...item, quantity: Math.max(1, item.quantity + change) }
-          : item
-      );
+      const updatedCart = prevCart.map((item) => {
+        // Match by _id or combinationId
+        const matches = item._id === id || item.combinationId === id;
+        if (matches) {
+          return { ...item, quantity: Math.max(1, item.quantity + change) };
+        }
+        return item;
+      });
 
       localStorage.setItem("cart", JSON.stringify(updatedCart));
 
@@ -426,12 +429,30 @@ export default function Checkout() {
                         <span className=" text-[15px] sm:text-[17px] font-medium truncate w-[9rem] sm:w-[15rem]">
                           {item?.title}
                         </span>
+                        {/* Display color and size if available */}
+                        {(item?.colors?.length > 0 ||
+                          item?.sizes?.length > 0) && (
+                          <div className="flex items-center gap-2 text-xs text-gray-600">
+                            {item?.colors?.[0] && (
+                              <span className="px-2 py-0.5 bg-gray-100 rounded">
+                                Color: {item.colors[0]}
+                              </span>
+                            )}
+                            {item?.sizes?.[0] && (
+                              <span className="px-2 py-0.5 bg-gray-100 rounded">
+                                Size: {item.sizes[0]}
+                              </span>
+                            )}
+                          </div>
+                        )}
                         <div
                           className="flex items-center h-[2.4rem] max-w-[9rem] min-w-[9rem]  border-2 border-red-500 rounded-sm"
                           style={{ padding: "0rem" }}
                         >
                           <button
-                            onClick={() => updateQuantity(item._id, -1)}
+                            onClick={() =>
+                              updateQuantity(item._id || item.combinationId, -1)
+                            }
                             className="px-3 py-1 rounded-md text-gray-900 text-xl w-full h-full flex items-center justify-center cursor-pointer"
                           >
                             -
@@ -440,7 +461,9 @@ export default function Checkout() {
                             {item?.quantity}
                           </span>
                           <button
-                            onClick={() => updateQuantity(item._id, 1)}
+                            onClick={() =>
+                              updateQuantity(item._id || item.combinationId, 1)
+                            }
                             className=" px-3 py-1 rounded-md text-gray-900 text-xl w-full h-full flex items-center justify-center cursor-pointer"
                           >
                             +

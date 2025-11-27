@@ -25,4 +25,7 @@ export const metadata = {
     image: "/logo2.jpg",
   },
   language: "en-US",
+  owner: "Salman Sadiq",
+  github: "https://github.com/salmansadiq1015?tab=repositories",
+  linkedin: "https://www.linkedin.com/in/salman-sadiq-679296266/",
 };

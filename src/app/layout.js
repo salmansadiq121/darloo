@@ -127,6 +127,11 @@ export default function RootLayout({ children }) {
         />
         <meta name="twitter:image" content={metadata.twitter.image} />
 
+        {/* Owner Information */}
+        <meta name="owner" content={metadata.owner} />
+        <meta name="github" content={metadata.github} />
+        <meta name="linkedin" content={metadata.linkedin} />
+
         {/* Favicon */}
         <link rel="icon" href="/rb_616.png" />
         <link rel="apple-touch-icon" sizes="180x180" href="/rb_616.png" />

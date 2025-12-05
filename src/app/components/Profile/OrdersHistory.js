@@ -55,6 +55,13 @@ export default function OrdersHistory({ userId, countryCode }) {
   });
   const isGerman = countryCode === "DE";
 
+  // Helper function to format order number to 6 digits
+  const formatOrderNumber = (orderNumber) => {
+    if (!orderNumber) return "N/A";
+    // Convert to string and pad with leading zeros to ensure 6 digits
+    return String(orderNumber).padStart(6, "0");
+  };
+
   const returnReasons = isGerman
     ? [
         "Falscher Artikel erhalten",
@@ -91,28 +98,37 @@ export default function OrdersHistory({ userId, countryCode }) {
 
   useEffect(() => {
     fetchOrders();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId]);
 
   // Get Tracking Data
-  const getTrackingData = async (trackingNumber) => {
+  const getTrackingData = async (trackingNumber, carrier = null) => {
     setLoading(true);
     setError(null);
     setTrackingData(null);
 
     try {
-      const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_SERVER_URI}/api/v1/order/track?trackingNumber=${trackingNumber}`
-      );
-      const data = await res.json();
+      let url = `${process.env.NEXT_PUBLIC_SERVER_URI}/api/v1/order/track?trackingNumber=${trackingNumber}`;
+      // Convert carrier to integer if it's a valid number string
+      if (carrier) {
+        const carrierCode = Number.parseInt(carrier, 10);
+        if (!Number.isNaN(carrierCode)) {
+          url += `&carrier=${carrierCode}`;
+        }
+      }
 
-      if (data) {
-        setTrackingData(data.details);
+      const { data } = await axios.get(url);
+
+      if (data.success) {
+        setTrackingData(data);
       } else {
         setError(data.message || "Tracking failed");
       }
     } catch (err) {
       console.error("❌ Error fetching tracking data:", err);
-      setError("Something went wrong. Please try again.");
+      setError(
+        err.response?.data?.message || "Something went wrong. Please try again."
+      );
     } finally {
       setLoading(false);
     }
@@ -120,8 +136,14 @@ export default function OrdersHistory({ userId, countryCode }) {
 
   useEffect(() => {
     if (trackingNumber) {
-      getTrackingData(trackingNumber);
+      // Get carrier from the order if available
+      const order = orders.find(
+        (o) => o?.tracking?.[0]?.trackingId === trackingNumber
+      );
+      const carrier = order?.tracking?.[0]?.shippingCarrier;
+      getTrackingData(trackingNumber, carrier);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [trackingNumber]);
 
   // Handle Return
@@ -383,7 +405,7 @@ export default function OrdersHistory({ userId, countryCode }) {
         </div>
 
         {/* Order Information */}
-        {(order?.trackingId || order?.shippingCarrier) && (
+        {order?.tracking && order.tracking.length > 0 && (
           <div className="space-y-3 rounded-lg border bg-card p-4 md:col-span-2">
             <div className="flex items-center gap-2">
               <Hash className="h-5 w-5 text-primary" />
@@ -392,23 +414,23 @@ export default function OrdersHistory({ userId, countryCode }) {
               </h3>
             </div>
             <div className="grid gap-2 text-sm md:grid-cols-2">
-              {order?.trackingId && (
+              {order?.tracking?.[0]?.trackingId && (
                 <div className="flex flex-col gap-1">
                   <span className="text-muted-foreground">
                     {isGerman ? "Tracking ID" : "Tracking ID"}:
                   </span>
                   <span className="font-mono font-medium text-foreground">
-                    {order?.trackingId}
+                    {order.tracking[0].trackingId}
                   </span>
                 </div>
               )}
-              {order?.shippingCarrier && (
+              {order?.tracking?.[0]?.shippingCarrier && (
                 <div className="flex flex-col gap-1">
                   <span className="text-muted-foreground">
                     {isGerman ? "Lieferant" : "Carrier"}:
                   </span>
                   <span className="font-medium text-foreground">
-                    {order?.shippingCarrier}
+                    {order.tracking[0].shippingCarrier}
                   </span>
                 </div>
               )}
@@ -504,7 +526,9 @@ export default function OrdersHistory({ userId, countryCode }) {
                       </div>
                       <div>
                         <div className="flex items-start sm:items-center flex-col-reverse sm:flex-row  gap-2">
-                          <h3 className="font-medium">{order?._id}</h3>
+                          <h3 className="font-medium">
+                            #{formatOrderNumber(order?.orderNumber)}
+                          </h3>
                           {getStatusBadge(order?.orderStatus)}
                         </div>
                         <p className="text-sm text-muted-foreground">
@@ -521,9 +545,17 @@ export default function OrdersHistory({ userId, countryCode }) {
                           setOrderId((prev) =>
                             prev === order?._id ? "" : order?._id
                           );
-                          setTrackingNumber(
-                            order?.tracking[0]?.trackingId || ""
-                          );
+                          // Set tracking number and trigger API call if available
+                          const trackingId = order?.tracking?.[0]?.trackingId;
+                          if (trackingId) {
+                            setTrackingNumber(trackingId);
+                            const carrier =
+                              order?.tracking?.[0]?.shippingCarrier;
+                            getTrackingData(trackingId, carrier);
+                          } else {
+                            setTrackingNumber("");
+                            setTrackingData(null);
+                          }
                         }}
                         variant="outline"
                         size="sm"
@@ -573,6 +605,204 @@ export default function OrdersHistory({ userId, countryCode }) {
 
                       {/* Shipping and Payment Details */}
                       <OrderDetailsSection order={order} />
+
+                      {/* Tracking Details Section */}
+                      {orderId === order?._id &&
+                        order?.tracking?.[0]?.trackingId &&
+                        (loading ? (
+                          <div className="rounded-lg border bg-card p-4">
+                            <div className="flex items-center gap-2">
+                              <RefreshCw className="h-5 w-5 animate-spin text-primary" />
+                              <span className="text-sm text-muted-foreground">
+                                {isGerman
+                                  ? "Tracking-Informationen werden geladen..."
+                                  : "Loading tracking information..."}
+                              </span>
+                            </div>
+                          </div>
+                        ) : error ? (
+                          <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-4">
+                            <div className="flex items-center gap-2">
+                              <AlertCircle className="h-5 w-5 text-destructive" />
+                              <span className="text-sm text-destructive">
+                                {error}
+                              </span>
+                            </div>
+                          </div>
+                        ) : trackingData?.success &&
+                          trackingData?.trackingNumber ===
+                            order?.tracking?.[0]?.trackingId ? (
+                          <div className="space-y-4 rounded-lg border bg-card p-4">
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                <Truck className="h-5 w-5 text-primary" />
+                                <h3 className="text-lg font-semibold text-foreground">
+                                  {isGerman
+                                    ? "Sendungsverfolgung"
+                                    : "Shipment Tracking"}
+                                </h3>
+                              </div>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => {
+                                  const trackingId =
+                                    order?.tracking?.[0]?.trackingId;
+                                  const carrier =
+                                    order?.tracking?.[0]?.shippingCarrier;
+                                  getTrackingData(trackingId, carrier);
+                                }}
+                                className="text-xs"
+                              >
+                                <RefreshCw className="h-3 w-3 mr-1" />
+                                {isGerman ? "Aktualisieren" : "Refresh"}
+                              </Button>
+                            </div>
+
+                            {/* Current Status */}
+                            {trackingData?.status && (
+                              <div className="rounded-lg border bg-muted/30 p-4">
+                                <div className="flex items-center justify-between mb-3">
+                                  <span className="text-sm font-medium text-muted-foreground">
+                                    {isGerman
+                                      ? "Aktueller Status"
+                                      : "Current Status"}
+                                  </span>
+                                  <Badge
+                                    variant="outline"
+                                    className="capitalize"
+                                  >
+                                    {trackingData.status.current}
+                                  </Badge>
+                                </div>
+                                {trackingData.carrier && (
+                                  <div className="flex items-center justify-between text-sm">
+                                    <span className="text-muted-foreground">
+                                      {isGerman ? "Spediteur" : "Carrier"}:
+                                    </span>
+                                    <span className="font-medium text-foreground">
+                                      {trackingData.carrier.name ||
+                                        trackingData.carrier.alias ||
+                                        "Unknown"}
+                                    </span>
+                                  </div>
+                                )}
+                                {trackingData?.timeMetrics
+                                  ?.estimated_delivery_date && (
+                                  <div className="flex items-center justify-between text-sm mt-2 pt-2 border-t">
+                                    <span className="text-muted-foreground">
+                                      {isGerman
+                                        ? "Geschätztes Lieferdatum"
+                                        : "Estimated Delivery"}
+                                      :
+                                    </span>
+                                    <span className="font-medium text-foreground">
+                                      {format(
+                                        new Date(
+                                          trackingData.timeMetrics.estimated_delivery_date.from
+                                        ),
+                                        "MMM dd, yyyy"
+                                      )}
+                                    </span>
+                                  </div>
+                                )}
+                              </div>
+                            )}
+
+                            {/* Latest Event */}
+                            {trackingData?.latestEvent && (
+                              <div className="rounded-lg border bg-muted/30 p-4">
+                                <h4 className="text-sm font-semibold text-foreground mb-2">
+                                  {isGerman
+                                    ? "Letztes Update"
+                                    : "Latest Update"}
+                                </h4>
+                                <p className="text-sm text-foreground mb-1">
+                                  {trackingData.latestEvent
+                                    .description_translation?.description ||
+                                    trackingData.latestEvent.description}
+                                </p>
+                                <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                                  {trackingData.latestEvent.time_iso && (
+                                    <span>
+                                      {format(
+                                        new Date(
+                                          trackingData.latestEvent.time_iso
+                                        ),
+                                        "MMM dd, yyyy • h:mm a"
+                                      )}
+                                    </span>
+                                  )}
+                                  {trackingData.latestEvent.location && (
+                                    <span>
+                                      📍 {trackingData.latestEvent.location}
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Tracking Events Timeline */}
+                            {trackingData?.events &&
+                              trackingData.events.length > 0 && (
+                                <div className="space-y-3">
+                                  <h4 className="text-sm font-semibold text-foreground">
+                                    {isGerman
+                                      ? "Sendungsverlauf"
+                                      : "Tracking History"}
+                                  </h4>
+                                  <div className="relative space-y-4 pl-6">
+                                    <div className="absolute left-[7px] top-2 bottom-2 w-0.5 bg-border" />
+                                    {trackingData.events.map((event, index) => (
+                                      <div
+                                        key={index}
+                                        className="relative flex items-start gap-4"
+                                      >
+                                        <div className="absolute -left-6 flex h-4 w-4 items-center justify-center">
+                                          <div
+                                            className={`h-3 w-3 rounded-full border-2 ${
+                                              index === 0
+                                                ? "bg-primary border-primary"
+                                                : "bg-muted border-border"
+                                            }`}
+                                          />
+                                        </div>
+                                        <div className="flex-1 space-y-1">
+                                          <p className="text-sm font-medium text-foreground">
+                                            {event.description_translation
+                                              ?.description ||
+                                              event.description}
+                                          </p>
+                                          <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                                            {event.time_iso && (
+                                              <span>
+                                                {format(
+                                                  new Date(event.time_iso),
+                                                  "MMM dd, yyyy • h:mm a"
+                                                )}
+                                              </span>
+                                            )}
+                                            {event.location && (
+                                              <span>📍 {event.location}</span>
+                                            )}
+                                          </div>
+                                          {event.address?.city && (
+                                            <p className="text-xs text-muted-foreground">
+                                              {event.address.city}
+                                              {event.address.state &&
+                                                `, ${event.address.state}`}
+                                              {event.address.country &&
+                                                `, ${event.address.country}`}
+                                            </p>
+                                          )}
+                                        </div>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+                          </div>
+                        ) : null)}
 
                       {/* Products Section */}
                       <div className="space-y-3">
@@ -773,7 +1003,9 @@ export default function OrdersHistory({ userId, countryCode }) {
                           </div>
                           <div>
                             <div className="flex items-start sm:items-center flex-col-reverse sm:flex-row  gap-2">
-                              <h3 className="font-medium">{order?._id}</h3>
+                              <h3 className="font-medium">
+                                #{formatOrderNumber(order?.orderNumber)}
+                              </h3>
                               {getStatusBadge(order?.orderStatus)}
                             </div>
                             <p className="text-sm text-muted-foreground">
@@ -790,6 +1022,18 @@ export default function OrdersHistory({ userId, countryCode }) {
                               setOrderId((prev) =>
                                 prev === order?._id ? "" : order?._id
                               );
+                              // Set tracking number and trigger API call if available
+                              const trackingId =
+                                order?.tracking?.[0]?.trackingId;
+                              if (trackingId) {
+                                setTrackingNumber(trackingId);
+                                const carrier =
+                                  order?.tracking?.[0]?.shippingCarrier;
+                                getTrackingData(trackingId, carrier);
+                              } else {
+                                setTrackingNumber("");
+                                setTrackingData(null);
+                              }
                             }}
                             variant="outline"
                             size="sm"
@@ -840,6 +1084,210 @@ export default function OrdersHistory({ userId, countryCode }) {
 
                           {/* Shipping and Payment Details */}
                           <OrderDetailsSection order={order} />
+
+                          {/* Tracking Details Section */}
+                          {orderId === order?._id &&
+                            order?.tracking?.[0]?.trackingId &&
+                            (loading ? (
+                              <div className="rounded-lg border bg-card p-4">
+                                <div className="flex items-center gap-2">
+                                  <RefreshCw className="h-5 w-5 animate-spin text-primary" />
+                                  <span className="text-sm text-muted-foreground">
+                                    {isGerman
+                                      ? "Tracking-Informationen werden geladen..."
+                                      : "Loading tracking information..."}
+                                  </span>
+                                </div>
+                              </div>
+                            ) : error ? (
+                              <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-4">
+                                <div className="flex items-center gap-2">
+                                  <AlertCircle className="h-5 w-5 text-destructive" />
+                                  <span className="text-sm text-destructive">
+                                    {error}
+                                  </span>
+                                </div>
+                              </div>
+                            ) : trackingData?.success &&
+                              trackingData?.trackingNumber ===
+                                order?.tracking?.[0]?.trackingId ? (
+                              <div className="space-y-4 rounded-lg border bg-card p-4">
+                                <div className="flex items-center justify-between">
+                                  <div className="flex items-center gap-2">
+                                    <Truck className="h-5 w-5 text-primary" />
+                                    <h3 className="text-lg font-semibold text-foreground">
+                                      {isGerman
+                                        ? "Sendungsverfolgung"
+                                        : "Shipment Tracking"}
+                                    </h3>
+                                  </div>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => {
+                                      const trackingId =
+                                        order?.tracking?.[0]?.trackingId;
+                                      const carrier =
+                                        order?.tracking?.[0]?.shippingCarrier;
+                                      getTrackingData(trackingId, carrier);
+                                    }}
+                                    className="text-xs"
+                                  >
+                                    <RefreshCw className="h-3 w-3 mr-1" />
+                                    {isGerman ? "Aktualisieren" : "Refresh"}
+                                  </Button>
+                                </div>
+
+                                {/* Current Status */}
+                                {trackingData?.status && (
+                                  <div className="rounded-lg border bg-muted/30 p-4">
+                                    <div className="flex items-center justify-between mb-3">
+                                      <span className="text-sm font-medium text-muted-foreground">
+                                        {isGerman
+                                          ? "Aktueller Status"
+                                          : "Current Status"}
+                                      </span>
+                                      <Badge
+                                        variant="outline"
+                                        className="capitalize"
+                                      >
+                                        {trackingData.status.current}
+                                      </Badge>
+                                    </div>
+                                    {trackingData.carrier && (
+                                      <div className="flex items-center justify-between text-sm">
+                                        <span className="text-muted-foreground">
+                                          {isGerman ? "Spediteur" : "Carrier"}:
+                                        </span>
+                                        <span className="font-medium text-foreground">
+                                          {trackingData.carrier.name ||
+                                            trackingData.carrier.alias ||
+                                            "Unknown"}
+                                        </span>
+                                      </div>
+                                    )}
+                                    {trackingData?.timeMetrics
+                                      ?.estimated_delivery_date && (
+                                      <div className="flex items-center justify-between text-sm mt-2 pt-2 border-t">
+                                        <span className="text-muted-foreground">
+                                          {isGerman
+                                            ? "Geschätztes Lieferdatum"
+                                            : "Estimated Delivery"}
+                                          :
+                                        </span>
+                                        <span className="font-medium text-foreground">
+                                          {format(
+                                            new Date(
+                                              trackingData.timeMetrics.estimated_delivery_date.from
+                                            ),
+                                            "MMM dd, yyyy"
+                                          )}
+                                        </span>
+                                      </div>
+                                    )}
+                                  </div>
+                                )}
+
+                                {/* Latest Event */}
+                                {trackingData?.latestEvent && (
+                                  <div className="rounded-lg border bg-muted/30 p-4">
+                                    <h4 className="text-sm font-semibold text-foreground mb-2">
+                                      {isGerman
+                                        ? "Letztes Update"
+                                        : "Latest Update"}
+                                    </h4>
+                                    <p className="text-sm text-foreground mb-1">
+                                      {trackingData.latestEvent
+                                        .description_translation?.description ||
+                                        trackingData.latestEvent.description}
+                                    </p>
+                                    <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                                      {trackingData.latestEvent.time_iso && (
+                                        <span>
+                                          {format(
+                                            new Date(
+                                              trackingData.latestEvent.time_iso
+                                            ),
+                                            "MMM dd, yyyy • h:mm a"
+                                          )}
+                                        </span>
+                                      )}
+                                      {trackingData.latestEvent.location && (
+                                        <span>
+                                          📍 {trackingData.latestEvent.location}
+                                        </span>
+                                      )}
+                                    </div>
+                                  </div>
+                                )}
+
+                                {/* Tracking Events Timeline */}
+                                {trackingData?.events &&
+                                  trackingData.events.length > 0 && (
+                                    <div className="space-y-3">
+                                      <h4 className="text-sm font-semibold text-foreground">
+                                        {isGerman
+                                          ? "Sendungsverlauf"
+                                          : "Tracking History"}
+                                      </h4>
+                                      <div className="relative space-y-4 pl-6">
+                                        <div className="absolute left-[7px] top-2 bottom-2 w-0.5 bg-border" />
+                                        {trackingData.events.map(
+                                          (event, index) => (
+                                            <div
+                                              key={index}
+                                              className="relative flex items-start gap-4"
+                                            >
+                                              <div className="absolute -left-6 flex h-4 w-4 items-center justify-center">
+                                                <div
+                                                  className={`h-3 w-3 rounded-full border-2 ${
+                                                    index === 0
+                                                      ? "bg-primary border-primary"
+                                                      : "bg-muted border-border"
+                                                  }`}
+                                                />
+                                              </div>
+                                              <div className="flex-1 space-y-1">
+                                                <p className="text-sm font-medium text-foreground">
+                                                  {event.description_translation
+                                                    ?.description ||
+                                                    event.description}
+                                                </p>
+                                                <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                                                  {event.time_iso && (
+                                                    <span>
+                                                      {format(
+                                                        new Date(
+                                                          event.time_iso
+                                                        ),
+                                                        "MMM dd, yyyy • h:mm a"
+                                                      )}
+                                                    </span>
+                                                  )}
+                                                  {event.location && (
+                                                    <span>
+                                                      📍 {event.location}
+                                                    </span>
+                                                  )}
+                                                </div>
+                                                {event.address?.city && (
+                                                  <p className="text-xs text-muted-foreground">
+                                                    {event.address.city}
+                                                    {event.address.state &&
+                                                      `, ${event.address.state}`}
+                                                    {event.address.country &&
+                                                      `, ${event.address.country}`}
+                                                  </p>
+                                                )}
+                                              </div>
+                                            </div>
+                                          )
+                                        )}
+                                      </div>
+                                    </div>
+                                  )}
+                              </div>
+                            ) : null)}
 
                           {/* Products Section */}
                           <div className="space-y-3">

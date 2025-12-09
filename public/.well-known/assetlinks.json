@@ -1,0 +1,11 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "com.animmza.ayoob",
+    "sha256_cert_fingerprints": [
+      "35:A9:D0:60:B5:02:B2:FE:87:48:54:C6:85:30:8A:2E:0A:9F:0C:85:F2:B6:3E:BF:45:FA:B2:71:99:FD:6D:3A"
+    ]
+  }
+}]
+

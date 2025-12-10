@@ -659,84 +659,180 @@ export default function OrdersHistory({ userId, countryCode }) {
                               </Button>
                             </div>
 
-                            {/* Current Status */}
+                            {/* Current Status & Key Info */}
                             {trackingData?.status && (
-                              <div className="rounded-lg border bg-muted/30 p-4">
-                                <div className="flex items-center justify-between mb-3">
-                                  <span className="text-sm font-medium text-muted-foreground">
-                                    {isGerman
-                                      ? "Aktueller Status"
-                                      : "Current Status"}
-                                  </span>
-                                  <Badge
-                                    variant="outline"
-                                    className="capitalize"
-                                  >
-                                    {trackingData.status.current}
-                                  </Badge>
-                                </div>
-                                {trackingData.carrier && (
-                                  <div className="flex items-center justify-between text-sm">
-                                    <span className="text-muted-foreground">
-                                      {isGerman ? "Spediteur" : "Carrier"}:
-                                    </span>
-                                    <span className="font-medium text-foreground">
-                                      {trackingData.carrier.name ||
-                                        trackingData.carrier.alias ||
-                                        "Unknown"}
-                                    </span>
-                                  </div>
-                                )}
-                                {trackingData?.timeMetrics
-                                  ?.estimated_delivery_date && (
-                                  <div className="flex items-center justify-between text-sm mt-2 pt-2 border-t">
-                                    <span className="text-muted-foreground">
+                              <div className="grid gap-4 md:grid-cols-2">
+                                {/* Status Card */}
+                                <div className="rounded-lg border bg-muted/30 p-4">
+                                  <div className="flex items-center justify-between mb-3">
+                                    <span className="text-sm font-medium text-muted-foreground">
                                       {isGerman
-                                        ? "Geschätztes Lieferdatum"
-                                        : "Estimated Delivery"}
-                                      :
+                                        ? "Aktueller Status"
+                                        : "Current Status"}
                                     </span>
-                                    <span className="font-medium text-foreground">
-                                      {format(
-                                        new Date(
-                                          trackingData.timeMetrics.estimated_delivery_date.from
-                                        ),
-                                        "MMM dd, yyyy"
+                                    <Badge
+                                      variant="outline"
+                                      className="capitalize"
+                                    >
+                                      {trackingData.status.current
+                                        ?.replace(/([A-Z])/g, " $1")
+                                        .trim() || "Unknown"}
+                                    </Badge>
+                                  </div>
+                                  {trackingData.carrier && (
+                                    <div className="flex items-center justify-between text-sm mt-2">
+                                      <span className="text-muted-foreground">
+                                        {isGerman ? "Spediteur" : "Carrier"}:
+                                      </span>
+                                      <span className="font-medium text-foreground">
+                                        {trackingData.carrier.name ||
+                                          trackingData.carrier.alias ||
+                                          "Unknown"}
+                                      </span>
+                                    </div>
+                                  )}
+                                </div>
+
+                                {/* Shipping Route */}
+                                {trackingData?.shippingInfo && (
+                                  <div className="rounded-lg border bg-muted/30 p-4">
+                                    <h4 className="text-sm font-semibold text-foreground mb-3">
+                                      {isGerman
+                                        ? "Versandroute"
+                                        : "Shipping Route"}
+                                    </h4>
+                                    <div className="space-y-2 text-sm">
+                                      {trackingData.shippingInfo.shipper_address
+                                        ?.country && (
+                                        <div className="flex items-center justify-between">
+                                          <span className="text-muted-foreground">
+                                            {isGerman ? "Von" : "From"}:
+                                          </span>
+                                          <span className="font-medium text-foreground">
+                                            {
+                                              trackingData.shippingInfo
+                                                .shipper_address.country
+                                            }
+                                          </span>
+                                        </div>
                                       )}
-                                    </span>
+                                      {trackingData.shippingInfo
+                                        .recipient_address?.country && (
+                                        <div className="flex items-center justify-between">
+                                          <span className="text-muted-foreground">
+                                            {isGerman ? "Nach" : "To"}:
+                                          </span>
+                                          <span className="font-medium text-foreground">
+                                            {
+                                              trackingData.shippingInfo
+                                                .recipient_address.country
+                                            }
+                                          </span>
+                                        </div>
+                                      )}
+                                    </div>
                                   </div>
                                 )}
+                              </div>
+                            )}
+
+                            {/* Time Metrics */}
+                            {trackingData?.timeMetrics && (
+                              <div className="rounded-lg border bg-muted/30 p-4">
+                                <h4 className="text-sm font-semibold text-foreground mb-3">
+                                  {isGerman ? "Zeitmetriken" : "Time Metrics"}
+                                </h4>
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+                                  {trackingData.timeMetrics.days_of_transit !==
+                                    null && (
+                                    <div className="flex flex-col">
+                                      <span className="text-muted-foreground text-xs">
+                                        {isGerman
+                                          ? "Tage im Transit"
+                                          : "Days in Transit"}
+                                      </span>
+                                      <span className="font-semibold text-foreground mt-1">
+                                        {
+                                          trackingData.timeMetrics
+                                            .days_of_transit
+                                        }
+                                      </span>
+                                    </div>
+                                  )}
+                                  {trackingData.timeMetrics
+                                    .days_after_last_update !== null && (
+                                    <div className="flex flex-col">
+                                      <span className="text-muted-foreground text-xs">
+                                        {isGerman
+                                          ? "Letztes Update"
+                                          : "Last Update"}
+                                      </span>
+                                      <span className="font-semibold text-foreground mt-1">
+                                        {
+                                          trackingData.timeMetrics
+                                            .days_after_last_update
+                                        }{" "}
+                                        {isGerman ? "Tage" : "days"} ago
+                                      </span>
+                                    </div>
+                                  )}
+                                  {trackingData.timeMetrics
+                                    .estimated_delivery_date?.from && (
+                                    <div className="flex flex-col md:col-span-2">
+                                      <span className="text-muted-foreground text-xs">
+                                        {isGerman
+                                          ? "Geschätztes Lieferdatum"
+                                          : "Estimated Delivery"}
+                                      </span>
+                                      <span className="font-semibold text-foreground mt-1">
+                                        {format(
+                                          new Date(
+                                            trackingData.timeMetrics.estimated_delivery_date.from
+                                          ),
+                                          "MMM dd, yyyy"
+                                        )}
+                                      </span>
+                                    </div>
+                                  )}
+                                </div>
                               </div>
                             )}
 
                             {/* Latest Event */}
                             {trackingData?.latestEvent && (
                               <div className="rounded-lg border bg-muted/30 p-4">
-                                <h4 className="text-sm font-semibold text-foreground mb-2">
+                                <h4 className="text-sm font-semibold text-foreground mb-3">
                                   {isGerman
                                     ? "Letztes Update"
                                     : "Latest Update"}
                                 </h4>
-                                <p className="text-sm text-foreground mb-1">
-                                  {trackingData.latestEvent
-                                    .description_translation?.description ||
-                                    trackingData.latestEvent.description}
+                                <p className="text-sm font-medium text-foreground mb-2">
+                                  {trackingData.latestEvent.description ||
+                                    trackingData.latestEvent
+                                      .description_translation?.description ||
+                                    "No description available"}
                                 </p>
-                                <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                                <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
                                   {trackingData.latestEvent.time_iso && (
-                                    <span>
-                                      {format(
-                                        new Date(
-                                          trackingData.latestEvent.time_iso
-                                        ),
-                                        "MMM dd, yyyy • h:mm a"
-                                      )}
-                                    </span>
+                                    <div className="flex items-center gap-1">
+                                      <Clock className="h-3 w-3" />
+                                      <span>
+                                        {format(
+                                          new Date(
+                                            trackingData.latestEvent.time_iso
+                                          ),
+                                          "MMM dd, yyyy • h:mm a"
+                                        )}
+                                      </span>
+                                    </div>
                                   )}
                                   {trackingData.latestEvent.location && (
-                                    <span>
-                                      📍 {trackingData.latestEvent.location}
-                                    </span>
+                                    <div className="flex items-center gap-1">
+                                      <MapPin className="h-3 w-3" />
+                                      <span>
+                                        {trackingData.latestEvent.location}
+                                      </span>
+                                    </div>
                                   )}
                                 </div>
                               </div>
@@ -769,21 +865,28 @@ export default function OrdersHistory({ userId, countryCode }) {
                                         </div>
                                         <div className="flex-1 space-y-1">
                                           <p className="text-sm font-medium text-foreground">
-                                            {event.description_translation
-                                              ?.description ||
-                                              event.description}
+                                            {event.description ||
+                                              event.description_translation
+                                                ?.description ||
+                                              "No description"}
                                           </p>
-                                          <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                                          <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
                                             {event.time_iso && (
-                                              <span>
-                                                {format(
-                                                  new Date(event.time_iso),
-                                                  "MMM dd, yyyy • h:mm a"
-                                                )}
-                                              </span>
+                                              <div className="flex items-center gap-1">
+                                                <Clock className="h-3 w-3" />
+                                                <span>
+                                                  {format(
+                                                    new Date(event.time_iso),
+                                                    "MMM dd, yyyy • h:mm a"
+                                                  )}
+                                                </span>
+                                              </div>
                                             )}
                                             {event.location && (
-                                              <span>📍 {event.location}</span>
+                                              <div className="flex items-center gap-1">
+                                                <MapPin className="h-3 w-3" />
+                                                <span>{event.location}</span>
+                                              </div>
                                             )}
                                           </div>
                                           {event.address?.city && (
@@ -1138,84 +1241,184 @@ export default function OrdersHistory({ userId, countryCode }) {
                                   </Button>
                                 </div>
 
-                                {/* Current Status */}
+                                {/* Current Status & Key Info */}
                                 {trackingData?.status && (
-                                  <div className="rounded-lg border bg-muted/30 p-4">
-                                    <div className="flex items-center justify-between mb-3">
-                                      <span className="text-sm font-medium text-muted-foreground">
-                                        {isGerman
-                                          ? "Aktueller Status"
-                                          : "Current Status"}
-                                      </span>
-                                      <Badge
-                                        variant="outline"
-                                        className="capitalize"
-                                      >
-                                        {trackingData.status.current}
-                                      </Badge>
-                                    </div>
-                                    {trackingData.carrier && (
-                                      <div className="flex items-center justify-between text-sm">
-                                        <span className="text-muted-foreground">
-                                          {isGerman ? "Spediteur" : "Carrier"}:
-                                        </span>
-                                        <span className="font-medium text-foreground">
-                                          {trackingData.carrier.name ||
-                                            trackingData.carrier.alias ||
-                                            "Unknown"}
-                                        </span>
-                                      </div>
-                                    )}
-                                    {trackingData?.timeMetrics
-                                      ?.estimated_delivery_date && (
-                                      <div className="flex items-center justify-between text-sm mt-2 pt-2 border-t">
-                                        <span className="text-muted-foreground">
+                                  <div className="grid gap-4 md:grid-cols-2">
+                                    {/* Status Card */}
+                                    <div className="rounded-lg border bg-muted/30 p-4">
+                                      <div className="flex items-center justify-between mb-3">
+                                        <span className="text-sm font-medium text-muted-foreground">
                                           {isGerman
-                                            ? "Geschätztes Lieferdatum"
-                                            : "Estimated Delivery"}
-                                          :
+                                            ? "Aktueller Status"
+                                            : "Current Status"}
                                         </span>
-                                        <span className="font-medium text-foreground">
-                                          {format(
-                                            new Date(
-                                              trackingData.timeMetrics.estimated_delivery_date.from
-                                            ),
-                                            "MMM dd, yyyy"
+                                        <Badge
+                                          variant="outline"
+                                          className="capitalize"
+                                        >
+                                          {trackingData.status.current
+                                            ?.replace(/([A-Z])/g, " $1")
+                                            .trim() || "Unknown"}
+                                        </Badge>
+                                      </div>
+                                      {trackingData.carrier && (
+                                        <div className="flex items-center justify-between text-sm mt-2">
+                                          <span className="text-muted-foreground">
+                                            {isGerman ? "Spediteur" : "Carrier"}
+                                            :
+                                          </span>
+                                          <span className="font-medium text-foreground">
+                                            {trackingData.carrier.name ||
+                                              trackingData.carrier.alias ||
+                                              "Unknown"}
+                                          </span>
+                                        </div>
+                                      )}
+                                    </div>
+
+                                    {/* Shipping Route */}
+                                    {trackingData?.shippingInfo && (
+                                      <div className="rounded-lg border bg-muted/30 p-4">
+                                        <h4 className="text-sm font-semibold text-foreground mb-3">
+                                          {isGerman
+                                            ? "Versandroute"
+                                            : "Shipping Route"}
+                                        </h4>
+                                        <div className="space-y-2 text-sm">
+                                          {trackingData.shippingInfo
+                                            .shipper_address?.country && (
+                                            <div className="flex items-center justify-between">
+                                              <span className="text-muted-foreground">
+                                                {isGerman ? "Von" : "From"}:
+                                              </span>
+                                              <span className="font-medium text-foreground">
+                                                {
+                                                  trackingData.shippingInfo
+                                                    .shipper_address.country
+                                                }
+                                              </span>
+                                            </div>
                                           )}
-                                        </span>
+                                          {trackingData.shippingInfo
+                                            .recipient_address?.country && (
+                                            <div className="flex items-center justify-between">
+                                              <span className="text-muted-foreground">
+                                                {isGerman ? "Nach" : "To"}:
+                                              </span>
+                                              <span className="font-medium text-foreground">
+                                                {
+                                                  trackingData.shippingInfo
+                                                    .recipient_address.country
+                                                }
+                                              </span>
+                                            </div>
+                                          )}
+                                        </div>
                                       </div>
                                     )}
+                                  </div>
+                                )}
+
+                                {/* Time Metrics */}
+                                {trackingData?.timeMetrics && (
+                                  <div className="rounded-lg border bg-muted/30 p-4">
+                                    <h4 className="text-sm font-semibold text-foreground mb-3">
+                                      {isGerman
+                                        ? "Zeitmetriken"
+                                        : "Time Metrics"}
+                                    </h4>
+                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+                                      {trackingData.timeMetrics
+                                        .days_of_transit !== null && (
+                                        <div className="flex flex-col">
+                                          <span className="text-muted-foreground text-xs">
+                                            {isGerman
+                                              ? "Tage im Transit"
+                                              : "Days in Transit"}
+                                          </span>
+                                          <span className="font-semibold text-foreground mt-1">
+                                            {
+                                              trackingData.timeMetrics
+                                                .days_of_transit
+                                            }
+                                          </span>
+                                        </div>
+                                      )}
+                                      {trackingData.timeMetrics
+                                        .days_after_last_update !== null && (
+                                        <div className="flex flex-col">
+                                          <span className="text-muted-foreground text-xs">
+                                            {isGerman
+                                              ? "Letztes Update"
+                                              : "Last Update"}
+                                          </span>
+                                          <span className="font-semibold text-foreground mt-1">
+                                            {
+                                              trackingData.timeMetrics
+                                                .days_after_last_update
+                                            }{" "}
+                                            {isGerman ? "Tage" : "days"} ago
+                                          </span>
+                                        </div>
+                                      )}
+                                      {trackingData.timeMetrics
+                                        .estimated_delivery_date?.from && (
+                                        <div className="flex flex-col md:col-span-2">
+                                          <span className="text-muted-foreground text-xs">
+                                            {isGerman
+                                              ? "Geschätztes Lieferdatum"
+                                              : "Estimated Delivery"}
+                                          </span>
+                                          <span className="font-semibold text-foreground mt-1">
+                                            {format(
+                                              new Date(
+                                                trackingData.timeMetrics.estimated_delivery_date.from
+                                              ),
+                                              "MMM dd, yyyy"
+                                            )}
+                                          </span>
+                                        </div>
+                                      )}
+                                    </div>
                                   </div>
                                 )}
 
                                 {/* Latest Event */}
                                 {trackingData?.latestEvent && (
                                   <div className="rounded-lg border bg-muted/30 p-4">
-                                    <h4 className="text-sm font-semibold text-foreground mb-2">
+                                    <h4 className="text-sm font-semibold text-foreground mb-3">
                                       {isGerman
                                         ? "Letztes Update"
                                         : "Latest Update"}
                                     </h4>
-                                    <p className="text-sm text-foreground mb-1">
-                                      {trackingData.latestEvent
-                                        .description_translation?.description ||
-                                        trackingData.latestEvent.description}
+                                    <p className="text-sm font-medium text-foreground mb-2">
+                                      {trackingData.latestEvent.description ||
+                                        trackingData.latestEvent
+                                          .description_translation
+                                          ?.description ||
+                                        "No description available"}
                                     </p>
-                                    <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                                    <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
                                       {trackingData.latestEvent.time_iso && (
-                                        <span>
-                                          {format(
-                                            new Date(
-                                              trackingData.latestEvent.time_iso
-                                            ),
-                                            "MMM dd, yyyy • h:mm a"
-                                          )}
-                                        </span>
+                                        <div className="flex items-center gap-1">
+                                          <Clock className="h-3 w-3" />
+                                          <span>
+                                            {format(
+                                              new Date(
+                                                trackingData.latestEvent.time_iso
+                                              ),
+                                              "MMM dd, yyyy • h:mm a"
+                                            )}
+                                          </span>
+                                        </div>
                                       )}
                                       {trackingData.latestEvent.location && (
-                                        <span>
-                                          📍 {trackingData.latestEvent.location}
-                                        </span>
+                                        <div className="flex items-center gap-1">
+                                          <MapPin className="h-3 w-3" />
+                                          <span>
+                                            {trackingData.latestEvent.location}
+                                          </span>
+                                        </div>
                                       )}
                                     </div>
                                   </div>
@@ -1249,25 +1452,33 @@ export default function OrdersHistory({ userId, countryCode }) {
                                               </div>
                                               <div className="flex-1 space-y-1">
                                                 <p className="text-sm font-medium text-foreground">
-                                                  {event.description_translation
-                                                    ?.description ||
-                                                    event.description}
+                                                  {event.description ||
+                                                    event
+                                                      .description_translation
+                                                      ?.description ||
+                                                    "No description"}
                                                 </p>
-                                                <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                                                <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
                                                   {event.time_iso && (
-                                                    <span>
-                                                      {format(
-                                                        new Date(
-                                                          event.time_iso
-                                                        ),
-                                                        "MMM dd, yyyy • h:mm a"
-                                                      )}
-                                                    </span>
+                                                    <div className="flex items-center gap-1">
+                                                      <Clock className="h-3 w-3" />
+                                                      <span>
+                                                        {format(
+                                                          new Date(
+                                                            event.time_iso
+                                                          ),
+                                                          "MMM dd, yyyy • h:mm a"
+                                                        )}
+                                                      </span>
+                                                    </div>
                                                   )}
                                                   {event.location && (
-                                                    <span>
-                                                      📍 {event.location}
-                                                    </span>
+                                                    <div className="flex items-center gap-1">
+                                                      <MapPin className="h-3 w-3" />
+                                                      <span>
+                                                        {event.location}
+                                                      </span>
+                                                    </div>
                                                   )}
                                                 </div>
                                                 {event.address?.city && (

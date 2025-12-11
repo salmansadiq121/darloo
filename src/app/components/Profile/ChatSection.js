@@ -44,10 +44,10 @@ import { fileType } from "@/app/utils/UploadChatFile";
 import Image from "next/image";
 import MessageLoader from "../Skeltons/MessageLoader";
 import socketIO from "socket.io-client";
-const ENDPOINT = process.env.NEXT_PUBLIC_SOCKET_SERVER_URI || "";
-const socketId = socketIO(ENDPOINT, { transports: ["websocket"] });
 
 export default function ChatSection({ user }) {
+  // Create socket connection with userID
+  const [socketId, setSocketId] = useState(null);
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const [isTyping, setIsTyping] = useState(false);
@@ -60,20 +60,62 @@ export default function ChatSection({ user }) {
   const [typing, setTyping] = useState(false);
   const [selectedQuickQuestion, setSelectedQuickQuestion] = useState(null);
 
-  // Socket.io
+  // Initialize Socket Connection
   useEffect(() => {
-    socketId.on("typing", (data) => {
-      setIsTyping(true);
+    const ENDPOINT = process.env.NEXT_PUBLIC_SOCKET_SERVER_URI || "";
+    
+    if (!user?._id || !ENDPOINT) {
+      console.warn("Socket: Missing user ID or endpoint");
+      return;
+    }
+
+    const socket = socketIO(ENDPOINT, {
+      transports: ["websocket", "polling"],
+      reconnection: true,
+      reconnectionDelay: 1000,
+      reconnectionDelayMax: 5000,
+      reconnectionAttempts: 5,
+      query: { userID: user._id },
     });
 
-    socketId.on("stopTyping", (data) => {
-      setIsTyping(false);
+    socket.on("connect", () => {
+      console.log("Socket connected!", socket.id);
     });
+
+    socket.on("disconnect", (reason) => {
+      console.log("Socket disconnected:", reason);
+    });
+
+    socket.on("connect_error", (error) => {
+      console.error("Socket connection error:", error);
+    });
+
+    setSocketId(socket);
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [user?._id]);
+
+  // Socket.io event listeners
+  useEffect(() => {
+    if (!socketId) return;
+
+    const handleTyping = () => {
+      setIsTyping(true);
+    };
+
+    const handleStopTyping = () => {
+      setIsTyping(false);
+    };
+
+    socketId.on("typing", handleTyping);
+    socketId.on("stopTyping", handleStopTyping);
 
     // Cleanup on component unmount
     return () => {
-      socketId.off("typing");
-      socketId.off("stopTyping");
+      socketId.off("typing", handleTyping);
+      socketId.off("stopTyping", handleStopTyping);
     };
   }, [socketId]);
 
@@ -168,7 +210,9 @@ export default function ChatSection({ user }) {
       setMessages([defaultMessage, ...data.messages]);
       console.log("Messages", data.messages);
 
-      socketId.emit("join chat", chatId);
+      if (socketId) {
+        socketId.emit("join chat", chatId);
+      }
     } catch (error) {
       console.log(error);
       toast.error(error?.response?.data?.message);
@@ -201,12 +245,14 @@ export default function ChatSection({ user }) {
     );
 
     if (data) {
-      socketId.emit("NewMessageAdded", {
-        content: messageContent,
-        contentType: "text",
-        chatId: selectedChat._id,
-        messageId: data._id,
-      });
+      if (socketId) {
+        socketId.emit("NewMessageAdded", {
+          content: messageContent,
+          contentType: "text",
+          chatId: selectedChat._id,
+          messageId: data._id,
+        });
+      }
       setMessages((prev) => [...prev, data.message]);
       // fetchMessages();
       setNewMessage("");
@@ -231,10 +277,21 @@ export default function ChatSection({ user }) {
     // }, 1500 + Math.random() * 1500);
   };
 
+  // Join chat room when socket and chat are available
+  useEffect(() => {
+    if (socketId && selectedChat?._id) {
+      socketId.emit("join chat", selectedChat._id);
+    }
+  }, [socketId, selectedChat?._id]);
+
   // Fetch Realtime Chat Messages
   useEffect(() => {
+    if (!socketId) return;
+
     const handleFetchMessages = (data) => {
-      fetchMessages(data.chatId);
+      if (data?.chatId && data.chatId === selectedChat?._id) {
+        fetchMessages(data.chatId);
+      }
     };
 
     socketId.on("fetchMessages", handleFetchMessages);
@@ -243,7 +300,7 @@ export default function ChatSection({ user }) {
       socketId.off("fetchMessages", handleFetchMessages);
     };
     // eslint-disable-next-line
-  }, [socketId]);
+  }, [socketId, selectedChat?._id]);
 
   // -------------------Handle Upload Files--------------->
 
@@ -260,12 +317,14 @@ export default function ChatSection({ user }) {
       );
 
       if (data) {
-        socketId.emit("NewMessageAdded", {
-          content: content,
-          contentType: mediaType,
-          chatId: selectedChat._id,
-          messageId: data._id,
-        });
+        if (socketId) {
+          socketId.emit("NewMessageAdded", {
+            content: content,
+            contentType: mediaType,
+            chatId: selectedChat._id,
+            messageId: data._id,
+          });
+        }
         setNewMessage("");
         setLoading(false);
       }
@@ -282,7 +341,7 @@ export default function ChatSection({ user }) {
     setNewMessage(e.target.value);
 
     // Typing Indicator login
-    if (!typing) {
+    if (!typing && socketId && selectedChat?._id) {
       setTyping(true);
       socketId.emit("typing", selectedChat._id);
     }
@@ -291,7 +350,7 @@ export default function ChatSection({ user }) {
     setTimeout(() => {
       var timeNow = new Date().getTime();
       var timeDiff = timeNow - lastTypingTime;
-      if (timeDiff >= timerLenght && typing) {
+      if (timeDiff >= timerLenght && typing && socketId && selectedChat?._id) {
         socketId.emit("stopTyping", selectedChat._id);
         setTyping(false);
       }

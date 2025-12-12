@@ -4,7 +4,7 @@ import { useAuth } from "@/app/content/authContent";
 import { authUri } from "@/app/utils/ServerURI";
 import axios from "axios";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, Suspense } from "react";
 import { RiLogoutCircleRFill } from "react-icons/ri";
 import {
   Bell,
@@ -58,7 +58,8 @@ import { TbTruckReturn } from "react-icons/tb";
 import ReturnHistory from "@/app/components/Profile/ReturnHistory";
 import CountrySelector from "@/components/ui/country-selector";
 
-export default function Profile() {
+// Component that uses useSearchParams - needs to be wrapped in Suspense
+function ProfileContent() {
   const { auth, setAuth, countryCode } = useAuth();
   const { id: userId } = useParams();
   const [userDetails, setUserDetails] = useState({});
@@ -667,5 +668,14 @@ export default function Profile() {
         />
       </div>
     </MainLayout>
+  );
+}
+
+// Main component with Suspense boundary
+export default function Profile() {
+  return (
+    <Suspense fallback={<LoadingSkelton />}>
+      <ProfileContent />
+    </Suspense>
   );
 }

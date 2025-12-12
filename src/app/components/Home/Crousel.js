@@ -143,10 +143,15 @@ export default function Crousel({ products, loading }) {
                 clipPath:
                   " polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)",
               }}
+<<<<<<< HEAD
               aria-label="Previous slide"
               suppressHydrationWarning
             >
               <span aria-hidden="true">❮</span>
+=======
+            >
+              ❮
+>>>>>>> e158cb47120590a5410ef9520a00f8635dcb3e8d
             </button>
             <button
               className="custom-next absolute top-1/2 right-4 -translate-y-1/2 bg-red-100 hover:bg-red-200 w-[2rem] h-[2.2rem] text-red-600  flex items-center justify-center shadow-md transition-all duration-300 z-10 cursor-pointer"
@@ -154,10 +159,15 @@ export default function Crousel({ products, loading }) {
                 clipPath:
                   " polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)",
               }}
+<<<<<<< HEAD
               aria-label="Next slide"
               suppressHydrationWarning
             >
               <span aria-hidden="true">❯</span>
+=======
+            >
+              ❯
+>>>>>>> e158cb47120590a5410ef9520a00f8635dcb3e8d
             </button>
           </div>
           <div className="col-span-4 sm:col-span-1">

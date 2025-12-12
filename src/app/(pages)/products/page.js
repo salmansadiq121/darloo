@@ -1,6 +1,13 @@
 "use client";
 
-import { useEffect, useState, useCallback, useMemo, Suspense } from "react";
+import {
+  useEffect,
+  useState,
+  useCallback,
+  useMemo,
+  Suspense,
+  useRef,
+} from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, ChevronUp, Filter, Search, X } from "lucide-react";
@@ -124,6 +131,12 @@ function ProductsContent() {
   const [isPC, setIsPC] = useState(true);
   const { countryCode } = useAuth();
 
+  // Refs to prevent unnecessary API calls
+  const prevFilterKeyRef = useRef("");
+  const isFetchingRef = useRef(false);
+  const fetchTimeoutRef = useRef(null);
+  const abortControllerRef = useRef(null);
+
   const isGerman = countryCode === "DE";
 
   // Debounced search
@@ -238,8 +251,49 @@ function ProductsContent() {
     }, 0);
   }, [searchParams]);
 
+  // Memoize filter key to detect actual changes
+  const filterKey = useMemo(() => {
+    return JSON.stringify({
+      page: currentPage,
+      categories: [...selectedCategories].sort().join(","),
+      subCategories: [...selectedSubCategories].sort().join(","),
+      minPrice,
+      maxPrice,
+      sortOption,
+      trending,
+      onSale,
+      search: debouncedSearchTerm,
+      isPC,
+    });
+  }, [
+    currentPage,
+    selectedCategories,
+    selectedSubCategories,
+    minPrice,
+    maxPrice,
+    sortOption,
+    trending,
+    onSale,
+    debouncedSearchTerm,
+    isPC,
+  ]);
+
   // Fetch products function
   const fetchProducts = useCallback(async () => {
+    // Prevent concurrent calls
+    if (isFetchingRef.current) {
+      return;
+    }
+
+    // Cancel previous request
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+
+    // Create new abort controller
+    abortControllerRef.current = new AbortController();
+    isFetchingRef.current = true;
+
     setIsLoading(true);
     setError(null);
 
@@ -292,10 +346,11 @@ function ProductsContent() {
       const { data } = await axios.get(
         `${
           process.env.NEXT_PUBLIC_SERVER_URI
-        }/api/v1/products/pagination?${params.toString()}`
+        }/api/v1/products/pagination?${params.toString()}`,
+        {
+          signal: abortControllerRef.current.signal,
+        }
       );
-
-      console.log("data", data);
 
       if (data) {
         setProducts(data.products || []);
@@ -305,6 +360,10 @@ function ProductsContent() {
         throw new Error(data.message || "Failed to fetch products");
       }
     } catch (err) {
+      // Ignore aborted requests
+      if (err.name === "AbortError" || err.code === "ERR_CANCELED") {
+        return;
+      }
       console.error("❌ Error fetching products:", err);
       setError(err.message);
       toast.error("Error fetching products. Please try again.");
@@ -313,6 +372,7 @@ function ProductsContent() {
       setTotalPages(0);
     } finally {
       setIsLoading(false);
+      isFetchingRef.current = false;
     }
   }, [
     currentPage,
@@ -324,16 +384,10 @@ function ProductsContent() {
     trending,
     onSale,
     debouncedSearchTerm,
+    isPC,
   ]);
 
-  // Fetch products when dependencies change
-  useEffect(() => {
-    if (filtersInitialized) {
-      fetchProducts();
-    }
-  }, [fetchProducts, filtersInitialized]);
-
-  // Reset to first page when filters change
+  // Reset to first page when filters change (except page itself)
   useEffect(() => {
     if (currentPage !== 1) {
       setCurrentPage(1);
@@ -349,6 +403,49 @@ function ProductsContent() {
     onSale,
     debouncedSearchTerm,
   ]);
+
+  // Fetch products only when filter key actually changes
+  useEffect(() => {
+    // Clear any pending timeout
+    if (fetchTimeoutRef.current) {
+      clearTimeout(fetchTimeoutRef.current);
+    }
+
+    if (!filtersInitialized) {
+      return;
+    }
+
+    // Only fetch if filter key actually changed
+    if (prevFilterKeyRef.current !== filterKey) {
+      prevFilterKeyRef.current = filterKey;
+
+      // Debounce to prevent rapid successive calls
+      fetchTimeoutRef.current = setTimeout(() => {
+        if (!isFetchingRef.current) {
+          fetchProducts();
+        }
+      }, 200);
+    }
+
+    // Cleanup
+    return () => {
+      if (fetchTimeoutRef.current) {
+        clearTimeout(fetchTimeoutRef.current);
+      }
+    };
+  }, [filterKey, filtersInitialized, fetchProducts]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+      if (fetchTimeoutRef.current) {
+        clearTimeout(fetchTimeoutRef.current);
+      }
+    };
+  }, []);
 
   // Clear all filters
   const clearFilters = useCallback(() => {

@@ -339,10 +339,12 @@ const Footer = () => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="px-4 py-2 rounded-l bg-white border border-gray-400 focus:border-red-500  text-sm focus:outline-none focus:ring-2 focus:ring-red-600 min-w-[200px]"
+                    suppressHydrationWarning
                   />
                   <button
                     type={"submit"}
                     className="px-4 py-2 rounded-r bg-red-500 text-white text-sm font-medium hover:bg-red-600 transition-colors duration-200 flex items-center gap-1"
+                    suppressHydrationWarning
                   >
                     {t("subscribe")}{" "}
                     {isLoading && (

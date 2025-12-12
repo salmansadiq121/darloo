@@ -50,12 +50,54 @@ export default function Crousel({ products, loading }) {
   }, []);
 
   useEffect(() => {
-    document.querySelector(".custom-prev").addEventListener("click", () => {
-      document.querySelector(".swiper-button-prev").click();
-    });
-    document.querySelector(".custom-next").addEventListener("click", () => {
-      document.querySelector(".swiper-button-next").click();
-    });
+    // Wait for DOM to be ready and Swiper to initialize
+    let handlePrevClick = null;
+    let handleNextClick = null;
+    let prevBtn = null;
+    let nextBtn = null;
+
+    const setupNavigation = () => {
+      prevBtn = document.querySelector(".custom-prev");
+      nextBtn = document.querySelector(".custom-next");
+      const swiperPrev = document.querySelector(".swiper-button-prev");
+      const swiperNext = document.querySelector(".swiper-button-next");
+
+      if (!prevBtn || !nextBtn || !swiperPrev || !swiperNext) {
+        return false;
+      }
+
+      handlePrevClick = () => {
+        if (swiperPrev) {
+          swiperPrev.click();
+        }
+      };
+
+      handleNextClick = () => {
+        if (swiperNext) {
+          swiperNext.click();
+        }
+      };
+
+      prevBtn.addEventListener("click", handlePrevClick);
+      nextBtn.addEventListener("click", handleNextClick);
+
+      return true;
+    };
+
+    // Use setTimeout to ensure Swiper is initialized
+    const timeoutId = setTimeout(() => {
+      setupNavigation();
+    }, 100);
+
+    return () => {
+      clearTimeout(timeoutId);
+      if (prevBtn && handlePrevClick) {
+        prevBtn.removeEventListener("click", handlePrevClick);
+      }
+      if (nextBtn && handleNextClick) {
+        nextBtn.removeEventListener("click", handleNextClick);
+      }
+    };
   }, []);
 
   return (
@@ -101,8 +143,10 @@ export default function Crousel({ products, loading }) {
                 clipPath:
                   " polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)",
               }}
+              aria-label="Previous slide"
+              suppressHydrationWarning
             >
-              ❮
+              <span aria-hidden="true">❮</span>
             </button>
             <button
               className="custom-next absolute top-1/2 right-4 -translate-y-1/2 bg-red-100 hover:bg-red-200 w-[2rem] h-[2.2rem] text-red-600  flex items-center justify-center shadow-md transition-all duration-300 z-10 cursor-pointer"
@@ -110,8 +154,10 @@ export default function Crousel({ products, loading }) {
                 clipPath:
                   " polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)",
               }}
+              aria-label="Next slide"
+              suppressHydrationWarning
             >
-              ❯
+              <span aria-hidden="true">❯</span>
             </button>
           </div>
           <div className="col-span-4 sm:col-span-1">

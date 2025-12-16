@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { Camera, Upload } from "lucide-react";
+import { Camera, Upload, MapPin } from "lucide-react";
+import { motion } from "framer-motion";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { ImSpinner2 } from "react-icons/im";
@@ -36,6 +37,7 @@ export default function UpdateProfileModal({
   const [avatar, setAvatar] = useState("");
   const [formData, setFormData] = useState({
     name: user?.name,
+    lastName: user?.lastName,
     email: user?.email,
     address: user?.addressDetails?.address,
     city: user?.addressDetails?.city,
@@ -50,12 +52,18 @@ export default function UpdateProfileModal({
   const [loading, setLoading] = useState(false);
   const [phoneCode, setPhoneCode] = useState("+1");
   const [number, setNumber] = useState(user?.number);
+  const [addressQuery, setAddressQuery] = useState(
+    user?.addressDetails?.address || ""
+  );
+  const [addressSuggestions, setAddressSuggestions] = useState([]);
+  const [isAddressLoading, setIsAddressLoading] = useState(false);
   const isGerman = countryCode === "DE";
 
   useEffect(() => {
     setAvatar(user?.avatar);
     setFormData({
       name: user?.name,
+      lastName: user?.lastName,
       email: user?.email,
       number: user?.number,
       phoneCode: user?.phoneCode,
@@ -70,7 +78,55 @@ export default function UpdateProfileModal({
       cvv: user?.bankDetails?.cvv,
       expiryDate: user?.bankDetails?.expiryDate,
     });
+    setAddressQuery(user?.addressDetails?.address || "");
   }, [user]);
+
+  // Google Places Autocomplete for address (via Next.js API proxy)
+  useEffect(() => {
+    if (!addressQuery || addressQuery.length < 3) {
+      setAddressSuggestions([]);
+      return;
+    }
+
+    let isCancelled = false;
+    const controller = new AbortController();
+
+    const fetchSuggestions = async () => {
+      try {
+        setIsAddressLoading(true);
+        const res = await fetch(
+          `/api/google-places?input=${encodeURIComponent(addressQuery)}`,
+          { signal: controller.signal }
+        );
+
+        if (!res.ok) {
+          throw new Error("Failed to fetch address suggestions");
+        }
+
+        const data = await res.json();
+        if (!isCancelled) {
+          setAddressSuggestions(data?.predictions || []);
+        }
+      } catch (err) {
+        if (!isCancelled) {
+          console.error("Address suggestions error:", err);
+          setAddressSuggestions([]);
+        }
+      } finally {
+        if (!isCancelled) {
+          setIsAddressLoading(false);
+        }
+      }
+    };
+
+    const timeoutId = setTimeout(fetchSuggestions, 400);
+
+    return () => {
+      isCancelled = true;
+      controller.abort();
+      clearTimeout(timeoutId);
+    };
+  }, [addressQuery]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -93,6 +149,7 @@ export default function UpdateProfileModal({
       if (activeTab === "personal") {
         const userData = new FormData();
         userData.append("name", formData.name);
+        userData.append("lastName", formData.lastName || "");
         userData.append("email", formData.email);
         userData.append("number", number);
         userData.append("phoneCode", phoneCode);
@@ -146,7 +203,7 @@ export default function UpdateProfileModal({
     a.name.common.localeCompare(b.name.common)
   );
 
-  const countryOptions = countries.map((country) => ({
+  const countryOptions = sortedCountries.map((country) => ({
     value: country.name.common,
     label: (
       <div className="flex items-center gap-2">
@@ -166,307 +223,515 @@ export default function UpdateProfileModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-3xl sm:min-w-[45rem] max-h-[95vh] overflow-y-auto shidden">
-        <DialogHeader>
-          <DialogTitle className="text-2xl">
-            {isGerman ? "Profil aktualisieren" : "Update Profile"}
-          </DialogTitle>
-          <DialogDescription>
-            {isGerman
-              ? "Ändern Sie hier Ihre Profilinformationen."
-              : "Make changes to your profile information here."}
-          </DialogDescription>
-        </DialogHeader>
-
-        <Tabs
-          defaultValue="personal"
-          className="mt-6"
-          value={activeTab}
-          onValueChange={setActiveTab}
+      <DialogContent className="max-w-3xl sm:min-w-[45rem] max-h-[95vh] overflow-y-auto shidden border border-red-100 bg-gradient-to-b from-white/95 via-white/95 to-red-50/60 shadow-2xl backdrop-blur-xl">
+        <motion.div
+          initial={{ opacity: 0, y: 24, scale: 0.98 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: 16, scale: 0.97 }}
+          transition={{ duration: 0.35, ease: [0.22, 0.61, 0.36, 1] }}
         >
-          <TabsList className="grid grid-cols-2 mb-6 gap-1 bg-red-100 overflow-x-auto shidden">
-            <TabsTrigger
-              value="personal"
-              className="px-4 min-w-fit mr-5 sm:mr-0 rounded-md data-[state=active]:bg-red-700 data-[state=active]:text-white text-black"
-              onClick={() => setActiveTab("personal")}
-            >
-              {isGerman ? "Persönliche Info" : "Personal Info"}
-            </TabsTrigger>
-            <TabsTrigger
-              value="address"
-              className="px-4 min-w-fit ml-5 sm:ml-0  rounded-md data-[state=active]:bg-red-700 data-[state=active]:text-white text-black"
-              onClick={() => setActiveTab("address")}
-            >
-              {isGerman ? "Adresse" : "Address"}
-            </TabsTrigger>
-            {/* <TabsTrigger
-              value="bank"
-              className="px-4 min-w-fit ml-5 sm:ml-0  rounded-md data-[state=active]:bg-red-700 data-[state=active]:text-white text-black"
-              onClick={() => setActiveTab("bank")}
-            >
-              Bank Details
-            </TabsTrigger> */}
-          </TabsList>
+          <DialogHeader className="space-y-2">
+            <DialogTitle className="text-2xl font-semibold tracking-tight flex items-center gap-2">
+              <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-red-100 text-red-700 text-sm font-medium shadow-sm">
+                ✨
+              </span>
+              {isGerman ? "Profil aktualisieren" : "Update Profile"}
+            </DialogTitle>
+            <DialogDescription className="text-sm text-gray-600">
+              {isGerman
+                ? "Ändern Sie hier Ihre Profilinformationen. Ihre Änderungen werden sofort angewendet."
+                : "Fine-tune your personal details, contact information and address. Changes apply instantly after saving."}
+            </DialogDescription>
+          </DialogHeader>
 
-          <form onSubmit={handleSubmit}>
-            <TabsContent value="personal" className="space-y-6">
-              <div className="flex flex-col items-center justify-center mb-6">
-                <Avatar className="h-24 w-24 mb-4 border-4 border-[#C6080A] relative">
-                  <AvatarImage
-                    src={avatar || "/placeholder.svg?height=96&width=96"}
-                    alt={user?.name}
-                  />
-                  <AvatarFallback className="text-2xl bg-[#C6080A] text-white">
-                    {user?.name
-                      ?.split(" ")
-                      ?.map((n) => n[0])
-                      ?.join("")}
-                  </AvatarFallback>
-                  <div className="absolute bottom-1 right-2 bg-[#C6080A] rounded-full p-1 text-white cursor-pointer">
-                    <Camera className="h-4 w-4" />
-                  </div>
-                </Avatar>
-                <input
-                  type="file"
-                  onChange={(e) => handleUploadImage(e.target.files[0])}
-                  className="hidden"
-                  id="file"
-                />
-                <label
-                  htmlFor="file"
-                  disabled={loading}
-                  className={`flex items-center gap-2 ${
-                    loading ? "cursor-not-allowed" : "cursor-pointer"
-                  }  border border-gray-400 rounded-md px-4 py-2 text-sm text-gray-500 hover:text-white hover:bg-[#C6080A] transition-all duration-300`}
+          <Tabs
+            defaultValue="personal"
+            className="mt-6"
+            value={activeTab}
+            onValueChange={setActiveTab}
+          >
+            <TabsList className="grid grid-cols-2 mb-6 gap-2 bg-red-50/80 overflow-x-auto shidden rounded-full p-1">
+              <TabsTrigger
+                value="personal"
+                className="px-4 py-2 min-w-fit mr-2 sm:mr-0 rounded-full text-xs sm:text-sm font-medium data-[state=active]:bg-red-600 data-[state=active]:text-white text-gray-800 data-[state=inactive]:hover:bg-red-100 transition-colors"
+                onClick={() => setActiveTab("personal")}
+              >
+                {isGerman ? "Persönliche Info" : "Personal Info"}
+              </TabsTrigger>
+              <TabsTrigger
+                value="address"
+                className="px-4 py-2 min-w-fit ml-2 sm:ml-0 rounded-full text-xs sm:text-sm font-medium data-[state=active]:bg-red-600 data-[state=active]:text-white text-gray-800 data-[state=inactive]:hover:bg-red-100 transition-colors"
+                onClick={() => setActiveTab("address")}
+              >
+                {isGerman ? "Adresse & Standort" : "Address & Location"}
+              </TabsTrigger>
+              {/* <TabsTrigger
+                value="bank"
+                className="px-4 min-w-fit ml-5 sm:ml-0  rounded-md data-[state=active]:bg-red-700 data-[state=active]:text-white text-black"
+                onClick={() => setActiveTab("bank")}
+              >
+                Bank Details
+              </TabsTrigger> */}
+            </TabsList>
+
+            <form
+              onSubmit={handleSubmit}
+              onKeyDown={(e) => {
+                // Prevent Enter from auto-submitting the form
+                if (e.key === "Enter" && e.target.tagName !== "TEXTAREA") {
+                  e.preventDefault();
+                }
+              }}
+              className="space-y-6"
+            >
+              <TabsContent value="personal" className="space-y-6">
+                <motion.div
+                  className="flex flex-col items-center justify-center mb-4"
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3 }}
                 >
-                  <Upload className="h-4 w-4" />
-                  {isGerman ? "Foto hochladen" : "Upload Photo"}
-                  {loading && (
-                    <ImSpinner2 className="ml-1 h-4 w-4 animate-spin" />
-                  )}
-                </label>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <Label htmlFor="name">
-                    {isGerman ? "Vollständiger Name" : "Full Name"}
-                  </Label>
-                  <Input
-                    id="name"
-                    name="name"
-                    value={formData?.name}
-                    onChange={handleChange}
-                    required
+                  <div className="relative">
+                    <motion.div
+                      className="absolute -inset-[2px] rounded-full bg-gradient-to-tr from-red-500/70 via-amber-400/70 to-red-600/70 opacity-70 blur-sm"
+                      animate={{
+                        opacity: [0.4, 0.8, 0.4],
+                        scale: [0.98, 1.03, 0.98],
+                      }}
+                      transition={{
+                        duration: 3,
+                        repeat: Infinity,
+                        ease: "easeInOut",
+                      }}
+                    />
+                    <Avatar className="relative h-24 w-24 mb-4 border-4 border-white shadow-xl bg-gradient-to-br from-red-500 via-rose-500 to-amber-400">
+                      <AvatarImage
+                        src={avatar || "/placeholder.svg?height=96&width=96"}
+                        alt={user?.name}
+                        className="object-cover"
+                      />
+                      <AvatarFallback className="text-2xl bg-transparent text-white font-semibold tracking-wide">
+                        {user?.name
+                          ?.split(" ")
+                          ?.map((n) => n[0])
+                          ?.join("")}
+                      </AvatarFallback>
+                      <label
+                        htmlFor="file"
+                        className={`absolute bottom-1.5 right-1.5 inline-flex items-center justify-center rounded-full bg-red-600 text-white p-1.5 shadow-md hover:bg-red-700 transition-colors ${
+                          loading
+                            ? "cursor-not-allowed opacity-80"
+                            : "cursor-pointer"
+                        }`}
+                      >
+                        <Camera className="h-4 w-4" />
+                      </label>
+                    </Avatar>
+                  </div>
+                  <input
+                    type="file"
+                    onChange={(e) => handleUploadImage(e.target.files[0])}
+                    className="hidden"
+                    id="file"
                   />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="email">{isGerman ? "E-Mail" : "Email"}</Label>
-                  <Input
-                    id="email"
-                    name="email"
-                    type="email"
-                    value={formData?.email}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="number">
-                    {isGerman ? "Telefonnummer" : "Phone Number"}
-                  </Label>
-                  {/* <Input
-                    id="number"
-                    name="number"
-                    value={formData?.number}
-                    onChange={handleChange}
-                  /> */}
-                  <PhoneNumberInput
-                    value={number}
-                    setPhone={setNumber}
-                    placeholder="+1 234 567 8901"
-                    phoneCode={phoneCode}
-                    setPhoneCode={setPhoneCode}
-                  />
-                </div>
-                {/* <div className="space-y-2">
-                  <Label htmlFor="bio">Bio</Label>
-                  <Textarea
-                    id="bio"
-                    name="bio"
-                    placeholder="Tell us about yourself"
-                    className="resize-none"
-                  />
-                </div> */}
-              </div>
-            </TabsContent>
-
-            <TabsContent value="address" className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2 md:col-span-2">
-                  <Label htmlFor="address">
-                    {isGerman ? "Adresse" : "Address"}
-                  </Label>
-                  <Textarea
-                    id="address"
-                    name="address"
-                    value={formData?.address}
-                    onChange={handleChange}
-                    placeholder="Enter your address"
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="city">{isGerman ? "Stadt" : "City"}</Label>
-                  <Input
-                    id="city"
-                    name="city"
-                    value={formData?.city}
-                    onChange={handleChange}
-                    placeholder="Enter your city"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="state">
-                    {isGerman ? "Bundesland" : "State/Province"}
-                  </Label>
-                  <Input
-                    id="state"
-                    name="state"
-                    value={formData?.state}
-                    onChange={handleChange}
-                    placeholder="Enter your state"
-                  />
-                </div>
-                {/* <div className="space-y-2">
-                  <Label htmlFor="country">Country</Label>
-                  <Input
-                    id="country"
-                    name="country"
-                    value={formData?.country}
-                    onChange={handleChange}
-                    placeholder="Enter your country"
-                  />
-                </div> */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    {isGerman ? "Land" : "Country"}
-                    <span className="text-red-700">*</span>
-                  </label>
-                  <Select
-                    options={countryOptions}
-                    value={countryOptions.find(
-                      (option) => option.value === formData.country
+                  <button
+                    type="button"
+                    disabled={loading}
+                    className={`inline-flex items-center gap-2 rounded-full border border-red-200 bg-white/80 px-4 py-2 text-xs sm:text-sm text-gray-700 shadow-sm hover:border-red-400 hover:bg-red-50 transition-all ${
+                      loading
+                        ? "cursor-not-allowed opacity-80"
+                        : "cursor-pointer"
+                    }`}
+                    onClick={() => {
+                      const input = document.getElementById("file");
+                      if (input) {
+                        input.click();
+                      }
+                    }}
+                  >
+                    <Upload className="h-4 w-4" />
+                    {isGerman ? "Foto hochladen" : "Upload Photo"}
+                    {loading && (
+                      <ImSpinner2 className="ml-1 h-4 w-4 animate-spin" />
                     )}
-                    onChange={(selected) =>
-                      setFormData({
-                        ...formData,
-                        country: selected?.value || "",
-                      })
-                    }
-                    isSearchable
-                    filterOption={(option, inputValue) =>
-                      option.data.name
-                        .toLowerCase()
-                        .includes(inputValue.toLowerCase())
-                    }
-                  />
+                  </button>
+                </motion.div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <motion.div
+                    className="space-y-2"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.05 }}
+                  >
+                    <Label htmlFor="name" className="text-xs font-medium">
+                      {isGerman ? "Vorname" : "First Name"}
+                    </Label>
+                    <Input
+                      id="name"
+                      name="name"
+                      value={formData?.name}
+                      onChange={handleChange}
+                      required
+                      className="rounded-xl border-gray-200 bg-white/80 focus-visible:ring-red-500 focus-visible:border-red-400 transition-all"
+                    />
+                  </motion.div>
+
+                  <motion.div
+                    className="space-y-2"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.08 }}
+                  >
+                    <Label htmlFor="lastName" className="text-xs font-medium">
+                      {isGerman ? "Nachname" : "Last Name"}
+                    </Label>
+                    <Input
+                      id="lastName"
+                      name="lastName"
+                      value={formData?.lastName || ""}
+                      onChange={handleChange}
+                      className="rounded-xl border-gray-200 bg-white/80 focus-visible:ring-red-500 focus-visible:border-red-400 transition-all"
+                    />
+                  </motion.div>
+
+                  <motion.div
+                    className="space-y-2 md:col-span-2"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.1 }}
+                  >
+                    <Label htmlFor="email" className="text-xs font-medium">
+                      {isGerman ? "E-Mail" : "Email"}
+                    </Label>
+                    <Input
+                      id="email"
+                      name="email"
+                      type="email"
+                      value={formData?.email}
+                      onChange={handleChange}
+                      required
+                      className="rounded-xl border-gray-200 bg-white/80 focus-visible:ring-red-500 focus-visible:border-red-400 transition-all"
+                    />
+                  </motion.div>
+
+                  <motion.div
+                    className="space-y-2 md:col-span-2"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.15 }}
+                  >
+                    <Label htmlFor="number" className="text-xs font-medium">
+                      {isGerman ? "Telefonnummer" : "Phone Number"}
+                    </Label>
+                    <div className="rounded-xl border border-gray-200 bg-white/80 px-2 py-1.5 focus-within:border-red-400 focus-within:ring-1 focus-within:ring-red-500 transition-all">
+                      <PhoneNumberInput
+                        value={number}
+                        setPhone={setNumber}
+                        placeholder="+1 234 567 8901"
+                        phoneCode={phoneCode}
+                        setPhoneCode={setPhoneCode}
+                      />
+                    </div>
+                  </motion.div>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="pincode">
-                    {isGerman ? "Postleitzahl" : "Postal Code"}
-                  </Label>
-                  <Input
-                    id="pincode"
-                    name="pincode"
-                    value={formData?.pincode}
-                    onChange={handleChange}
-                    placeholder="Enter your postal code"
-                  />
+              </TabsContent>
+
+              <TabsContent value="address" className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <motion.div
+                    className="space-y-2 md:col-span-2 relative"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.05 }}
+                  >
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="address" className="text-xs font-medium">
+                        {isGerman ? "Adresse" : "Address"}
+                      </Label>
+                      <span className="text-[11px] text-gray-400">
+                        {isGerman
+                          ? "Suche mit Google Maps, um deinen Standort zu finden"
+                          : "Powered by Google Maps for smarter suggestions"}
+                      </span>
+                    </div>
+                    <div className="relative">
+                      <Textarea
+                        id="address"
+                        name="address"
+                        value={addressQuery}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          setAddressQuery(value);
+                          setFormData((prev) => ({
+                            ...prev,
+                            address: value,
+                          }));
+                        }}
+                        placeholder={
+                          isGerman
+                            ? "Beginnen Sie mit der Eingabe Ihrer Adresse..."
+                            : "Start typing your address to see suggestions..."
+                        }
+                        required
+                        className="resize-none rounded-xl border-gray-200 bg-white/80 pr-10 focus-visible:ring-red-500 focus-visible:border-red-400 transition-all min-h-[90px]"
+                      />
+                      <div className="pointer-events-none absolute right-3 top-3 text-red-500/80">
+                        {isAddressLoading ? (
+                          <ImSpinner2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <MapPin className="h-4 w-4" />
+                        )}
+                      </div>
+                    </div>
+
+                    {addressSuggestions?.length > 0 && (
+                      <div className="absolute z-50 mt-1 w-full rounded-xl border border-gray-200 bg-white/95 shadow-lg max-h-60 overflow-y-auto backdrop-blur-sm">
+                        {addressSuggestions.map((suggestion) => (
+                          <button
+                            key={suggestion.place_id}
+                            type="button"
+                            className="flex w-full items-start gap-2 px-3 py-2 text-left text-sm text-gray-800 hover:bg-red-50 transition-colors"
+                            onClick={() => {
+                              const desc = suggestion.description;
+                              setAddressQuery(desc);
+                              setFormData((prev) => ({
+                                ...prev,
+                                address: desc,
+                              }));
+                              setAddressSuggestions([]);
+                            }}
+                          >
+                            <MapPin className="mt-1 h-4 w-4 text-red-500" />
+                            <span>{suggestion.description}</span>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </motion.div>
+
+                  <motion.div
+                    className="space-y-2"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.1 }}
+                  >
+                    <Label htmlFor="city" className="text-xs font-medium">
+                      {isGerman ? "Stadt" : "City"}
+                    </Label>
+                    <Input
+                      id="city"
+                      name="city"
+                      value={formData?.city}
+                      onChange={handleChange}
+                      placeholder={
+                        isGerman ? "Gib deine Stadt ein" : "Enter your city"
+                      }
+                      className="rounded-xl border-gray-200 bg-white/80 focus-visible:ring-red-500 focus-visible:border-red-400 transition-all"
+                    />
+                  </motion.div>
+
+                  <motion.div
+                    className="space-y-2"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.15 }}
+                  >
+                    <Label htmlFor="state" className="text-xs font-medium">
+                      {isGerman ? "Bundesland" : "State/Province"}
+                    </Label>
+                    <Input
+                      id="state"
+                      name="state"
+                      value={formData?.state}
+                      onChange={handleChange}
+                      placeholder={
+                        isGerman
+                          ? "Gib dein Bundesland ein"
+                          : "Enter your state"
+                      }
+                      className="rounded-xl border-gray-200 bg-white/80 focus-visible:ring-red-500 focus-visible:border-red-400 transition-all"
+                    />
+                  </motion.div>
+
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2 }}
+                  >
+                    <label className="block text-xs font-medium text-gray-700 mb-1.5">
+                      {isGerman ? "Land" : "Country"}
+                      <span className="text-red-700 ml-0.5">*</span>
+                    </label>
+                    <div className="rounded-xl border border-gray-200 bg-white/80 px-1.5 py-1.5 focus-within:border-red-400 focus-within:ring-1 focus-within:ring-red-500 transition-all">
+                      <Select
+                        options={countryOptions}
+                        value={countryOptions.find(
+                          (option) => option.value === formData.country
+                        )}
+                        onChange={(selected) =>
+                          setFormData({
+                            ...formData,
+                            country: selected?.value || "",
+                          })
+                        }
+                        isSearchable
+                        filterOption={(option, inputValue) =>
+                          option.data.name
+                            .toLowerCase()
+                            .includes(inputValue.toLowerCase())
+                        }
+                        classNamePrefix="address-country-select"
+                        menuPortalTarget={
+                          typeof document !== "undefined" ? document.body : null
+                        }
+                        styles={{
+                          control: (base, state) => ({
+                            ...base,
+                            borderRadius: 9999,
+                            borderColor: state.isFocused
+                              ? "#f97373"
+                              : "#e5e7eb",
+                            boxShadow: state.isFocused
+                              ? "0 0 0 1px rgba(248, 113, 113, 0.5)"
+                              : "none",
+                            paddingLeft: 4,
+                            paddingRight: 4,
+                            minHeight: 40,
+                          }),
+                          menu: (base) => ({
+                            ...base,
+                            borderRadius: 12,
+                            overflow: "hidden",
+                            zIndex: 9999,
+                          }),
+                          option: (base, state) => ({
+                            ...base,
+                            backgroundColor: state.isFocused
+                              ? "rgba(248, 113, 113, 0.08)"
+                              : "white",
+                            color: "#111827",
+                          }),
+                        }}
+                      />
+                    </div>
+                  </motion.div>
+
+                  <motion.div
+                    className="space-y-2"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.25 }}
+                  >
+                    <Label htmlFor="pincode" className="text-xs font-medium">
+                      {isGerman ? "Postleitzahl" : "Postal Code"}
+                    </Label>
+                    <Input
+                      id="pincode"
+                      name="pincode"
+                      value={formData?.pincode}
+                      onChange={handleChange}
+                      placeholder={
+                        isGerman
+                          ? "Gib deine Postleitzahl ein"
+                          : "Enter your postal code"
+                      }
+                      className="rounded-xl border-gray-200 bg-white/80 focus-visible:ring-red-500 focus-visible:border-red-400 transition-all"
+                    />
+                  </motion.div>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="bank" className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="accountHolder">Account Holder Name</Label>
+                    <Input
+                      id="accountHolder"
+                      name="accountHolder"
+                      value={formData?.accountHolder}
+                      onChange={handleChange}
+                      placeholder="Enter your account holder name"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="accountNumber">Account Number</Label>
+                    <Input
+                      id="accountNumber"
+                      name="accountNumber"
+                      value={formData?.accountNumber}
+                      onChange={handleChange}
+                      placeholder="Enter your account number"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="ifscCode">IFSC Code</Label>
+                    <Input
+                      id="ifscCode"
+                      name="ifscCode"
+                      value={formData?.ifscCode}
+                      onChange={handleChange}
+                      placeholder="Enter your IFSC code"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="ifscCode">Expiry Date</Label>
+                    <Input
+                      id="expiryDate"
+                      name="expiryDate"
+                      type={"date"}
+                      value={formData?.expiryDate}
+                      onChange={handleChange}
+                      placeholder="Enter your expiry date"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="ifscCode">CVV</Label>
+                    <Input
+                      id="cvv"
+                      name="cvv"
+                      value={formData?.cvv}
+                      onChange={handleChange}
+                      placeholder="Enter your CVV"
+                    />
+                  </div>
+                </div>
+              </TabsContent>
+
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2 border-t border-red-100 mt-4">
+                <p className="text-[11px] text-gray-500">
+                  {isGerman
+                    ? "Änderungen werden sicher gespeichert. Drücken Sie „Änderungen speichern“ zum Bestätigen."
+                    : "Changes are saved securely. Press “Save Changes” to confirm."}
+                </p>
+                <div className="flex justify-end gap-3">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={onClose}
+                    className="cursor-pointer rounded-full border-gray-200 bg-white/80 hover:bg-gray-50"
+                  >
+                    {isGerman ? "Abbrechen" : "Cancel"}
+                  </Button>
+                  <Button
+                    type="submit"
+                    disabled={isLoading}
+                    className={`rounded-full bg-gradient-to-r from-red-600 via-rose-600 to-red-500 hover:from-red-700 hover:via-rose-700 hover:to-red-600 shadow-md shadow-red-500/25 px-5 ${
+                      isLoading
+                        ? "cursor-not-allowed opacity-90"
+                        : "cursor-pointer"
+                    } flex items-center gap-2`}
+                  >
+                    {isGerman ? "Änderungen speichern" : "Save Changes"}
+                    {isLoading && (
+                      <ImSpinner2 className="h-4 w-4 animate-spin" />
+                    )}
+                  </Button>
                 </div>
               </div>
-            </TabsContent>
-
-            <TabsContent value="bank" className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <Label htmlFor="accountHolder">Account Holder Name</Label>
-                  <Input
-                    id="accountHolder"
-                    name="accountHolder"
-                    value={formData?.accountHolder}
-                    onChange={handleChange}
-                    placeholder="Enter your account holder name"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="accountNumber">Account Number</Label>
-                  <Input
-                    id="accountNumber"
-                    name="accountNumber"
-                    value={formData?.accountNumber}
-                    onChange={handleChange}
-                    placeholder="Enter your account number"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="ifscCode">IFSC Code</Label>
-                  <Input
-                    id="ifscCode"
-                    name="ifscCode"
-                    value={formData?.ifscCode}
-                    onChange={handleChange}
-                    placeholder="Enter your IFSC code"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="ifscCode">Expiry Date</Label>
-                  <Input
-                    id="expiryDate"
-                    name="expiryDate"
-                    type={"date"}
-                    value={formData?.expiryDate}
-                    onChange={handleChange}
-                    placeholder="Enter your expiry date"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="ifscCode">CVV</Label>
-                  <Input
-                    id="cvv"
-                    name="cvv"
-                    value={formData?.cvv}
-                    onChange={handleChange}
-                    placeholder="Enter your CVV"
-                  />
-                </div>
-              </div>
-            </TabsContent>
-
-            <div className="flex justify-end gap-3 mt-6">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={onClose}
-                className="cursor-pointer"
-              >
-                Cancel
-              </Button>
-              <Button
-                type="submit"
-                disabled={isLoading}
-                className={`bg-[#C6080A] hover:bg-[#a50709] ${
-                  isLoading
-                    ? "cursor-not-allowed animate-pulse"
-                    : "cursor-pointer"
-                } flex items-center gap-2`}
-              >
-                Save Changes{" "}
-                {isLoading && <ImSpinner2 className="h-4 w-4 animate-spin" />}
-              </Button>
-            </div>
-          </form>
-        </Tabs>
+            </form>
+          </Tabs>
+        </motion.div>
       </DialogContent>
     </Dialog>
   );

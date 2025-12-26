@@ -217,10 +217,10 @@ export default function AllProducts() {
     [productsPerPage]
   );
 
-  // Memoized products grid
-  const ProductsGrid = useMemo(
+  // Memoized products grid - Desktop
+  const ProductsGridDesktop = useMemo(
     () => (
-      <div className="grid  max-[350px]:grid-cols-1 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 2xl:grid-cols-6 3xl:grid-cols-7 sm:gap-3 gap-4">
+      <div className="hidden sm:grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 2xl:grid-cols-6 3xl:grid-cols-7 sm:gap-4 gap-3 auto-rows-fr">
         <AnimatePresence>
           {products.map((product, index) => (
             <motion.div
@@ -229,16 +229,63 @@ export default function AllProducts() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.3, delay: index * 0.02 }}
+              className="h-full"
             >
               <ProductCard
                 product={product}
                 sale={true}
-                trending={true}
+                tranding={true}
                 isDesc={true}
               />
             </motion.div>
           ))}
         </AnimatePresence>
+      </div>
+    ),
+    [products]
+  );
+
+  // Memoized products carousel - Mobile
+  const ProductsCarouselMobile = useMemo(
+    () => (
+      <div className="sm:hidden relative">
+        <div
+          className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide scroll-smooth snap-x snap-mandatory px-2"
+          style={{
+            scrollbarWidth: "none",
+            msOverflowStyle: "none",
+          }}
+        >
+          {products.map((product, index) => (
+            <motion.div
+              key={product._id}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.3, delay: index * 0.05 }}
+              className="flex-shrink-0 w-[85vw] snap-start"
+            >
+              <ProductCard
+                product={product}
+                sale={true}
+                tranding={true}
+                isDesc={true}
+              />
+            </motion.div>
+          ))}
+        </div>
+        {/* Scroll Indicator */}
+        {products.length > 1 && (
+          <div className="flex justify-center gap-2 mt-4">
+            {products
+              .slice(0, Math.min(5, products.length))
+              .map((_, index) => (
+                <div
+                  key={index}
+                  className="h-1.5 w-1.5 rounded-full bg-gray-300"
+                />
+              ))}
+          </div>
+        )}
       </div>
     ),
     [products]
@@ -332,8 +379,11 @@ export default function AllProducts() {
       {/* Loading State */}
       {isLoading && products.length === 0 && SkeletonLoader}
 
-      {/* Products Grid */}
-      {!isLoading && !error && products.length > 0 && ProductsGrid}
+      {/* Products Grid - Desktop */}
+      {!isLoading && !error && products.length > 0 && ProductsGridDesktop}
+
+      {/* Products Carousel - Mobile */}
+      {!isLoading && !error && products.length > 0 && ProductsCarouselMobile}
 
       {/* Load More Indicator */}
       {isLoadingMore && (

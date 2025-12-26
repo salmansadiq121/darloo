@@ -2,11 +2,12 @@
 import React, { useState } from "react";
 import { FaCartPlus } from "react-icons/fa";
 import Ratings from "../utils/Ratings";
-import { Diamond, Eye, Flame } from "lucide-react";
+import { Diamond, Eye, Flame, Heart, ShoppingCart, Sparkles } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../content/authContent";
 import toast from "react-hot-toast";
+import { motion } from "framer-motion";
 
 export default function ProductCard({ product, sale, tranding, isDesc }) {
   const router = useRouter();
@@ -14,6 +15,8 @@ export default function ProductCard({ product, sale, tranding, isDesc }) {
   const [selectedColor, setSelectedColor] = useState("");
   const [selectedSize, setSelectedSize] = useState("");
   const [quantity, setQuantity] = useState(1);
+  const [isWishlisted, setIsWishlisted] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
 
   // Handle Add to Cart
   const handleAddToCart = (product) => {
@@ -60,93 +63,202 @@ export default function ProductCard({ product, sale, tranding, isDesc }) {
     });
     toast.success("Product added to cart");
   };
+
+  const handleWishlist = (e) => {
+    e.stopPropagation();
+    setIsWishlisted(!isWishlisted);
+    let favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+    if (favorites.includes(product._id)) {
+      favorites = favorites.filter((id) => id !== product._id);
+      toast.success("Removed from wishlist");
+    } else {
+      favorites.push(product._id);
+      toast.success("Added to wishlist");
+    }
+    localStorage.setItem("favorites", JSON.stringify(favorites));
+  };
+
+  const discountPercentage =
+    product?.estimatedPrice > product?.price
+      ? Math.round(
+          ((product.estimatedPrice - product.price) / product.estimatedPrice) *
+            100
+        )
+      : product?.sale?.isActive
+      ? product.sale.discountPercentage
+      : 0;
+
   return (
-    <div className="group bg-white min-w-[10.5rem] max-w-[17rem] border overflow-hidden transition-all duration-300  hover:shadow-[#9333EA]/20 hover:shadow-2xl hover:border-red-500/50 hover:-translate-y-1">
-      <div className="relative ">
+    <motion.div
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      whileHover={{ y: -8 }}
+      transition={{ duration: 0.3 }}
+      className="group bg-white rounded-2xl border border-gray-200 overflow-hidden transition-all duration-500 hover:shadow-2xl hover:shadow-red-500/20 hover:border-red-300 relative h-full flex flex-col"
+    >
+      {/* Image Container */}
+      <div className="relative aspect-square overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100 flex-shrink-0">
         <Image
           src={product?.thumbnails || "/placeholder.svg"}
           alt={product?.name}
-          width={200}
-          height={230}
-          className="w-full h-[180px] sm:h-[230px] object-fill"
+          fill
+          className={`object-cover transition-transform duration-700 ${
+            isHovered ? "scale-110" : "scale-100"
+          }`}
+          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
           loading="lazy"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0F172A]   to-transparent"></div>
 
-        {/* Tags */}
-        <div className="absolute top-2 right-0 px-2 flex items-center justify-between w-full">
-          {product?.estimatedPrice > product?.price && (
-            <div className="bg-red-600/80 backdrop-blur-sm px-2 py-1 rounded-full text-xs font-medium flex items-center text-white">
-              <Diamond size={12} className="mr-1" />
-              {product?.estimatedPrice > product?.price
-                ? `${(
-                    (1 - product?.price / product?.estimatedPrice) *
-                    100
-                  ).toFixed(0)}% OFF`
-                : ""}
-            </div>
-          )}
+        {/* Gradient Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
-          {product?.sale?.isActive && sale && (
-            <div className="bg-[#06B6D4]/80 backdrop-blur-sm px-2 py-1 rounded-full text-xs font-medium flex items-center text-white">
-              <Flame size={12} className="mr-1 text-white" />
-              Sale
-            </div>
-          )}
+        {/* Top Badges */}
+        <div className="absolute top-3 left-3 right-3 flex items-start justify-between gap-2 z-10">
+          <div className="flex flex-col gap-2">
+            {discountPercentage > 0 && (
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                className="bg-gradient-to-r from-red-600 to-red-500 backdrop-blur-sm px-2.5 py-1 rounded-full text-[10px] sm:text-xs font-bold flex items-center gap-1 text-white shadow-lg"
+              >
+                <Sparkles className="w-3 h-3" />
+                {discountPercentage}% OFF
+              </motion.div>
+            )}
+
+            {product?.sale?.isActive && sale && (
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ delay: 0.1 }}
+                className="bg-gradient-to-r from-cyan-500 to-blue-500 backdrop-blur-sm px-2.5 py-1 rounded-full text-[10px] sm:text-xs font-bold flex items-center gap-1 text-white shadow-lg"
+              >
+                <Flame className="w-3 h-3" />
+                Sale
+              </motion.div>
+            )}
+          </div>
+
+          {/* Wishlist Button */}
+          <motion.button
+            onClick={handleWishlist}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            className={`p-2 rounded-full backdrop-blur-md transition-all duration-300 ${
+              isWishlisted
+                ? "bg-red-500 text-white"
+                : "bg-white/90 text-gray-700 hover:bg-red-50 hover:text-red-500"
+            } shadow-lg`}
+          >
+            <Heart
+              className={`w-4 h-4 sm:w-5 sm:h-5 ${
+                isWishlisted ? "fill-current" : ""
+              }`}
+            />
+          </motion.button>
         </div>
 
-        {product?.trending && (
-          <div className="bg-green-600/80 absolute bottom-1 right-1 backdrop-blur-sm px-2 py-1 rounded-full text-xs font-medium flex items-center text-white">
-            <Flame size={12} className="mr-1 text-white" />
+        {/* Bottom Badge */}
+        {product?.trending && tranding && (
+          <motion.div
+            initial={{ x: -50, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            className="absolute bottom-3 left-3 bg-gradient-to-r from-emerald-500 to-green-600 backdrop-blur-sm px-2.5 py-1 rounded-full text-[10px] sm:text-xs font-bold flex items-center gap-1 text-white shadow-lg"
+          >
+            <Flame className="w-3 h-3" />
             Trending
-          </div>
+          </motion.div>
         )}
 
-        {/* Quick view button (appears on hover) */}
-        <div
+        {/* Quick View Overlay */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: isHovered ? 1 : 0 }}
+          transition={{ duration: 0.3 }}
+          className="absolute inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-20"
           onClick={() => router.push(`/products/${product._id}`)}
-          className="absolute inset-0 bg-black/40 backdrop-blur-sm opacity-[0] group-hover:opacity-[1] transition-opacity duration-300 flex items-center justify-center"
         >
-          <button className="px-4 py-2 cursor-pointer bg-white/20 backdrop-blur-md rounded-lg text-white font-medium border border-white/30 hover:bg-white/30 transition-colors duration-200 flex items-center">
-            <Eye size={16} className="mr-2" />
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="px-5 py-2.5 bg-white/95 backdrop-blur-md rounded-xl text-gray-900 font-semibold text-sm shadow-xl border border-white/50 hover:bg-white transition-all duration-200 flex items-center gap-2"
+          >
+            <Eye className="w-4 h-4" />
             Quick View
-          </button>
-        </div>
+          </motion.button>
+        </motion.div>
       </div>
 
-      <div className="p-3">
+      {/* Product Info */}
+      <div className="p-3 sm:p-4 flex flex-col flex-grow">
+        {/* Product Name */}
         <div
           onClick={() => router.push(`/products/${product._id}`)}
-          className="flex  items-start flex-col gap-1 mb-3"
+          className="mb-3 cursor-pointer flex-grow min-h-[3rem]"
         >
-          <h3 className="text-[14px]  sm:text-lg font-medium dm:font-semibold capitalize line-clamp-1">
+          <h3 className="text-[13px] sm:text-[15px] font-bold text-gray-900 line-clamp-2 mb-1 group-hover:text-red-600 transition-colors duration-300 min-h-[2.5rem]">
             {product?.name}
           </h3>
-          {/* {isDesc && (
-            <p className="capitalize text-sm text-gray-600 font-light line-clamp-2">
+          {isDesc && product?.description && (
+            <p className="text-[11px] sm:text-[12px] text-gray-500 line-clamp-2 mt-1">
               {product?.description}
             </p>
-          )} */}
+          )}
         </div>
 
-        <div className="flex items-center justify-between pb-2">
-          <div className="flex items-center gap-2">
-            <div className="text-xl font-bold  text-black">
-              €{product?.price?.toFixed(2)}
+        {/* Price and Add to Cart */}
+        <div className="flex items-center justify-between gap-2 mb-2 flex-shrink-0">
+          <div className="flex flex-col gap-0.5">
+            <div className="flex items-center gap-2">
+              <span className="text-lg sm:text-xl font-extrabold text-gray-900">
+                €{product?.price?.toFixed(2)}
+              </span>
+              {product?.estimatedPrice > product?.price && (
+                <span className="text-xs sm:text-sm text-gray-400 line-through">
+                  €{product?.estimatedPrice?.toFixed(2)}
+                </span>
+              )}
             </div>
-            <div className="text-sm  text-gray-600 line-through">
-              €{product?.estimatedPrice}
-            </div>
+            {product?.sale?.isActive && (
+              <span className="text-[10px] text-emerald-600 font-semibold">
+                Save €
+                {(
+                  product.estimatedPrice -
+                  product.price
+                ).toFixed(2)}
+              </span>
+            )}
           </div>
-          <button
-            onClick={() => handleAddToCart(product)}
-            className="w-[1.8rem] h-[1.8rem] cursor-pointer flex items-center justify-center rounded-full  bg-gradient-to-r from-red-600 via-red-500 to-amber-500 text-white hover:opacity-90 transition-opacity duration-200 "
+
+          {/* Add to Cart Button */}
+          <motion.button
+            onClick={(e) => {
+              e.stopPropagation();
+              handleAddToCart(product);
+            }}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            className="p-2.5 sm:p-3 rounded-xl bg-gradient-to-r from-red-600 via-red-500 to-amber-500 text-white shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center group/btn flex-shrink-0"
           >
-            <FaCartPlus size={16} className=" text-white" />
-          </button>
+            <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5 group-hover/btn:scale-110 transition-transform" />
+          </motion.button>
         </div>
-        <Ratings rating={product?.ratings} />
+
+        {/* Ratings */}
+        <div className="flex items-center justify-between flex-shrink-0">
+          <Ratings rating={product?.ratings} />
+          {product?.purchased > 0 && (
+            <span className="text-[10px] sm:text-xs text-gray-500">
+              {product.purchased} sold
+            </span>
+          )}
+        </div>
       </div>
-    </div>
+
+      {/* Hover Glow Effect */}
+      <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-red-500/0 via-red-500/5 to-red-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+    </motion.div>
   );
 }

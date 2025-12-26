@@ -42,6 +42,10 @@ export default function MainLayout({
     <div className="min-h-screen  mx-auto flex flex-col relative">
       <Helmet>
         <meta charSet="utf-8" />
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+        />
         <meta name="description" content={description} />
         <meta name="keywords" content={keywords} />
         <meta name="author" content={author} />
@@ -62,35 +66,8 @@ export default function MainLayout({
       >
         <Header />
       </div>
-      <main className="flex-grow overflow-hidden bg-whitw text-black relative">
-        <div className="absolute top-[-2rem] sm:top-[-6rem] right-[-2rem] sm:right-[-6rem] w-[8rem] sm:w-[20rem] h-[8rem] sm:h-[20rem] bg-red-500 rounded-full z-[1]"></div>
-        <div
-          className="absolute top-[-2rem] right-[-2rem] w-[8rem] sm:w-[20rem] h-[8rem] sm:h-[20rem] bg-red-200 rounded-full z-0"
-          style={{
-            borderRadius: "140px 200px 104px 86px",
-            WebkitBorderRadius: "140px 200px 104px 86px",
-            MozBorderRadius: "140px 200px 104px 86px",
-          }}
-        ></div>
-
+      <main className="flex-grow overflow-hidden bg-white text-black relative">
         {children}
-
-        <div
-          className="absolute bottom-[-6rem] left-[-6rem] w-[8rem] sm:w-[20rem] h-[8rem] sm:h-[20rem] bg-red-500 rounded-full z-[1]"
-          style={{
-            borderRadius: "140px 75px 200px 161px",
-            WebkitBorderRadius: "140px 75px 200px 161px",
-            MozBorderRadius: " 140px 75px 200px 161px",
-          }}
-        ></div>
-        <div
-          className="absolute bottom-[-2rem] left-[-2rem] w-[8rem] sm:w-[20rem] h-[8rem] sm:h-[20rem] bg-red-200 rounded-full z-0"
-          style={{
-            borderRadius: "140px 75px 200px 161px",
-            WebkitBorderRadius: "140px 75px 200px 161px",
-            MozBorderRadius: " 140px 75px 200px 161px",
-          }}
-        ></div>
       </main>
       <Footer />
     </div>

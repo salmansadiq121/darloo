@@ -30,23 +30,76 @@ export default function TrendingProducts({ products, loading }) {
         </h1>
         <div className="w-24 h-1 bg-gradient-to-r from-red-400 to-pink-400 mx-auto mt-4 rounded-full"></div>
       </div>
-      <div className="grid  max-[350px]:grid-cols-1 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 2xl:grid-cols-6 3xl:grid-cols-7 sm:gap-3 gap-4">
+      {/* Desktop Grid */}
+      <div className="hidden sm:grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 2xl:grid-cols-6 3xl:grid-cols-7 sm:gap-4 gap-3 auto-rows-fr">
         {loading
           ? Array.from({ length: 8 }).map((_, index) => (
               <div
                 key={index}
-                className="w-full min-w-[320px] h-[280px] bg-gray-600 animate-pulse rounded-lg"
+                className="w-full h-full min-h-[400px] bg-gradient-to-br from-gray-200 to-gray-300 animate-pulse rounded-2xl"
               ></div>
             ))
           : products?.map((product) => (
-              <ProductCard
-                key={product._id}
-                product={product}
-                sale={false}
-                tranding={true}
-                isDesc={false}
-              />
+              <div key={product._id} className="h-full">
+                <ProductCard
+                  product={product}
+                  sale={false}
+                  tranding={true}
+                  isDesc={false}
+                />
+              </div>
             ))}
+      </div>
+
+      {/* Mobile Swipeable Carousel */}
+      <div className="sm:hidden relative">
+        {loading ? (
+          <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
+            {Array.from({ length: 6 }).map((_, index) => (
+              <div
+                key={index}
+                className="flex-shrink-0 w-[85vw] h-[320px] bg-gradient-to-br from-gray-200 to-gray-300 animate-pulse rounded-2xl"
+              ></div>
+            ))}
+          </div>
+        ) : (
+          <div className="relative">
+            <div
+              className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide scroll-smooth snap-x snap-mandatory px-2"
+              style={{
+                scrollbarWidth: "none",
+                msOverflowStyle: "none",
+              }}
+            >
+              {products?.map((product, index) => (
+                <div
+                  key={product._id}
+                  className="flex-shrink-0 w-[85vw] snap-start"
+                >
+                  <ProductCard
+                    product={product}
+                    sale={false}
+                    tranding={true}
+                    isDesc={false}
+                  />
+                </div>
+              ))}
+            </div>
+            {/* Scroll Indicator */}
+            {products && products.length > 1 && (
+              <div className="flex justify-center gap-2 mt-4">
+                {products
+                  .slice(0, Math.min(5, products.length))
+                  .map((_, index) => (
+                    <div
+                      key={index}
+                      className="h-1.5 w-1.5 rounded-full bg-gray-300"
+                    />
+                  ))}
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

@@ -1,83 +1,28 @@
 "use client";
 import MainLayout from "@/app/components/Layout/Layout";
 import { useAuth } from "@/app/content/authContent";
-import { Style } from "@/app/utils/CommonStyle";
-import { Separator } from "@/components/ui/separator";
-import Image from "next/image";
-import React, { useEffect, useState } from "react";
-import { MdOutlineLocationOn } from "react-icons/md";
-import { MdOutlinePayments } from "react-icons/md";
-import { BiSolidEdit } from "react-icons/bi";
-import PaymentMethodModal from "@/app/components/checkout/PaymentMethodModal";
+import React, { useEffect, useState, useMemo } from "react";
 import toast from "react-hot-toast";
 import axios from "axios";
-import { FiLoader } from "react-icons/fi";
 import { useRouter } from "next/navigation";
 import TrendingProducts from "@/app/components/Home/TrendingProducts";
 import CheckoutElement from "@/app/components/checkout/CheckoutElement";
-
-const paymentMethods = [
-  {
-    id: 1,
-    image: "/checkout1.png",
-  },
-  {
-    id: 2,
-    image: "/checkout2.png",
-  },
-  {
-    id: 3,
-    image: "/checkout3.png",
-  },
-  {
-    id: 4,
-    image: "/checkout4.png",
-  },
-  {
-    id: 5,
-    image: "/checkout5.png",
-  },
-];
-
-// const carts = {
-//   user: "6751997892669289c3e2f4ad",
-//   products: [
-//     {
-//       product: "677788a8f14cad4ebe669947",
-//       quantity: 2,
-//       price: 1300,
-//       colors: ["#000000", "#FFFFFF"],
-//       sizes: ["M", "L"],
-//     },
-//     {
-//       product: "67780226425c66b0a52f9127",
-//       quantity: 1,
-//       price: 5999,
-//       colors: ["#FFFFFF", "#0000FF"],
-//       sizes: ["XL", "L"],
-//     },
-//   ],
-//   totalAmount: "12278",
-//   shippingFee: "500",
-//   shippingAddress: {
-//     address: "123 Street, ABC Avenue",
-//     city: "New York",
-//     state: "NY",
-//     postalCode: "10001",
-//     country: "USA",
-//   },
-//   paymentMethod: "Credit Card",
-// };
+import CheckoutStepper from "@/app/components/checkout/CheckoutStepper";
+import SellerProductGroup from "@/app/components/checkout/SellerProductGroup";
+import OrderSummaryCard from "@/app/components/checkout/OrderSummaryCard";
+import ShippingForm from "@/app/components/checkout/ShippingForm";
+import PaymentMethodSelector from "@/app/components/checkout/PaymentMethodSelector";
+import { motion, AnimatePresence } from "framer-motion";
+import { ShoppingBag, ArrowLeft, ArrowRight } from "lucide-react";
 
 export default function Checkout() {
-  const { auth, selectedProduct, setSelectedProduct, oneClickBuyProduct } =
-    useAuth();
+  const { auth, selectedProduct, setSelectedProduct } = useAuth();
   const [shippingFee, setShippingFee] = useState(0);
   const [cart, setCart] = useState({
     user: "",
     products: [],
     totalAmount: "",
-    shippingFee: shippingFee,
+    shippingFee: 0,
     discount: 0,
     shippingAddress: {
       address: "",
@@ -91,18 +36,19 @@ export default function Checkout() {
   const [voucherCode, setVoucherCode] = useState("");
   const [showPayment, setShowPayment] = useState(false);
   const [discount, setDiscount] = useState(0);
-
   const [loading, setLoading] = useState(false);
-  const [isDisabled, setIsDisabled] = useState(false);
+  const [isVoucherApplied, setIsVoucherApplied] = useState(false);
   const router = useRouter();
   const [products, setProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [country, setCountry] = useState("");
+  const [currentStep, setCurrentStep] = useState(1);
+  const [paymentMethod, setPaymentMethod] = useState("card");
+  const [isEditingShipping, setIsEditingShipping] = useState(false);
 
   // Fetch Trending Products
   useEffect(() => {
     setIsLoading(true);
-
     const fetchTrendingProducts = async () => {
       try {
         const { data } = await axios.get(
@@ -115,54 +61,84 @@ export default function Checkout() {
         setIsLoading(false);
       }
     };
-
     fetchTrendingProducts();
   }, []);
 
-  // 🔹 Update Quantity - Handle both _id and combinationId
-  const updateQuantity = (id, change) => {
-    console.log("selectedProduct:", id, change);
+  // Group products by seller
+  const groupedProducts = useMemo(() => {
+    const groups = {};
+    selectedProduct?.forEach((item) => {
+      const sellerId = item.sellerId || item.seller || "marketplace";
+      const sellerName = item.sellerName || item.storeName || "Darloo Store";
+      const storeLogo = item.storeLogo || "";
+
+      if (!groups[sellerId]) {
+        groups[sellerId] = {
+          sellerId,
+          sellerName,
+          storeLogo,
+          products: [],
+          subtotal: 0,
+          estimatedDelivery: { min: 3, max: 7 },
+        };
+      }
+      groups[sellerId].products.push(item);
+      groups[sellerId].subtotal +=
+        parseFloat(item.price || 0) * (item.quantity || 1);
+    });
+    return Object.values(groups);
+  }, [selectedProduct]);
+
+  // Update Quantity
+  const updateQuantity = (id, newQuantity) => {
     setSelectedProduct((prevCart) => {
       const updatedCart = prevCart.map((item) => {
-        // Match by _id or combinationId
         const matches = item._id === id || item.combinationId === id;
         if (matches) {
-          return { ...item, quantity: Math.max(1, item.quantity + change) };
+          return { ...item, quantity: Math.max(1, newQuantity) };
         }
         return item;
       });
-
       localStorage.setItem("cart", JSON.stringify(updatedCart));
-
       return updatedCart;
     });
   };
 
-  // 🔹 Get Total Price
-  const getTotal = () => {
-    return selectedProduct
-      .reduce((acc, item) => acc + item.price * item.quantity, 0)
-      .toFixed(2);
+  // Remove Product
+  const removeProduct = (id) => {
+    setSelectedProduct((prevCart) => {
+      const updatedCart = prevCart.filter(
+        (item) => item._id !== id && item.combinationId !== id
+      );
+      localStorage.setItem("cart", JSON.stringify(updatedCart));
+      return updatedCart;
+    });
+    toast.success("Item removed from cart");
+  };
+
+  // Get Total Price
+  const getSubtotal = () => {
+    return selectedProduct.reduce(
+      (acc, item) => acc + item.price * item.quantity,
+      0
+    );
   };
 
   // Apply Voucher
-  const applyVoucher = async (e) => {
-    e.preventDefault();
-    setLoading(true);
+  const applyVoucher = async () => {
     if (!voucherCode) {
-      setLoading(false);
+      toast.error("Please enter a voucher code");
       return;
     }
+    setLoading(true);
     try {
-      // Calculate subtotal (only products, before discount, shipping, and GST)
-      const subtotal = getTotal();
-
+      const subtotal = getSubtotal();
       const { data } = await axios.post(
         `${process.env.NEXT_PUBLIC_SERVER_URI}/api/v1/coupon/apply/order`,
         {
           code: voucherCode,
-          cartItems: cart.products.map((item) => ({
-            productId: item.product,
+          cartItems: selectedProduct.map((item) => ({
+            productId: item._id || item.product,
             price: item.price,
             quantity: item.quantity,
           })),
@@ -171,49 +147,39 @@ export default function Checkout() {
       );
       if (data) {
         setDiscount(data.discount);
-        toast.success("Voucher applied successfully.");
-        setVoucherCode("");
-        setIsDisabled(true);
-      } else {
-        toast.error(response?.data?.message || "Something went wrong.");
+        toast.success("Voucher applied successfully!");
+        setIsVoucherApplied(true);
       }
     } catch (error) {
       console.error("Error applying voucher:", error);
-      toast.error(error.response?.data?.message || "Something went wrong.");
+      toast.error(error.response?.data?.message || "Invalid voucher code");
     } finally {
       setLoading(false);
     }
   };
 
-  // Add Shipping Fee
+  // Get Shipping Fee
   useEffect(() => {
     const getShippingFee = async () => {
-      if (!auth?.user) {
-        return;
-      }
+      if (!auth?.user?.addressDetails?.country) return;
       try {
         const { data } = await axios.get(
-          `${process.env.NEXT_PUBLIC_SERVER_URI}/api/v1/shipping/${auth?.user?.addressDetails?.country}`
+          `${process.env.NEXT_PUBLIC_SERVER_URI}/api/v1/shipping/${auth.user.addressDetails.country}`
         );
         if (data) {
           setCountry(data?.shipping?.country || "");
-          setCart((prev) => ({
-            ...prev,
-            shippingFee: data?.shipping?.fee ?? 0,
-          }));
           setShippingFee(data?.shipping?.fee ?? 0);
         }
       } catch (error) {
         console.error("Error getting shipping fee:", error);
       }
     };
-
     getShippingFee();
-  }, [auth?.user]);
+  }, [auth?.user?.addressDetails?.country]);
 
-  // Cart
+  // Update Cart
   useEffect(() => {
-    const subtotal = parseFloat(getTotal() || 0);
+    const subtotal = getSubtotal();
     const discountAmount = parseFloat(discount || 0);
     const shipping = parseFloat(shippingFee || 0);
     const subtotalAfterDiscount = subtotal - discountAmount;
@@ -225,6 +191,8 @@ export default function Checkout() {
       products: selectedProduct,
       totalAmount: finalTotal.toFixed(2),
       discount: discountAmount,
+      couponCode: isVoucherApplied ? voucherCode : "",
+      shippingFee: shipping,
       shippingAddress: {
         address: auth?.user?.addressDetails?.address || "",
         country: auth?.user?.addressDetails?.country || "",
@@ -233,364 +201,261 @@ export default function Checkout() {
         postalCode: auth?.user?.addressDetails?.pincode || "",
       },
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedProduct, auth.user, discount, shippingFee]);
+  }, [selectedProduct, auth?.user, discount, shippingFee, voucherCode, isVoucherApplied]);
 
-  // Handle Verification
-  const handelVerification = () => {
-    if (
-      !auth?.user?.name ||
-      !auth?.user?.email ||
-      !auth?.user?.number ||
-      !auth?.user?.addressDetails?.address ||
-      !auth?.user?.addressDetails?.country ||
-      !auth?.user?.addressDetails?.state ||
-      !auth?.user?.addressDetails?.city ||
-      !auth?.user?.addressDetails?.pincode
-    ) {
+  // Calculate totals
+  const subtotal = getSubtotal();
+  const tax = (subtotal - discount) * 0.01;
+  const total = subtotal - discount + shippingFee + tax;
+
+  // Validation
+  const isFormValid =
+    auth?.user?.name &&
+    auth?.user?.email &&
+    auth?.user?.number &&
+    auth?.user?.addressDetails?.address &&
+    auth?.user?.addressDetails?.country &&
+    auth?.user?.addressDetails?.city;
+
+  const canCheckout =
+    selectedProduct?.length > 0 && isFormValid && total <= 150 && country;
+
+  // Handle Checkout
+  const handleCheckout = () => {
+    if (!auth?.user) {
+      router.push("/authentication");
+      return;
+    }
+
+    if (!isFormValid) {
+      toast.error("Please complete your shipping information");
+      setCurrentStep(2);
+      return;
+    }
+
+    if (total > 150) {
+      toast.error("Order total cannot exceed €150. Please adjust your cart.");
+      return;
+    }
+
+    if (!country) {
+      toast.error("Shipping not available in your country");
+      return;
+    }
+
+    setCurrentStep(3);
+    setShowPayment(true);
+  };
+
+  // Handle Step Change
+  const handleStepClick = (step) => {
+    if (step <= currentStep) {
+      setCurrentStep(step);
+      if (step < 3) {
+        setShowPayment(false);
+      }
+    }
+  };
+
+  // Navigate steps
+  const goToNextStep = () => {
+    if (currentStep === 1 && selectedProduct?.length === 0) {
+      toast.error("Your cart is empty");
+      return;
+    }
+    if (currentStep === 2 && !isFormValid) {
       toast.error("Please complete shipping information");
       return;
     }
-    if (cart?.totalAmount > 150) {
-      return toast.error(
-        "Your order total exceeds the limit of €150. Please adjust the quantity of items in your cart to proceed."
-      );
+    if (currentStep < 3) {
+      setCurrentStep(currentStep + 1);
     }
+  };
 
-    if (!country || country === "" || country === undefined) {
-      toast.error(
-        "We’re sorry, purchases are currently unavailable in the selected country."
-      );
-      return;
-    } else {
-      setShowPayment(true);
+  const goToPrevStep = () => {
+    if (currentStep > 1) {
+      setCurrentStep(currentStep - 1);
+      setShowPayment(false);
     }
   };
 
   return (
     <MainLayout title="Darloo - Checkout">
-      <div className="bg-transparent min-h-screen w-full z-10 relative px-4 sm:px-8 py-5 sm:py-6 overflow-hidden">
-        <div className="grid grid-cols-5 gap-5 sm:gap-[2rem] w-full">
-          {/* Left */}
-          <div className="col-span-5 sm:col-span-3 flex flex-col gap-4  w-full">
-            <h1 className={`${Style.h1}`}>Checkout</h1>
-            <Separator />
-            {/* Personal Information */}
-            <div className="w-full flex flex-col gap-3">
-              <div className="flex items-center justify-between gap-6">
-                <p className="text-[17px] sm:text-lg font-medium text-gray-900 flex items-center gap-2">
-                  <MdOutlineLocationOn size={25} color="red" />
-                  Shipping Information
-                </p>
-                <span
-                  onClick={() =>
-                    router.push(
-                      auth?.user
-                        ? `profile/${auth?.user?._id}?tab=profile`
-                        : `/authentication`
-                    )
-                  }
-                  className="p-1 rounded-full bg-red-100 flex items-center justify-center cursor-pointer"
-                >
-                  <BiSolidEdit className="h-5 w-5 text-red-500 hover:text-red-700 transition-all duration-300" />
-                </span>
-              </div>
-              <form className="flex flex-col gap-4">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="w-full h-[2.8rem] ">
-                    <input
-                      type="text"
-                      placeholder="Full Name"
-                      value={auth?.user?.name}
-                      required
-                      readOnly
-                      className=" w-full h-full px-5  py-2  text-[15px] text-gray-900 bg-transparent border border-gray-400 rounded-sm outline-none"
-                    />
-                  </div>
-                  <div className="w-full h-[2.8rem] ">
-                    <input
-                      type="email"
-                      placeholder="Enter your email address"
-                      value={auth?.user?.email}
-                      readOnly
-                      required
-                      className=" w-full h-full px-5 py-2 text-[15px] text-gray-900 bg-transparent  border border-gray-400 outline-none rounded-sm "
-                    />
-                  </div>
-                </div>
+      <div className="bg-gray-50 min-h-screen w-full relative px-4 sm:px-6 lg:px-8 py-4 sm:py-6 z-10">
+        {/* Progress Stepper */}
+        <CheckoutStepper currentStep={currentStep} onStepClick={handleStepClick} />
 
-                <div className="w-full h-[2.8rem] inputBox-clip">
-                  <input
-                    type="text"
-                    placeholder="Enter your shipping address"
-                    value={auth?.user?.addressDetails?.address}
-                    readOnly
-                    required
-                    className=" w-full h-full px-5 py-2 text-[15px] text-gray-900 bg-transparent  border border-gray-400 outline-none rounded-sm "
-                  />
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="w-full h-[2.8rem] ">
-                    <input
-                      type="text"
-                      placeholder="Country"
-                      value={auth?.user?.addressDetails?.country}
-                      readOnly
-                      required
-                      className=" w-full h-full px-5 py-2 text-[15px] text-gray-900 bg-transparent  border border-gray-400 outline-none rounded-sm "
-                    />
-                  </div>
-                  <div className="w-full h-[2.8rem] ">
-                    {/* State Dropdown */}
-                    <input
-                      type="text"
-                      placeholder="State"
-                      value={auth?.user?.addressDetails?.state}
-                      readOnly
-                      required
-                      className=" w-full h-full px-5 py-2 text-[15px] text-gray-900 bg-transparent  border border-gray-400 outline-none rounded-sm "
-                    />
-                  </div>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="w-full h-[2.8rem] ">
-                    <input
-                      type="text"
-                      placeholder="City"
-                      value={auth?.user?.addressDetails?.city}
-                      readOnly
-                      required
-                      className=" w-full h-full px-5 py-2 text-[15px] text-gray-900 bg-transparent  border border-gray-400 outline-none rounded-sm "
-                    />
-                  </div>
-                  <div className="w-full h-[2.8rem] ">
-                    {/* State Dropdown */}
-                    <div className="flex items-center gap-1 w-full px-[1px]">
-                      <input
-                        type="number"
-                        placeholder="Phone Number"
-                        value={auth?.user?.number}
-                        readOnly
-                        className="w-full h-[2.8rem] pl-2 pr-3 py-2 text-[15px] text-gray-900 bg-transparent  border border-gray-400 outline-none rounded-sm "
-                        required
-                      />
-                    </div>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    className="w-4 h-4 border-2 border-red-500 accent-red-600 "
-                  />
-                  <span className="text-sm text-gray-500">
-                    Same as billing address
-                  </span>
-                </div>
-              </form>
-            </div>
-
-            <div className="flex items-center gap-4 mt-4">
-              {paymentMethods?.map((peymentMethod, i) => (
-                <Image
-                  src={`${peymentMethod?.image}`}
-                  key={i}
-                  alt="checkout"
-                  width={80}
-                  height={50}
-                  className="object-contain cursor-pointer"
-                />
-              ))}
-            </div>
-          </div>
-          {/* Right */}
-          <div className="col-span-5 sm:col-span-2 z-[20] w-full py-[2rem] bg-transparent pb-[4rem] px-[1.5rem] rounded-lg relative cart max-h-fit min-h-[20rem] flex flex-col gap-3">
-            <div className="glow-effect"></div>
-
-            <h3 className="text-xl font-semibold mb-4 z-10">Your Cart</h3>
-
-            <div className="w-full max-h-[20rem] overflow-y-auto overflow-x-hidden scroll-smooth z-20">
-              {selectedProduct?.length > 0 ? (
-                selectedProduct?.map((item) => (
-                  <div
-                    key={item._id}
-                    className="flex items-center justify-between w-full py-4 border-b border-gray-700  gap-2 sm:gap-4"
+        <div className="max-w-7xl mx-auto mt-6">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            {/* Left Column - Main Content */}
+            <div className="lg:col-span-7 xl:col-span-8 space-y-6">
+              <AnimatePresence mode="wait">
+                {/* Step 1: Cart Review */}
+                {currentStep === 1 && (
+                  <motion.div
+                    key="step1"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 20 }}
+                    className="space-y-4"
                   >
-                    <div className=" flex items-center flex-row gap-2 sm:gap-3">
-                      <div className=" bg-gray-300/50 relative  rounded-lg">
-                        <Image
-                          src={item?.image}
-                          alt={item?.title}
-                          width={40}
-                          height={40}
-                          className=" text-8 w-[4.5rem] h-[5rem]  rounded-lg object-fill"
-                        />
-                      </div>
-                      <div className="flex flex-col gap-1">
-                        <span className=" text-[15px] sm:text-[17px] font-medium truncate w-[9rem] sm:w-[15rem]">
-                          {item?.title}
-                        </span>
-                        {/* Display color and size if available */}
-                        {(item?.colors?.length > 0 ||
-                          item?.sizes?.length > 0) && (
-                          <div className="flex items-center gap-2 text-xs text-gray-600">
-                            {item?.colors?.[0] && (
-                              <span className="px-2 py-0.5 bg-gray-100 rounded">
-                                Color: {item.colors[0]}
-                              </span>
-                            )}
-                            {item?.sizes?.[0] && (
-                              <span className="px-2 py-0.5 bg-gray-100 rounded">
-                                Size: {item.sizes[0]}
-                              </span>
-                            )}
-                          </div>
-                        )}
-                        <div
-                          className="flex items-center h-[2.4rem] max-w-[9rem] min-w-[9rem]  border-2 border-red-500 rounded-sm"
-                          style={{ padding: "0rem" }}
-                        >
-                          <button
-                            onClick={() =>
-                              updateQuantity(item._id || item.combinationId, -1)
-                            }
-                            className="px-3 py-1 rounded-md text-gray-900 text-xl w-full h-full flex items-center justify-center cursor-pointer"
-                          >
-                            -
-                          </button>
-                          <span className=" text-[14px] sm:text-[16px] font-medium bg-red-500 w-full h-[2.4rem] flex items-center justify-center px-2 ">
-                            {item?.quantity}
-                          </span>
-                          <button
-                            onClick={() =>
-                              updateQuantity(item._id || item.combinationId, 1)
-                            }
-                            className=" px-3 py-1 rounded-md text-gray-900 text-xl w-full h-full flex items-center justify-center cursor-pointer"
-                          >
-                            +
-                          </button>
-                        </div>
-                      </div>
+                    <div className="flex items-center gap-3 mb-4">
+                      <ShoppingBag className="w-6 h-6 text-red-500" />
+                      <h2 className="text-xl font-bold text-gray-800">
+                        Review Your Cart
+                      </h2>
+                      <span className="bg-red-100 text-red-600 text-sm px-2 py-0.5 rounded-full">
+                        {selectedProduct?.length || 0} items
+                      </span>
                     </div>
 
-                    <span className=" text-[15px] sm:text-lg ">
-                      €{(item.price * item?.quantity).toFixed(2)}
-                    </span>
-                  </div>
-                ))
-              ) : (
-                <p className="text-center text-gray-400">Your cart is empty.</p>
-              )}
-            </div>
+                    {selectedProduct?.length === 0 ? (
+                      <div className="bg-white rounded-xl p-8 text-center">
+                        <ShoppingBag className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                        <h3 className="text-lg font-medium text-gray-600 mb-2">
+                          Your cart is empty
+                        </h3>
+                        <p className="text-gray-400 mb-4">
+                          Add some products to continue shopping
+                        </p>
+                        <button
+                          onClick={() => router.push("/products")}
+                          className="px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
+                        >
+                          Browse Products
+                        </button>
+                      </div>
+                    ) : (
+                      groupedProducts.map((group) => (
+                        <SellerProductGroup
+                          key={group.sellerId}
+                          sellerName={group.sellerName}
+                          storeLogo={group.storeLogo}
+                          products={group.products}
+                          estimatedDelivery={group.estimatedDelivery}
+                          subtotal={group.subtotal}
+                          onQuantityChange={updateQuantity}
+                          onRemoveProduct={removeProduct}
+                        />
+                      ))
+                    )}
 
-            <div className="py-2 w-full">
-              <Separator className="h-px w-full bg-gray-500" />
-            </div>
-            <div className="flex justify-between z-10">
-              <span className="text-red-600 uppercase">Subtotal:</span>
-              <span>€{getTotal()}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-red-600 uppercase">G.S.T:</span>
-              <span>€{(getTotal() * 0.01).toFixed(2)}</span>
-            </div>
-
-            <div className="flex justify-between">
-              <span className="text-red-600 uppercase">Delivery:</span>
-              <span>€{shippingFee || 0}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-red-600 uppercase">Discount:</span>
-              <span>€{discount}</span>
-            </div>
-            <form
-              onSubmit={applyVoucher}
-              className="w-full flex flex-col gap-3 z-10"
-            >
-              <div className="w-full h-[2.6rem] bg-white border border-gray-400 rounded-sm">
-                <input
-                  type="text"
-                  placeholder="Enter voucher code"
-                  value={voucherCode}
-                  required
-                  onChange={(e) => setVoucherCode(e.target.value)}
-                  className="w-full h-full text-black px-6 bg-transparent outline-none border-none"
-                />
-              </div>
-              <button
-                className={`w-full h-[2.8rem] flex items-center rounded justify-center gap-2  transition-all duration-300 text-white py-2 mt-2 ${
-                  isDisabled
-                    ? "cursor-not-allowed bg-red-400"
-                    : "cursor-pointer bg-red-600 hover:bg-red-700"
-                }  `}
-                // style={{
-                //   clipPath:
-                //     "polygon(4.98% 0%, 86.4% 0%, 100% 0%, 100% 70.29%, 95.08% 100%, 9.8% 100%, 0% 100%, 0% 30.23%)",
-                // }}
-                disabled={isDisabled}
-              >
-                Apply Voucher{" "}
-                {loading && (
-                  <FiLoader className="h-5 w-5 animate-spin text-white" />
+                    {selectedProduct?.length > 0 && (
+                      <div className="flex justify-end">
+                        <button
+                          onClick={goToNextStep}
+                          className="flex items-center gap-2 px-6 py-2.5 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
+                        >
+                          Continue to Shipping
+                          <ArrowRight className="w-4 h-4" />
+                        </button>
+                      </div>
+                    )}
+                  </motion.div>
                 )}
-              </button>
-            </form>
-            <div className="py-2 w-full">
-              <Separator className="h-px w-full bg-gray-500" />
+
+                {/* Step 2: Shipping & Payment */}
+                {currentStep === 2 && (
+                  <motion.div
+                    key="step2"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 20 }}
+                    className="space-y-6"
+                  >
+                    <ShippingForm
+                      user={auth?.user}
+                      shippingAddress={cart.shippingAddress}
+                      isEditing={isEditingShipping}
+                      setIsEditing={setIsEditingShipping}
+                    />
+
+                    <PaymentMethodSelector
+                      selectedMethod={paymentMethod}
+                      onMethodChange={setPaymentMethod}
+                    />
+
+                    <div className="flex justify-between">
+                      <button
+                        onClick={goToPrevStep}
+                        className="flex items-center gap-2 px-6 py-2.5 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition"
+                      >
+                        <ArrowLeft className="w-4 h-4" />
+                        Back to Cart
+                      </button>
+                      <button
+                        onClick={handleCheckout}
+                        disabled={!canCheckout}
+                        className="flex items-center gap-2 px-6 py-2.5 bg-red-500 text-white rounded-lg hover:bg-red-600 transition disabled:bg-gray-300 disabled:cursor-not-allowed"
+                      >
+                        Proceed to Payment
+                        <ArrowRight className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </motion.div>
+                )}
+
+                {/* Step 3: Payment Processing */}
+                {currentStep === 3 && (
+                  <motion.div
+                    key="step3"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 20 }}
+                    className="space-y-4"
+                  >
+                    <div className="bg-white rounded-xl p-6">
+                      <h3 className="text-lg font-semibold mb-4">
+                        Complete Your Payment
+                      </h3>
+                      <p className="text-gray-600">
+                        Your payment window is open. Please complete the payment
+                        to place your order.
+                      </p>
+                    </div>
+
+                    <button
+                      onClick={goToPrevStep}
+                      className="flex items-center gap-2 px-6 py-2.5 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition"
+                    >
+                      <ArrowLeft className="w-4 h-4" />
+                      Back to Shipping
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
-            <div className="flex justify-between font-semibold text-lg">
-              <span className="text-red-600 uppercase">Total:</span>
-              <span>€{Number(cart?.totalAmount || 0).toFixed(2)}</span>
-            </div>
-            <div className="py-2 w-full">
-              <Separator className="h-px w-full bg-gray-500" />
-            </div>
-            <div className="flex items-center justify-center w-full z-10">
-              {!auth?.user ? (
-                <button
-                  className={`px-8 text-white mt-4 bg-red-600 rounded-md hover:bg-red-700 transition-all duration-300 cursor-pointer py-2  font-medium disabled:opacity-50`}
-                  onClick={() => router.push("/authentication")}
-                >
-                  Login
-                </button>
-              ) : (
-                <button
-                  className={`px-8 text-white mt-4 rounded bg-red-600 hover:bg-red-700 transition-all duration-300 ${
-                    selectedProduct.length === 0
-                      ? "cursor-not-allowed"
-                      : "cursor-pointer"
-                  } py-2  font-medium disabled:opacity-50`}
-                  disabled={
-                    selectedProduct?.length === 0 ||
-                    loading ||
-                    !auth?.user?.name ||
-                    !auth?.user?.email ||
-                    !auth?.user?.number ||
-                    !auth?.user?.addressDetails?.address ||
-                    !auth?.user?.addressDetails?.country ||
-                    !auth?.user?.addressDetails?.state ||
-                    !auth?.user?.addressDetails?.city ||
-                    !auth?.user?.addressDetails?.pincode
-                  }
-                  // style={{
-                  //   clipPath:
-                  //     " polygon(6.71% 0%, 86.4% 0%, 100% 0%, 100% 66.1%, 94.08% 100%, 9.8% 100%, 0% 100%, 0% 42.16%)",
-                  // }}
-                  onClick={() => handelVerification()}
-                >
-                  Checkout
-                </button>
-              )}
+
+            {/* Right Column - Order Summary */}
+            <div className="lg:col-span-5 xl:col-span-4">
+              <OrderSummaryCard
+                subtotal={subtotal}
+                shippingFee={shippingFee}
+                tax={tax}
+                discount={discount}
+                total={total}
+                itemCount={selectedProduct?.length || 0}
+                voucher={voucherCode}
+                onVoucherChange={setVoucherCode}
+                onVoucherApply={applyVoucher}
+                isVoucherApplied={isVoucherApplied}
+                isApplyingVoucher={loading}
+                onCheckout={handleCheckout}
+                isCheckoutDisabled={!canCheckout || !auth?.user}
+                isProcessing={showPayment}
+              />
             </div>
           </div>
+
+          {/* Trending Products - Hide when payment modal is open */}
+          {!showPayment && (
+            <div className="mt-12">
+              <TrendingProducts products={products} loading={isLoading} />
+            </div>
+          )}
         </div>
 
-        {/* ------------------------Tranding Products-------------- */}
-        <div className="w-full p-4">
-          <TrendingProducts products={products} loading={isLoading} />
-        </div>
-
-        {/* -----------------Payment Method--------------- */}
-
+        {/* Payment Modal */}
         {showPayment && (
           <CheckoutElement
             setpayment={setShowPayment}
@@ -598,14 +463,6 @@ export default function Checkout() {
             shippingFee={shippingFee}
           />
         )}
-        {/* {showPayment && (
-          <PaymentMethodModal
-            isOpen={showPayment}
-            onClose={() => setShowPayment(false)}
-            product={cart}
-            shippingFee={shippingFee}
-          />
-        )} */}
       </div>
     </MainLayout>
   );

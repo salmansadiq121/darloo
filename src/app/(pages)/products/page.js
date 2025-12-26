@@ -10,7 +10,7 @@ import {
 } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown, ChevronUp, Filter, Search, X } from "lucide-react";
+import { ChevronDown, ChevronUp, Filter, Search, X, ChevronLeft, ChevronRight } from "lucide-react";
 import {
   FaSortAlphaDown,
   FaSortAlphaUp,
@@ -666,27 +666,82 @@ function ProductsContent() {
               ) : products.length === 0 && !isLoading ? (
                 <EmptyState onClearFilters={clearFilters} isGerman={isGerman} />
               ) : (
-                <div className="grid  max-[350px]:grid-cols-1 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6 sm:gap-3 gap-4">
-                  {isLoading
-                    ? Array.from({ length: 12 }).map((_, index) => (
-                        <ProductSkeleton key={index} />
-                      ))
-                    : products.map((product) => (
-                        <motion.div
-                          key={product._id}
-                          initial={{ opacity: 0, y: 20 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ duration: 0.3 }}
+                <>
+                  {/* Desktop Grid View */}
+                  <div className="hidden sm:grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6 sm:gap-3 gap-4 auto-rows-fr">
+                    {isLoading
+                      ? Array.from({ length: 12 }).map((_, index) => (
+                          <ProductSkeleton key={index} />
+                        ))
+                      : products.map((product) => (
+                          <motion.div
+                            key={product._id}
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.3 }}
+                            className="h-full"
+                          >
+                            <ProductCard
+                              product={product}
+                              sale={true}
+                              tranding={true}
+                              isDesc={true}
+                            />
+                          </motion.div>
+                        ))}
+                  </div>
+
+                  {/* Mobile Swipeable Carousel */}
+                  <div className="sm:hidden relative">
+                    {isLoading ? (
+                      <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
+                        {Array.from({ length: 6 }).map((_, index) => (
+                          <div key={index} className="flex-shrink-0 w-[85vw]">
+                            <ProductSkeleton />
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="relative">
+                        <div
+                          className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide scroll-smooth snap-x snap-mandatory"
+                          style={{
+                            scrollbarWidth: "none",
+                            msOverflowStyle: "none",
+                          }}
                         >
-                          <ProductCard
-                            product={product}
-                            sale={true}
-                            tranding={true}
-                            isDesc={true}
-                          />
-                        </motion.div>
-                      ))}
-                </div>
+                          {products.map((product, index) => (
+                            <motion.div
+                              key={product._id}
+                              initial={{ opacity: 0, x: 20 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              transition={{ duration: 0.3, delay: index * 0.05 }}
+                              className="flex-shrink-0 w-[85vw] snap-start"
+                            >
+                              <ProductCard
+                                product={product}
+                                sale={true}
+                                tranding={true}
+                                isDesc={true}
+                              />
+                            </motion.div>
+                          ))}
+                        </div>
+                        {/* Scroll Indicator */}
+                        {products.length > 1 && (
+                          <div className="flex justify-center gap-2 mt-4">
+                            {products.slice(0, Math.min(5, products.length)).map((_, index) => (
+                              <div
+                                key={index}
+                                className="h-1.5 w-1.5 rounded-full bg-gray-300"
+                              />
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </>
               )}
 
               {/* Pagination */}

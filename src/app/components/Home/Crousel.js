@@ -189,9 +189,11 @@ const ProductSkeleton = () => (
 );
 
 const GridProductSkeleton = () => (
-  <div className="bg-white p-1 animate-pulse">
-    <div className="bg-gray-300 aspect-square rounded-sm mb-1"></div>
-    <div className="h-3 bg-gray-300 rounded w-1/2 mx-auto mt-1"></div>
+  <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm animate-pulse">
+    <div className="bg-gradient-to-br from-gray-200 to-gray-300 aspect-square"></div>
+    <div className="p-2">
+      <div className="h-3 bg-gray-200 rounded-full w-2/3 mx-auto"></div>
+    </div>
   </div>
 );
 
@@ -224,13 +226,25 @@ const TrendingProducts = ({ products, loading, countryCode }) => {
     `${countryCode === "DE" ? "€" : "€"}${price.toFixed(2)}`;
 
   const getTrendingStatus = (product) => {
-    if (!product) return { text: t.new, color: "text-blue-500" };
+    if (!product)
+      return { text: t.new, color: "text-blue-500", bg: "bg-blue-500/20" };
     const purchaseRate = (product.purchased / product.quantity) * 100;
 
-    if (purchaseRate > 50) return { text: t.hot, color: "text-red-600" };
-    if (purchaseRate > 30) return { text: t.popular, color: "text-orange-500" };
-    if (product.trending) return { text: t.trending, color: "text-purple-600" };
-    return { text: t.new, color: "text-blue-500" };
+    if (purchaseRate > 50)
+      return { text: t.hot, color: "text-red-600", bg: "bg-red-500/20" };
+    if (purchaseRate > 30)
+      return {
+        text: t.popular,
+        color: "text-orange-500",
+        bg: "bg-orange-500/20",
+      };
+    if (product.trending)
+      return {
+        text: t.trending,
+        color: "text-purple-600",
+        bg: "bg-purple-500/20",
+      };
+    return { text: t.new, color: "text-blue-500", bg: "bg-blue-500/20" };
   };
 
   const renderRatings = (rating) => {
@@ -241,71 +255,83 @@ const TrendingProducts = ({ products, loading, countryCode }) => {
     const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
 
     return (
-      <div className="flex items-center">
+      <div className="flex items-center justify-center gap-0.5">
         {[...Array(fullStars)].map((_, i) => (
           <Star
             key={`full-${i}`}
-            size={12}
+            size={10}
             className="fill-yellow-400 text-yellow-400"
           />
         ))}
         {hasHalfStar && (
           <div className="relative">
-            <Star size={12} className="text-gray-300" />
+            <Star size={10} className="text-gray-300" />
             <div className="absolute top-0 left-0 w-1/2 overflow-hidden">
-              <Star size={12} className="fill-yellow-400 text-yellow-400" />
+              <Star size={10} className="fill-yellow-400 text-yellow-400" />
             </div>
           </div>
         )}
         {[...Array(emptyStars)].map((_, i) => (
-          <Star key={`empty-${i}`} size={12} className="text-gray-300" />
+          <Star key={`empty-${i}`} size={10} className="text-gray-300" />
         ))}
-        <span className="ml-1 text-xs text-gray-600">
-          ({rating.toFixed(1)})
+        <span className="ml-1 text-[9px] text-gray-500 font-medium">
+          {rating.toFixed(1)}
         </span>
       </div>
     );
   };
 
   return (
-    <div className="bg-white rounded-md shadow-sm border border-gray-200 overflow-hidden h-full">
-      <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-red-700 to-red-600">
+    <div className="rounded-xl shadow-lg border border-gray-100 overflow-hidden h-full backdrop-blur-sm bg-white/95">
+      <div className="flex items-center justify-between px-4 py-3.5 bg-gradient-to-r from-red-600 via-red-700 to-red-800 shadow-md">
         <div className="flex items-center gap-2">
-          <TrendingUp size={18} className="text-white" />
-          <h2 className="text-lg font-semibold text-white">{t.topTrends}</h2>
+          <div className="p-1.5 bg-white/20 rounded-lg backdrop-blur-sm">
+            <TrendingUp size={16} className="text-white" />
+          </div>
+          <h2 className="text-lg font-bold text-white tracking-tight">
+            {t.topTrends}
+          </h2>
         </div>
         <Link
           href="/products"
-          className="flex items-center text-white text-sm hover:underline"
+          className="flex items-center text-white/90 text-sm font-medium hover:text-white hover:underline transition-all duration-200 group/link"
         >
           {t.viewAll}
-          <ChevronRight size={16} />
+          <ChevronRight
+            size={16}
+            className="ml-0.5 group-hover/link:translate-x-0.5 transition-transform"
+          />
         </Link>
       </div>
 
-      <div className="bg-red-50/50 p-1 max-h-[300px] overflow-y-auto">
+      <div className="bg-gradient-to-br from-gray-50/50 to-white p-3 max-h-[340px] overflow-y-auto custom-scrollbar">
         {loading ? (
-          <div className="grid grid-cols-2 gap-1">
+          <div className="grid grid-cols-2 gap-3">
             {[...Array(6)].map((_, index) => (
               <GridProductSkeleton key={index} />
             ))}
           </div>
         ) : !products || products.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-full p-4 text-center">
-            <div className="text-red-700 mb-2">
+          <div className="flex flex-col items-center justify-center h-full p-6 text-center">
+            <div className="text-red-600 mb-3 p-3 bg-red-50 rounded-full">
               <ShoppingCart size={32} />
             </div>
-            <p className="text-sm text-gray-600 mb-2">{t.noTrendingProducts}</p>
+            <p className="text-sm text-gray-700 mb-3 font-medium">
+              {t.noTrendingProducts}
+            </p>
             <Link
               href="/products"
-              className="text-xs text-red-700 flex items-center hover:underline"
+              className="text-xs text-red-700 flex items-center hover:text-red-800 hover:underline font-semibold transition-colors"
             >
-              {t.browseAll} <ArrowRight size={12} className="ml-1" />
+              {t.browseAll} <ArrowRight size={14} className="ml-1" />
             </Link>
           </div>
         ) : (
-          <div className="grid grid-cols-3 sm:grid-cols-2 gap-1">
-            {products.slice(0, 6).map((product) => {
+          <div
+            className="grid grid-cols-2 gap-4"
+            style={{ gridAutoRows: "1fr" }}
+          >
+            {products.slice(0, 6).map((product, index) => {
               if (!product) return null;
               const discountedPrice = product.sale?.isActive
                 ? getDiscountedPrice(
@@ -317,63 +343,128 @@ const TrendingProducts = ({ products, loading, countryCode }) => {
               const isHovered = hoveredProduct === product._id;
 
               return (
-                <motion.div
+                <Link
                   key={product._id}
-                  className="relative bg-white border overflow-hidden group"
-                  onMouseEnter={() => setHoveredProduct(product._id)}
-                  onMouseLeave={() => setHoveredProduct(null)}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.2 }}
+                  href={`/products/${product._id}`}
+                  className="block h-full"
                 >
-                  <div className="relative aspect-square overflow-hidden">
-                    <figure className="relative w-full h-64 overflow-hidden rounded-none">
-                      <Image
-                        src={product?.thumbnails || "/placeholder.svg"}
-                        alt={product?.name || "Product image"}
-                        fill
-                        className={`object-cover transition-transform duration-300 rounded-none ${
-                          isHovered ? "scale-110" : "scale-100"
-                        }`}
-                        sizes="(max-width: 768px) 100vw, max-width: 1200px) 50vw,  33vw"
-                      />
-                    </figure>
+                  <motion.div
+                    className="relative bg-white rounded-2xl border border-gray-100 overflow-hidden group cursor-pointer h-full w-full flex flex-col shadow-sm hover:shadow-2xl transition-all duration-500"
+                    onMouseEnter={() => setHoveredProduct(product._id)}
+                    onMouseLeave={() => setHoveredProduct(null)}
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.3, delay: index * 0.05 }}
+                    whileHover={{ y: -6, scale: 1.02 }}
+                  >
+                    {/* Image Container - Always Visible */}
+                    <div className="relative w-full aspect-square overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100 flex-shrink-0">
+                      <figure className="relative w-full h-full">
+                        <Image
+                          src={product?.thumbnails || "/placeholder.svg"}
+                          alt={product?.name || "Product image"}
+                          fill
+                          className={`object-cover transition-all duration-700 ease-out ${
+                            isHovered ? "scale-125 brightness-110" : "scale-100"
+                          }`}
+                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        />
 
-                    <div
-                      className={`absolute top-1 left-1 ${trendingStatus.color} text-[9px] font-medium px-1 py-0.5`}
-                    >
-                      ↗ {trendingStatus.text}
+                        {/* Gradient Overlay - Appears on hover */}
+                        <div
+                          className={`absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent transition-opacity duration-500 ${
+                            isHovered ? "opacity-100" : "opacity-0"
+                          }`}
+                        />
+
+                        {/* Trending Badge */}
+                        <motion.div
+                          className={`absolute top-2 left-2 ${trendingStatus.bg} backdrop-blur-md ${trendingStatus.color} text-[8px] font-bold px-2 py-1 rounded-full border border-white/30 shadow-lg`}
+                          initial={{ scale: 0 }}
+                          animate={{ scale: 1 }}
+                          transition={{ delay: 0.1 }}
+                        >
+                          ↗ {trendingStatus.text}
+                        </motion.div>
+
+                        {/* Discount Badge */}
+                        {product.sale?.isActive && (
+                          <motion.div
+                            className="absolute top-2 right-2 bg-gradient-to-br from-red-500 to-red-600 text-white text-[9px] font-bold px-2 py-1 rounded-full shadow-lg border border-white/30"
+                            initial={{ scale: 0, rotate: -180 }}
+                            animate={{ scale: 1, rotate: 0 }}
+                            transition={{ delay: 0.15 }}
+                          >
+                            -{product.sale.discountPercentage}%
+                          </motion.div>
+                        )}
+
+                        {/* Quick View Button - Shows on Hover */}
+                        <motion.div
+                          className={`absolute inset-0 flex items-center justify-center transition-opacity duration-300 ${
+                            isHovered ? "opacity-100" : "opacity-0"
+                          }`}
+                          initial={{ y: 20 }}
+                          animate={{ y: isHovered ? 0 : 20 }}
+                        >
+                          <div className="bg-white/95 backdrop-blur-sm rounded-full p-3 shadow-2xl border border-white/50">
+                            <Eye size={18} className="text-red-600" />
+                          </div>
+                        </motion.div>
+                      </figure>
                     </div>
 
-                    {product.sale?.isActive && (
-                      <div className="absolute top-1 right-1 bg-red-600 text-white text-[9px] font-medium px-1 py-0.5 rounded-sm">
-                        {product.sale.discountPercentage}%
-                      </div>
-                    )}
-
-                    <Link
-                      className={`absolute cursor-pointer inset-0 bg-black/40 flex items-center justify-center transition-opacity duration-200 ${
-                        isHovered ? "opacity-100" : "opacity-0"
+                    {/* Details Overlay - Slides up on hover */}
+                    <motion.div
+                      className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/95 via-black/90 to-transparent backdrop-blur-md transition-all duration-500 ${
+                        isHovered
+                          ? "translate-y-0 opacity-100"
+                          : "translate-y-full opacity-0"
                       }`}
-                      href={`/products/${product._id}`}
+                      style={{ paddingTop: "60%" }}
                     >
-                      <button className="bg-white rounded-full p-1.5 hover:bg-red-50 transition-colors">
-                        <Eye size={14} className="text-red-700" />
-                      </button>
-                    </Link>
-                  </div>
+                      <div className="absolute bottom-0 left-0 right-0 p-3 space-y-2">
+                        {/* Product Name */}
+                        <h3 className="text-white text-xs font-semibold line-clamp-2 leading-tight">
+                          {product?.name || "Product Name"}
+                        </h3>
 
-                  <div className="p-1 text-center">
-                    <span className="font-bold text-xs text-red-700">
-                      {formatPrice(discountedPrice)}
-                    </span>
-                    {product.sale?.isActive && (
-                      <span className="text-[9px] text-gray-500 line-through ml-1">
-                        {formatPrice(product.price)}
-                      </span>
-                    )}
-                  </div>
-                </motion.div>
+                        {/* Rating */}
+                        {product.rating && (
+                          <div className="flex items-center justify-center">
+                            {renderRatings(product.rating)}
+                          </div>
+                        )}
+
+                        {/* Price */}
+                        <div className="flex items-center justify-center gap-2 pt-1">
+                          <span className="font-bold text-white text-sm">
+                            {formatPrice(discountedPrice)}
+                          </span>
+                          {product.sale?.isActive && (
+                            <span className="text-[10px] text-gray-300 line-through">
+                              {formatPrice(product.price)}
+                            </span>
+                          )}
+                        </div>
+
+                        {/* Quick Add Button */}
+                        <motion.button
+                          className="w-full bg-white text-red-600 text-xs font-bold py-2 rounded-lg hover:bg-red-50 transition-colors duration-200 flex items-center justify-center gap-1.5 shadow-lg"
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                          }}
+                        >
+                          <ShoppingCart size={14} />
+                          Quick Add
+                        </motion.button>
+                      </div>
+                    </motion.div>
+                  </motion.div>
+                </Link>
               );
             })}
           </div>

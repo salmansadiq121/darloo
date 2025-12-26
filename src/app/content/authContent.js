@@ -30,8 +30,14 @@ export const AuthProvider = ({ children }) => {
   const [country, setCountry] = useState("USD");
   const [countryCode, setCountryCode] = useState("US");
 
-  //   Token Check
-  axios.defaults.headers.common["Authorization"] = auth?.token;
+  // Set axios authorization header when token changes
+  useEffect(() => {
+    if (auth?.token) {
+      axios.defaults.headers.common["Authorization"] = auth.token;
+    } else {
+      delete axios.defaults.headers.common["Authorization"];
+    }
+  }, [auth?.token]);
 
   useEffect(() => {
     const data = localStorage.getItem("@ayoob");

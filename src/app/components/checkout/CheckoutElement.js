@@ -13,7 +13,7 @@ const stripePromise = loadStripe(
   "pk_test_51OoTmdDy4uT85vUQJcAXdDEWUTSjn2zxNMRy1GqzWoLAWiwAEpIl1G6E5wBcx9XxrVqTV6nsm09PhqWGZy0g0rEK00wxxaNysW"
 );
 
-export default function CheckoutElement({ carts, setpayment, shippingFee }) {
+export default function CheckoutElement({ carts, setpayment, shippingFee, affiliateRef }) {
   const [clientSecret, setClientSecret] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -28,7 +28,7 @@ export default function CheckoutElement({ carts, setpayment, shippingFee }) {
           throw new Error("Minimum order amount is €0.50");
         }
 
-        const token = Cookies.get("@ayoob");
+        const token = Cookies.get("@darloo");
         if (!token) {
           throw new Error("Please log in to continue");
         }
@@ -118,6 +118,7 @@ export default function CheckoutElement({ carts, setpayment, shippingFee }) {
                 shippingFee={shippingFee}
                 clientSecret={clientSecret}
                 onClose={handleClose}
+                affiliateRef={affiliateRef}
               />
             </Elements>
           )}

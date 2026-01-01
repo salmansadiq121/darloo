@@ -99,17 +99,17 @@ export default function UpdateProfileModal({
           { signal: controller.signal }
         );
 
-        if (!res.ok) {
-          throw new Error("Failed to fetch address suggestions");
-        }
-
+        // Parse JSON response even if not ok to check for error details
         const data = await res.json();
+
         if (!isCancelled) {
+          // If we have predictions, use them; otherwise set empty array
           setAddressSuggestions(data?.predictions || []);
         }
       } catch (err) {
-        if (!isCancelled) {
-          console.error("Address suggestions error:", err);
+        // Only log errors that aren't abort errors (user typing causes aborts)
+        if (!isCancelled && err.name !== "AbortError") {
+          // Silently fail - address suggestions are a nice-to-have feature
           setAddressSuggestions([]);
         }
       } finally {
@@ -160,7 +160,7 @@ export default function UpdateProfileModal({
           userData
         );
         if (data) {
-          localStorage.setItem("@ayoob", JSON.stringify({ user: data.user }));
+          localStorage.setItem("@darloo", JSON.stringify({ user: data.user }));
           getUserDetails();
           toast.success("Profile updated successfully");
         }

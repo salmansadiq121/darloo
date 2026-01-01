@@ -40,8 +40,8 @@ export const AuthProvider = ({ children }) => {
   }, [auth?.token]);
 
   useEffect(() => {
-    const data = localStorage.getItem("@ayoob");
-    const token = Cookies.get("@ayoob");
+    const data = localStorage.getItem("@darloo");
+    const token = Cookies.get("@darloo");
     const activation = localStorage.getItem("activation");
     setActivationToken(activation);
 
@@ -122,7 +122,7 @@ export const AuthProvider = ({ children }) => {
         `${authUri}/userDetail/${auth?.user?._id}`
       );
       setAuth({ ...auth, user: data.user });
-      localStorage.setItem("@ayoob", JSON.stringify({ user: data.user }));
+      localStorage.setItem("@darloo", JSON.stringify({ user: data.user }));
     } catch (error) {
       console.log(error);
     }
@@ -143,7 +143,7 @@ export const AuthProvider = ({ children }) => {
         }
       );
 
-      Cookies.set("@ayoob", data.accessToken, {
+      Cookies.set("@darloo", data.accessToken, {
         expires: 1,
         secure: true,
         sameSite: "Strict",
@@ -168,11 +168,11 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const checkTokenExpiry = () => {
       try {
-        const token = Cookies.get("@ayoob");
+        const token = Cookies.get("@darloo");
         if (!token) {
           setAuth({ user: null, token: "" });
-          localStorage.removeItem("@ayoob");
-          Cookies.remove("@ayoob");
+          localStorage.removeItem("@darloo");
+          Cookies.remove("@darloo");
           return;
         }
 
@@ -186,14 +186,14 @@ export const AuthProvider = ({ children }) => {
         if (decodedToken.exp * 1000 < Date.now()) {
           router.push("/authentication");
           setAuth({ user: null, token: "" });
-          localStorage.removeItem("@ayoob");
-          Cookies.remove("@ayoob");
+          localStorage.removeItem("@darloo");
+          Cookies.remove("@darloo");
         }
       } catch (error) {
         console.error("Error decoding token:", error.message);
         setAuth({ user: null, token: "" });
         localStorage.removeItem("auth");
-        Cookies.remove("@ayoob");
+        Cookies.remove("@darloo");
       }
     };
 

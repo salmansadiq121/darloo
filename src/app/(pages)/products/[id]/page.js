@@ -247,9 +247,18 @@ export default function ProductDetail() {
     fetchProductDetail();
   }, [fetchProductDetail]);
 
+  // Check if product is out of stock
+  const isOutOfStock = !product?.quantity || product?.quantity <= 0;
+
   // Handle Add to Cart - Creates separate entries for each color/size combination
   const handleAddToCart = (product) => {
     if (!product || !product._id) return;
+
+    // Prevent adding out of stock products
+    if (isOutOfStock) {
+      toast.error(isGerman ? "Dieses Produkt ist nicht auf Lager" : "This product is out of stock");
+      return;
+    }
 
     // Create a unique identifier for this color/size combination
     const combinationId = `${product._id}_${selectedColor}_${selectedSize}`;
@@ -296,6 +305,12 @@ export default function ProductDetail() {
 
   // One Click Buy Now
   const handleOneClickBuy = async (product) => {
+    // Prevent buying out of stock products
+    if (isOutOfStock) {
+      toast.error(isGerman ? "Dieses Produkt ist nicht auf Lager" : "This product is out of stock");
+      return;
+    }
+
     const combinationId = `${product._id}_${selectedColor}_${selectedSize}`;
     const productData = {
       product: product._id,
@@ -1390,17 +1405,26 @@ export default function ProductDetail() {
                     {/* Glow effect */}
                     <div className="absolute -inset-0.5 bg-gradient-to-r from-red-600 to-orange-600 rounded-lg blur-md opacity-30 group-hover:opacity-50 transition-opacity" />
                     <Button
-                      className="relative w-full h-10 cursor-pointer rounded-lg text-xs font-bold bg-gradient-to-r from-red-600 via-red-500 to-orange-500 hover:from-red-700 hover:via-red-600 hover:to-orange-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 border-0"
+                      className={`relative w-full h-10 rounded-lg text-xs font-bold shadow-lg transition-all duration-300 border-0 ${
+                        isOutOfStock
+                          ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                          : "cursor-pointer bg-gradient-to-r from-red-600 via-red-500 to-orange-500 hover:from-red-700 hover:via-red-600 hover:to-orange-600 text-white hover:shadow-xl"
+                      }`}
                       size="lg"
                       onClick={() => handleAddToCart(product)}
+                      disabled={isOutOfStock}
                       title={
-                        isGerman
-                          ? "Jede Farbe/Größe-Kombination wird als separates Produkt hinzugefügt"
-                          : "Each color/size combination will be added as a separate item"
+                        isOutOfStock
+                          ? (isGerman ? "Nicht auf Lager" : "Out of Stock")
+                          : (isGerman
+                            ? "Jede Farbe/Größe-Kombination wird als separates Produkt hinzugefügt"
+                            : "Each color/size combination will be added as a separate item")
                       }
                     >
                       <ShoppingCart className="mr-1.5 h-4 w-4" />
-                      {isGerman ? "In den Warenkorb" : "Add to Cart"}
+                      {isOutOfStock
+                        ? (isGerman ? "Nicht verfügbar" : "Out of Stock")
+                        : (isGerman ? "In den Warenkorb" : "Add to Cart")}
                     </Button>
                   </motion.div>
                   <motion.div
@@ -1411,8 +1435,13 @@ export default function ProductDetail() {
                     {/* Glow effect */}
                     <div className="absolute -inset-0.5 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-lg blur-md opacity-30 group-hover:opacity-50 transition-opacity" />
                     <Button
-                      className="relative w-full h-10 text-xs font-bold rounded-lg cursor-pointer bg-gradient-to-r from-cyan-500 via-blue-500 to-indigo-500 hover:from-cyan-600 hover:via-blue-600 hover:to-indigo-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 border-0"
+                      className={`relative w-full h-10 text-xs font-bold rounded-lg shadow-lg transition-all duration-300 border-0 ${
+                        isOutOfStock
+                          ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                          : "cursor-pointer bg-gradient-to-r from-cyan-500 via-blue-500 to-indigo-500 hover:from-cyan-600 hover:via-blue-600 hover:to-indigo-600 text-white hover:shadow-xl"
+                      }`}
                       size="lg"
+                      disabled={isOutOfStock}
                       onClick={() => {
                         handleOneClickBuy(product);
                         setShowStickyBar(false);
@@ -1863,10 +1892,17 @@ export default function ProductDetail() {
                 </div>
                 <Button
                   onClick={() => handleAddToCart(product)}
-                  className="flex-1 bg-primary hover:bg-primary/90"
+                  disabled={isOutOfStock}
+                  className={`flex-1 ${
+                    isOutOfStock
+                      ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                      : "bg-primary hover:bg-primary/90"
+                  }`}
                 >
                   <ShoppingBag className="mr-2 h-5 w-5" />
-                  {isGerman ? "In den Warenkorb" : "Add to Cart"}
+                  {isOutOfStock
+                    ? (isGerman ? "Nicht verfügbar" : "Out of Stock")
+                    : (isGerman ? "In den Warenkorb" : "Add to Cart")}
                 </Button>
               </div>
             </motion.div>

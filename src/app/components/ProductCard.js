@@ -18,9 +18,18 @@ export default function ProductCard({ product, sale, tranding, isDesc }) {
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
 
+  // Check if product is out of stock
+  const isOutOfStock = !product?.quantity || product?.quantity <= 0;
+
   // Handle Add to Cart
   const handleAddToCart = (product) => {
     if (!product || !product._id) return;
+
+    // Prevent adding out of stock products
+    if (isOutOfStock) {
+      toast.error("This product is out of stock");
+      return;
+    }
 
     setSelectedProduct((prevProducts) => {
       let updatedProducts = [...prevProducts];
@@ -161,7 +170,15 @@ export default function ProductCard({ product, sale, tranding, isDesc }) {
         </div>
 
         {/* Bottom Badge */}
-        {product?.trending && tranding && (
+        {isOutOfStock ? (
+          <motion.div
+            initial={{ x: -50, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            className="absolute bottom-3 left-3 bg-gradient-to-r from-gray-700 to-gray-800 backdrop-blur-sm px-2.5 py-1 rounded-full text-[10px] sm:text-xs font-bold flex items-center gap-1 text-white shadow-lg"
+          >
+            Out of Stock
+          </motion.div>
+        ) : product?.trending && tranding ? (
           <motion.div
             initial={{ x: -50, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
@@ -170,7 +187,7 @@ export default function ProductCard({ product, sale, tranding, isDesc }) {
             <Flame className="w-3 h-3" />
             Trending
           </motion.div>
-        )}
+        ) : null}
 
         {/* Quick View Overlay */}
         <motion.div
@@ -238,11 +255,16 @@ export default function ProductCard({ product, sale, tranding, isDesc }) {
               e.stopPropagation();
               handleAddToCart(product);
             }}
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-            className="p-2.5 sm:p-3 rounded-xl bg-gradient-to-r from-red-600 via-red-500 to-amber-500 text-white shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center group/btn flex-shrink-0"
+            whileHover={!isOutOfStock ? { scale: 1.1 } : {}}
+            whileTap={!isOutOfStock ? { scale: 0.9 } : {}}
+            disabled={isOutOfStock}
+            className={`p-2.5 sm:p-3 rounded-xl shadow-lg transition-all duration-300 flex items-center justify-center group/btn flex-shrink-0 ${
+              isOutOfStock
+                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                : "bg-gradient-to-r from-red-600 via-red-500 to-amber-500 text-white hover:shadow-xl"
+            }`}
           >
-            <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5 group-hover/btn:scale-110 transition-transform" />
+            <ShoppingCart className={`w-4 h-4 sm:w-5 sm:h-5 ${!isOutOfStock ? "group-hover/btn:scale-110" : ""} transition-transform`} />
           </motion.button>
         </div>
 

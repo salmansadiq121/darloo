@@ -22,6 +22,15 @@ const geistMono = Geist_Mono({
 
 export default function RootLayout({ children }) {
   useEffect(() => {
+    /** ✅ Capture affiliate ref from URL on any page */
+    const urlParams = new URLSearchParams(window.location.search);
+    const refParam = urlParams.get("ref");
+    if (refParam) {
+      // Store affiliate ref in localStorage with timestamp
+      localStorage.setItem("affiliateRef", refParam);
+      localStorage.setItem("affiliateRefTime", Date.now().toString());
+    }
+
     /** ✅ GoAffPro script loader */
     // Only append if not already present
     if (!document.querySelector("#goaffpro-script")) {

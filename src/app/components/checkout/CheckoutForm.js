@@ -34,7 +34,7 @@ const CARD_ELEMENT_OPTIONS = {
   hidePostalCode: true,
 };
 
-const CheckOutForm = ({ carts, shippingFee, clientSecret, onClose }) => {
+const CheckOutForm = ({ carts, shippingFee, clientSecret, onClose, affiliateRef }) => {
   const stripe = useStripe();
   const elements = useElements();
   const { setSelectedProduct } = useAuth();
@@ -54,9 +54,15 @@ const CheckOutForm = ({ carts, shippingFee, clientSecret, onClose }) => {
           shippingFee: shippingFee,
           payment_info,
           paymentMethod: "Credit Card",
+          affiliateRef: affiliateRef || null,
         }
       );
       if (data) {
+        // Clear affiliate ref from localStorage after successful order
+        if (affiliateRef) {
+          localStorage.removeItem("affiliateRef");
+          localStorage.removeItem("affiliateRefTime");
+        }
         localStorage.removeItem("cart");
         setSelectedProduct([]);
         setPaymentStatus("success");

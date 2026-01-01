@@ -70,10 +70,17 @@ import { fileType } from "@/app/utils/UploadChatFile";
 const MessageLoader = () => (
   <div className="space-y-4 p-4">
     {[1, 2, 3, 4, 5].map((i) => (
-      <div key={i} className={`flex ${i % 2 === 0 ? "justify-end" : "justify-start"}`}>
+      <div
+        key={i}
+        className={`flex ${i % 2 === 0 ? "justify-end" : "justify-start"}`}
+      >
         {i % 2 !== 0 && <Skeleton className="w-8 h-8 rounded-full mr-2" />}
-        <div className={`space-y-2 ${i % 2 === 0 ? "items-end" : "items-start"}`}>
-          <Skeleton className={`h-16 ${i % 2 === 0 ? "w-48" : "w-56"} rounded-2xl`} />
+        <div
+          className={`space-y-2 ${i % 2 === 0 ? "items-end" : "items-start"}`}
+        >
+          <Skeleton
+            className={`h-16 ${i % 2 === 0 ? "w-48" : "w-56"} rounded-2xl`}
+          />
           <Skeleton className="h-3 w-16" />
         </div>
         {i % 2 === 0 && <Skeleton className="w-8 h-8 rounded-full ml-2" />}
@@ -84,10 +91,46 @@ const MessageLoader = () => (
 
 // Emoji data
 const emojis = [
-  "😊", "😂", "❤️", "👍", "🙏", "🔥", "😍", "😎", "🤔", "😢",
-  "😡", "🎉", "👋", "🤝", "👏", "🙌", "🤷‍♂️", "🤦‍♀️", "💯", "🚀",
-  "✅", "😘", "🥰", "😭", "😱", "🤗", "😴", "🤩", "😇", "🥺",
-  "👌", "✌️", "🤞", "👀", "💪", "🎁", "💰", "📦", "🛒", "⭐",
+  "😊",
+  "😂",
+  "❤️",
+  "👍",
+  "🙏",
+  "🔥",
+  "😍",
+  "😎",
+  "🤔",
+  "😢",
+  "😡",
+  "🎉",
+  "👋",
+  "🤝",
+  "👏",
+  "🙌",
+  "🤷‍♂️",
+  "🤦‍♀️",
+  "💯",
+  "🚀",
+  "✅",
+  "😘",
+  "🥰",
+  "😭",
+  "😱",
+  "🤗",
+  "😴",
+  "🤩",
+  "😇",
+  "🥺",
+  "👌",
+  "✌️",
+  "🤞",
+  "👀",
+  "💪",
+  "🎁",
+  "💰",
+  "📦",
+  "🛒",
+  "⭐",
 ];
 
 // Quick questions for sellers
@@ -234,7 +277,9 @@ function ChatPageContent() {
         prevChats.map((chat) => ({
           ...chat,
           users: chat.users.map((user) =>
-            user._id === data.userID ? { ...user, isOnline: data.isOnline } : user
+            user._id === data.userID
+              ? { ...user, isOnline: data.isOnline }
+              : user
           ),
         }))
       );
@@ -312,7 +357,9 @@ function ChatPageContent() {
           }
         } catch (error) {
           console.error("Error creating seller chat:", error);
-          toast.error(error?.response?.data?.message || "Failed to start chat with seller");
+          toast.error(
+            error?.response?.data?.message || "Failed to start chat with seller"
+          );
         }
       }
     };
@@ -356,7 +403,9 @@ function ChatPageContent() {
     setIsSearchingProducts(true);
     try {
       const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_SERVER_URI}/api/v1/products/search/${encodeURIComponent(query)}`
+        `${
+          process.env.NEXT_PUBLIC_SERVER_URI
+        }/api/v1/products/search/${encodeURIComponent(query)}`
       );
       if (data?.success) {
         setProductSearchResults(data.products || []);
@@ -397,7 +446,12 @@ function ChatPageContent() {
     if (e) e.preventDefault();
 
     const messageContent = quickQuestion || newMessage.trim();
-    if ((!messageContent && !attachedProduct) || !selectedChat?._id || isSending) return;
+    if (
+      (!messageContent && !attachedProduct) ||
+      !selectedChat?._id ||
+      isSending
+    )
+      return;
 
     const currentAttachedProduct = attachedProduct;
     setNewMessage("");
@@ -415,7 +469,11 @@ function ChatPageContent() {
       const { data } = await axios.post(
         `${process.env.NEXT_PUBLIC_SERVER_URI}/api/v1/messages/send`,
         {
-          content: messageContent || (currentAttachedProduct ? `Check out this product: ${currentAttachedProduct.name}` : ""),
+          content:
+            messageContent ||
+            (currentAttachedProduct
+              ? `Check out this product: ${currentAttachedProduct.name}`
+              : ""),
           chatId: selectedChat._id,
           contentType: currentAttachedProduct ? "product" : "text",
           productId: currentAttachedProduct?._id || null,
@@ -710,9 +768,7 @@ function ChatPageContent() {
                           whileTap={{ scale: 0.98 }}
                           onClick={() => handleSelectChat(chat)}
                           className={`px-4 py-3 cursor-pointer transition-all border-b border-gray-100 ${
-                            isSelected
-                              ? "bg-emerald-50"
-                              : "hover:bg-gray-50"
+                            isSelected ? "bg-emerald-50" : "hover:bg-gray-50"
                           }`}
                         >
                           <div className="flex items-center gap-3">
@@ -752,8 +808,17 @@ function ChatPageContent() {
                                     ? chat.seller?.storeName || chat.chatName
                                     : otherUser?.name || chat.chatName}
                                 </h3>
-                                <span className={`text-xs ${unread > 0 ? "text-emerald-600 font-semibold" : "text-gray-500"}`}>
-                                  {formatChatTime(chat.latestMessage?.createdAt || chat.updatedAt)}
+                                <span
+                                  className={`text-xs ${
+                                    unread > 0
+                                      ? "text-emerald-600 font-semibold"
+                                      : "text-gray-500"
+                                  }`}
+                                >
+                                  {formatChatTime(
+                                    chat.latestMessage?.createdAt ||
+                                      chat.updatedAt
+                                  )}
                                 </span>
                               </div>
 
@@ -761,11 +826,14 @@ function ChatPageContent() {
                                 <p className="text-sm text-gray-500 truncate flex-1 pr-2">
                                   {chat.latestMessage?.contentType === "text"
                                     ? chat.latestMessage?.content
-                                    : chat.latestMessage?.contentType === "Image"
+                                    : chat.latestMessage?.contentType ===
+                                      "Image"
                                     ? "📷 Photo"
-                                    : chat.latestMessage?.contentType === "Video"
+                                    : chat.latestMessage?.contentType ===
+                                      "Video"
                                     ? "🎥 Video"
-                                    : chat.latestMessage?.contentType === "Audio"
+                                    : chat.latestMessage?.contentType ===
+                                      "Audio"
                                     ? "🎵 Audio"
                                     : chat.latestMessage?.contentType
                                     ? "📎 File"
@@ -835,7 +903,9 @@ function ChatPageContent() {
                         </div>
                       ) : (
                         <Avatar className="w-10 h-10">
-                          <AvatarImage src={getOtherUser(selectedChat)?.avatar} />
+                          <AvatarImage
+                            src={getOtherUser(selectedChat)?.avatar}
+                          />
                           <AvatarFallback className="bg-gradient-to-br from-emerald-500 to-teal-600 text-white">
                             {getOtherUser(selectedChat)?.name?.charAt(0) || "U"}
                           </AvatarFallback>
@@ -867,7 +937,9 @@ function ChatPageContent() {
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <button
-                              onClick={() => setShowMessageSearch(!showMessageSearch)}
+                              onClick={() =>
+                                setShowMessageSearch(!showMessageSearch)
+                              }
                               className="p-2 hover:bg-gray-200 rounded-full transition-colors"
                             >
                               <Search className="w-5 h-5 text-gray-600" />
@@ -901,7 +973,9 @@ function ChatPageContent() {
                           </button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-48">
-                          <DropdownMenuItem onClick={() => setShowChatInfo(true)}>
+                          <DropdownMenuItem
+                            onClick={() => setShowChatInfo(true)}
+                          >
                             <Info className="w-4 h-4 mr-2" />
                             Contact info
                           </DropdownMenuItem>
@@ -948,7 +1022,9 @@ function ChatPageContent() {
                   {/* Quick Questions */}
                   {messages.length === 0 && !isMessagesLoading && (
                     <div className="px-4 py-3 bg-white/80 border-b">
-                      <p className="text-xs text-gray-500 mb-2 font-medium">Quick Questions:</p>
+                      <p className="text-xs text-gray-500 mb-2 font-medium">
+                        Quick Questions:
+                      </p>
                       <div className="flex flex-wrap gap-2">
                         {quickQuestions.map((question, index) => (
                           <button
@@ -976,153 +1052,220 @@ function ChatPageContent() {
                         <div className="w-20 h-20 bg-white/80 rounded-full flex items-center justify-center mb-4 shadow-sm">
                           <MessageCircle className="w-10 h-10 text-emerald-300" />
                         </div>
-                        <p className="font-medium text-gray-700">No messages yet</p>
-                        <p className="text-sm text-gray-500">Send a message to start the conversation</p>
+                        <p className="font-medium text-gray-700">
+                          No messages yet
+                        </p>
+                        <p className="text-sm text-gray-500">
+                          Send a message to start the conversation
+                        </p>
                       </div>
                     ) : (
-                      Object.entries(groupedMessages).map(([date, dateMessages]) => (
-                        <div key={date}>
-                          {/* Date Separator */}
-                          <div className="flex justify-center my-4">
-                            <span className="text-xs bg-white/90 text-gray-600 px-3 py-1 rounded-lg shadow-sm">
-                              {date}
-                            </span>
-                          </div>
+                      Object.entries(groupedMessages).map(
+                        ([date, dateMessages]) => (
+                          <div key={date}>
+                            {/* Date Separator */}
+                            <div className="flex justify-center my-4">
+                              <span className="text-xs bg-white/90 text-gray-600 px-3 py-1 rounded-lg shadow-sm">
+                                {date}
+                              </span>
+                            </div>
 
-                          {/* Messages for this date */}
-                          {dateMessages.map((message, index) => {
-                            const isMine = message.sender?._id === auth.user._id;
-                            const showAvatar =
-                              !isMine &&
-                              (index === 0 ||
-                                dateMessages[index - 1]?.sender?._id !== message.sender?._id);
+                            {/* Messages for this date */}
+                            {dateMessages.map((message, index) => {
+                              const isMine =
+                                message.sender?._id === auth.user._id;
+                              const showAvatar =
+                                !isMine &&
+                                (index === 0 ||
+                                  dateMessages[index - 1]?.sender?._id !==
+                                    message.sender?._id);
 
-                            return (
-                              <motion.div
-                                key={message._id}
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                className={`flex mb-1 ${isMine ? "justify-end" : "justify-start"}`}
-                              >
-                                {/* Avatar for other user */}
-                                {!isMine && showAvatar && (
-                                  <Avatar className="w-8 h-8 mr-2 mt-auto flex-shrink-0">
-                                    <AvatarImage src={message.sender?.avatar} />
-                                    <AvatarFallback className="text-xs bg-gray-300">
-                                      {message.sender?.name?.charAt(0) || "U"}
-                                    </AvatarFallback>
-                                  </Avatar>
-                                )}
-                                {!isMine && !showAvatar && <div className="w-8 mr-2 flex-shrink-0" />}
-
-                                {/* Message Bubble */}
-                                <div
-                                  className={`max-w-[75%] md:max-w-[65%] rounded-lg px-3 py-2 shadow-sm ${
-                                    isMine
-                                      ? "bg-[#dcf8c6] rounded-tr-none"
-                                      : "bg-white rounded-tl-none"
+                              return (
+                                <motion.div
+                                  key={message._id}
+                                  initial={{ opacity: 0, y: 10 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  className={`flex mb-1 ${
+                                    isMine ? "justify-end" : "justify-start"
                                   }`}
                                 >
-                                  {/* Message Content */}
-                                  {message.contentType === "product" && message.product ? (
-                                    <div className="min-w-[200px]">
-                                      <Link
-                                        href={`/products/${message.product._id}`}
-                                        className="block border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow bg-white"
-                                      >
-                                        {message.product.thumbnail && (
-                                          <div className="w-full h-32 bg-gray-100">
-                                            <Image
-                                              src={message.product.thumbnail}
-                                              alt={message.product.name}
-                                              width={200}
-                                              height={128}
-                                              className="w-full h-full object-cover"
-                                            />
-                                          </div>
-                                        )}
-                                        <div className="p-2">
-                                          <p className="text-sm font-medium text-gray-900 line-clamp-2">
-                                            {message.product.name}
-                                          </p>
-                                          <p className="text-sm font-bold text-emerald-600 mt-1">
-                                            ${message.product.price?.toFixed(2)}
-                                          </p>
-                                        </div>
-                                      </Link>
-                                      {message.content && message.content !== `Check out this product: ${message.product.name}` && (
-                                        <p className="text-sm text-gray-900 mt-2 whitespace-pre-wrap break-words">
-                                          {message.content}
-                                        </p>
-                                      )}
-                                    </div>
-                                  ) : message.contentType === "text" ? (
-                                    <p className="text-sm text-gray-900 whitespace-pre-wrap break-words">
-                                      {message.content}
-                                    </p>
-                                  ) : message.contentType === "Image" ? (
-                                    <a
-                                      href={message.content}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      className="block"
-                                    >
-                                      <Image
-                                        src={message.content}
-                                        alt="Sent image"
-                                        width={250}
-                                        height={200}
-                                        className="rounded-lg max-w-full h-auto object-cover cursor-pointer hover:opacity-90 transition-opacity"
+                                  {/* Avatar for other user */}
+                                  {!isMine && showAvatar && (
+                                    <Avatar className="w-8 h-8 mr-2 mt-auto flex-shrink-0">
+                                      <AvatarImage
+                                        src={message.sender?.avatar}
                                       />
-                                    </a>
-                                  ) : message.contentType === "Video" ? (
-                                    <video
-                                      controls
-                                      className="rounded-lg max-w-full"
-                                      style={{ maxHeight: "250px" }}
-                                    >
-                                      <source src={message.content} type="video/mp4" />
-                                      Your browser does not support video.
-                                    </video>
-                                  ) : message.contentType === "Audio" ? (
-                                    <audio controls className="w-full max-w-[250px]">
-                                      <source src={message.content} type="audio/mpeg" />
-                                      Your browser does not support audio.
-                                    </audio>
-                                  ) : (
-                                    <a
-                                      href={message.content}
-                                      download
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      className="flex items-center gap-2 py-2 px-3 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
-                                    >
-                                      <TbFileDownload className="h-5 w-5 text-emerald-600" />
-                                      <span className="text-sm text-gray-700">Download File</span>
-                                    </a>
+                                      <AvatarFallback className="text-xs bg-gray-300">
+                                        {message.sender?.name?.charAt(0) || "U"}
+                                      </AvatarFallback>
+                                    </Avatar>
+                                  )}
+                                  {!isMine && !showAvatar && (
+                                    <div className="w-8 mr-2 flex-shrink-0" />
                                   )}
 
-                                  {/* Time & Read Receipt */}
-                                  <div className={`flex items-center justify-end gap-1 mt-1`}>
-                                    <span className="text-[10px] text-gray-500">
-                                      {formatMessageTime(message.createdAt)}
-                                    </span>
-                                    {isMine && (
-                                      <>
-                                        {message.read ? (
-                                          <CheckCheck className="w-4 h-4 text-blue-500" />
-                                        ) : (
-                                          <Check className="w-4 h-4 text-gray-400" />
-                                        )}
-                                      </>
+                                  {/* Message Bubble */}
+                                  <div
+                                    className={`max-w-[75%] md:max-w-[65%] rounded-lg px-3 py-2 shadow-sm ${
+                                      isMine
+                                        ? "bg-[#dcf8c6] rounded-tr-none"
+                                        : "bg-white rounded-tl-none"
+                                    }`}
+                                  >
+                                    {/* Message Content */}
+                                    {message.contentType === "product" &&
+                                    message.product ? (
+                                      <div className="min-w-[200px] max-w-[260px]">
+                                        <Link
+                                          href={`/products/${message.product._id}`}
+                                          className="block border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition-all bg-white"
+                                        >
+                                          {/* Product Image - check thumbnails, images.gallery, variations */}
+                                          {(() => {
+                                            const productImage =
+                                              message.product.thumbnails ||
+                                              message.product.images
+                                                ?.gallery?.[0]?.url ||
+                                              message.product.variations?.[0]
+                                                ?.imageURL;
+                                            return productImage ? (
+                                              <div className="relative w-full h-36 bg-gradient-to-br from-gray-100 to-gray-50">
+                                                <Image
+                                                  src={productImage}
+                                                  alt={
+                                                    message.product.name ||
+                                                    "Product"
+                                                  }
+                                                  fill
+                                                  className="object-cover"
+                                                />
+                                                {/* Product badge */}
+                                                <div className="absolute top-2 left-2">
+                                                  <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-white/90 backdrop-blur-sm rounded-full text-[10px] font-medium text-gray-700 shadow-sm">
+                                                    <Package className="w-3 h-3 text-emerald-500" />
+                                                    Product
+                                                  </span>
+                                                </div>
+                                              </div>
+                                            ) : (
+                                              <div className="w-full h-36 bg-gradient-to-br from-gray-100 to-gray-50 flex items-center justify-center">
+                                                <div className="text-center">
+                                                  <Package className="w-10 h-10 text-gray-300 mx-auto mb-1" />
+                                                  <span className="text-xs text-gray-400">
+                                                    No image
+                                                  </span>
+                                                </div>
+                                              </div>
+                                            );
+                                          })()}
+                                          <div className="p-3">
+                                            <p className="text-sm font-semibold text-gray-900 line-clamp-2 leading-tight">
+                                              {message.product.name ||
+                                                "Product"}
+                                            </p>
+                                            <div className="flex items-center justify-between mt-2">
+                                              <p className="text-base font-bold text-emerald-600">
+                                                €
+                                                {message.product.price?.toFixed(
+                                                  2
+                                                ) || "0.00"}
+                                              </p>
+                                              <span className="text-[10px] text-gray-400 flex items-center gap-1">
+                                                <ExternalLink className="w-3 h-3" />
+                                                View
+                                              </span>
+                                            </div>
+                                          </div>
+                                        </Link>
+                                        {message.content &&
+                                          message.content !==
+                                            `Check out this product: ${message.product.name}` && (
+                                            <p className="text-sm text-gray-900 mt-2 whitespace-pre-wrap break-words">
+                                              {message.content}
+                                            </p>
+                                          )}
+                                      </div>
+                                    ) : message.contentType === "text" ? (
+                                      <p className="text-sm text-gray-900 whitespace-pre-wrap break-words">
+                                        {message.content}
+                                      </p>
+                                    ) : message.contentType === "Image" ? (
+                                      <a
+                                        href={message.content}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="block"
+                                      >
+                                        <Image
+                                          src={message.content}
+                                          alt="Sent image"
+                                          width={250}
+                                          height={200}
+                                          className="rounded-lg max-w-full h-auto object-cover cursor-pointer hover:opacity-90 transition-opacity"
+                                        />
+                                      </a>
+                                    ) : message.contentType === "Video" ? (
+                                      <video
+                                        controls
+                                        className="rounded-lg max-w-full"
+                                        style={{ maxHeight: "250px" }}
+                                      >
+                                        <source
+                                          src={message.content}
+                                          type="video/mp4"
+                                        />
+                                        Your browser does not support video.
+                                      </video>
+                                    ) : message.contentType === "Audio" ? (
+                                      <audio
+                                        controls
+                                        className="w-full max-w-[250px]"
+                                      >
+                                        <source
+                                          src={message.content}
+                                          type="audio/mpeg"
+                                        />
+                                        Your browser does not support audio.
+                                      </audio>
+                                    ) : (
+                                      <a
+                                        href={message.content}
+                                        download
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="flex items-center gap-2 py-2 px-3 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                                      >
+                                        <TbFileDownload className="h-5 w-5 text-emerald-600" />
+                                        <span className="text-sm text-gray-700">
+                                          Download File
+                                        </span>
+                                      </a>
                                     )}
+
+                                    {/* Time & Read Receipt */}
+                                    <div
+                                      className={`flex items-center justify-end gap-1 mt-1`}
+                                    >
+                                      <span className="text-[10px] text-gray-500">
+                                        {formatMessageTime(message.createdAt)}
+                                      </span>
+                                      {isMine && (
+                                        <>
+                                          {message.read ? (
+                                            <CheckCheck className="w-4 h-4 text-blue-500" />
+                                          ) : (
+                                            <Check className="w-4 h-4 text-gray-400" />
+                                          )}
+                                        </>
+                                      )}
+                                    </div>
                                   </div>
-                                </div>
-                              </motion.div>
-                            );
-                          })}
-                        </div>
-                      ))
+                                </motion.div>
+                              );
+                            })}
+                          </div>
+                        )
+                      )
                     )}
 
                     {/* Typing Indicator */}
@@ -1138,8 +1281,14 @@ function ChatPageContent() {
                           <div className="bg-white rounded-lg rounded-tl-none px-4 py-3 shadow-sm">
                             <div className="flex space-x-1">
                               <div className="h-2 w-2 bg-gray-400 rounded-full animate-bounce" />
-                              <div className="h-2 w-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0.2s" }} />
-                              <div className="h-2 w-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0.4s" }} />
+                              <div
+                                className="h-2 w-2 bg-gray-400 rounded-full animate-bounce"
+                                style={{ animationDelay: "0.2s" }}
+                              />
+                              <div
+                                className="h-2 w-2 bg-gray-400 rounded-full animate-bounce"
+                                style={{ animationDelay: "0.4s" }}
+                              />
                             </div>
                           </div>
                         </motion.div>
@@ -1150,7 +1299,7 @@ function ChatPageContent() {
                   </div>
 
                   {/* Message Input */}
-                  <div className="px-3 py-2 bg-gray-100">
+                  <div className="px-3 py-2 bg-gray-100 mt-8">
                     {/* Attached Product Preview */}
                     {attachedProduct && (
                       <div className="mb-2 bg-white rounded-lg p-2 flex items-center gap-3 border border-emerald-200">
@@ -1192,7 +1341,10 @@ function ChatPageContent() {
                       className="flex items-center gap-2"
                     >
                       {/* Emoji Picker */}
-                      <Popover open={showEmojiPicker} onOpenChange={setShowEmojiPicker}>
+                      <Popover
+                        open={showEmojiPicker}
+                        onOpenChange={setShowEmojiPicker}
+                      >
                         <PopoverTrigger asChild>
                           <button
                             type="button"
@@ -1201,7 +1353,11 @@ function ChatPageContent() {
                             <Smile className="w-6 h-6 text-gray-500" />
                           </button>
                         </PopoverTrigger>
-                        <PopoverContent className="w-72 p-2" side="top" align="start">
+                        <PopoverContent
+                          className="w-72 p-2"
+                          side="top"
+                          align="start"
+                        >
                           <div className="grid grid-cols-8 gap-1">
                             {emojis.map((emoji) => (
                               <button
@@ -1221,17 +1377,30 @@ function ChatPageContent() {
                       </Popover>
 
                       {/* Attachments */}
-                      <Popover open={showAttachments} onOpenChange={setShowAttachments}>
+                      <Popover
+                        open={showAttachments}
+                        onOpenChange={setShowAttachments}
+                      >
                         <PopoverTrigger asChild>
                           <button
                             type="button"
                             className="p-2 hover:bg-gray-200 rounded-full transition-colors flex-shrink-0"
                             disabled={isUploading}
                           >
-                            <Paperclip className={`w-6 h-6 ${isUploading ? "text-gray-300 animate-pulse" : "text-gray-500"}`} />
+                            <Paperclip
+                              className={`w-6 h-6 ${
+                                isUploading
+                                  ? "text-gray-300 animate-pulse"
+                                  : "text-gray-500"
+                              }`}
+                            />
                           </button>
                         </PopoverTrigger>
-                        <PopoverContent className="w-48 p-2" side="top" align="start">
+                        <PopoverContent
+                          className="w-48 p-2"
+                          side="top"
+                          align="start"
+                        >
                           <div className="flex flex-col space-y-1">
                             <label className="flex items-center gap-2 px-3 py-2 hover:bg-gray-100 rounded-lg cursor-pointer transition-colors">
                               <ImageIcon className="w-5 h-5 text-purple-500" />
@@ -1241,7 +1410,11 @@ function ChatPageContent() {
                                 accept="image/*"
                                 onChange={(e) => {
                                   if (e.target.files[0]) {
-                                    fileType(e.target.files[0], handleSendFiles, setIsUploading);
+                                    fileType(
+                                      e.target.files[0],
+                                      handleSendFiles,
+                                      setIsUploading
+                                    );
                                   }
                                 }}
                                 className="hidden"
@@ -1255,7 +1428,11 @@ function ChatPageContent() {
                                 accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt,.zip"
                                 onChange={(e) => {
                                   if (e.target.files[0]) {
-                                    fileType(e.target.files[0], handleSendFiles, setIsUploading);
+                                    fileType(
+                                      e.target.files[0],
+                                      handleSendFiles,
+                                      setIsUploading
+                                    );
                                   }
                                 }}
                                 className="hidden"
@@ -1269,7 +1446,11 @@ function ChatPageContent() {
                                 accept="video/*"
                                 onChange={(e) => {
                                   if (e.target.files[0]) {
-                                    fileType(e.target.files[0], handleSendFiles, setIsUploading);
+                                    fileType(
+                                      e.target.files[0],
+                                      handleSendFiles,
+                                      setIsUploading
+                                    );
                                   }
                                 }}
                                 className="hidden"
@@ -1307,20 +1488,31 @@ function ChatPageContent() {
                       </TooltipProvider>
 
                       {/* Product Picker Modal */}
-                      <Popover open={showProductPicker} onOpenChange={setShowProductPicker}>
+                      <Popover
+                        open={showProductPicker}
+                        onOpenChange={setShowProductPicker}
+                      >
                         <PopoverTrigger asChild>
                           <span></span>
                         </PopoverTrigger>
-                        <PopoverContent className="w-80 p-0" side="top" align="start">
+                        <PopoverContent
+                          className="w-80 p-0"
+                          side="top"
+                          align="start"
+                        >
                           <div className="p-3 border-b">
-                            <h4 className="font-semibold text-sm mb-2">Attach a Product</h4>
+                            <h4 className="font-semibold text-sm mb-2">
+                              Attach a Product
+                            </h4>
                             <div className="relative">
                               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                               <Input
                                 type="text"
                                 placeholder="Search products..."
                                 value={productSearchQuery}
-                                onChange={(e) => setProductSearchQuery(e.target.value)}
+                                onChange={(e) =>
+                                  setProductSearchQuery(e.target.value)
+                                }
                                 className="pl-9 h-9 text-sm"
                               />
                             </div>
@@ -1329,7 +1521,10 @@ function ChatPageContent() {
                             {isSearchingProducts ? (
                               <div className="p-4 space-y-3">
                                 {[1, 2, 3].map((i) => (
-                                  <div key={i} className="flex items-center gap-3">
+                                  <div
+                                    key={i}
+                                    className="flex items-center gap-3"
+                                  >
                                     <Skeleton className="w-12 h-12 rounded" />
                                     <div className="flex-1">
                                       <Skeleton className="h-4 w-32 mb-1" />
@@ -1401,9 +1596,13 @@ function ChatPageContent() {
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         type="submit"
-                        disabled={(!newMessage.trim() && !attachedProduct) || isSending || isUploading}
+                        disabled={
+                          (!newMessage.trim() && !attachedProduct) ||
+                          isSending ||
+                          isUploading
+                        }
                         className={`p-2.5 rounded-full transition-all flex-shrink-0 ${
-                          (newMessage.trim() || attachedProduct)
+                          newMessage.trim() || attachedProduct
                             ? "bg-emerald-500 text-white shadow-md hover:bg-emerald-600"
                             : "bg-gray-200 text-gray-400"
                         }`}
@@ -1431,7 +1630,8 @@ function ChatPageContent() {
                       WhatsApp Clone
                     </h2>
                     <p className="text-gray-500 max-w-sm">
-                      Send and receive messages with sellers. Click on a chat to start messaging.
+                      Send and receive messages with sellers. Click on a chat to
+                      start messaging.
                     </p>
                   </div>
                 </div>

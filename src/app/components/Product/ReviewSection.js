@@ -496,20 +496,25 @@ export default function ReviewSection({
         { voteType }
       );
 
-      if (data.success) {
+      if (data.success && data.review) {
         setReviews((prev) =>
           prev.map((r) =>
             r._id === reviewId
               ? {
                   ...r,
-                  helpfulVotes: data.review.helpfulVotes,
-                  unhelpfulVotes: data.review.unhelpfulVotes,
-                  helpfulVoters: data.review.helpfulVoters,
-                  unhelpfulVoters: data.review.unhelpfulVoters,
+                  helpfulVotes: data.review.helpfulVotes || 0,
+                  unhelpfulVotes: data.review.unhelpfulVotes || 0,
+                  helpfulVoters: data.review.helpfulVoters || [],
+                  unhelpfulVoters: data.review.unhelpfulVoters || [],
                 }
               : r
           )
         );
+        toast.success(
+          voteType === "helpful" ? "Marked as helpful" : "Marked as unhelpful"
+        );
+      } else if (data.success) {
+        // API returned success but without review data, just show success message
         toast.success(
           voteType === "helpful" ? "Marked as helpful" : "Marked as unhelpful"
         );

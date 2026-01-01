@@ -53,10 +53,12 @@ export default function Home() {
   }, []);
   return (
     <MainLayout>
+      {/* Categories Navigation - Full Width */}
+      <HeaderFilter categoriesData={categoriesData} isLoading={isLoading} />
+
       <div
         className={`w-full ${Style.container} min-h-screen bg-white text-black flex flex-col gap-4 z-[10] pb-6 `}
       >
-        <HeaderFilter categoriesData={categoriesData} isLoading={isLoading} />
         <Crousel products={products} loading={loading} />
         {/* <SectionSeparator title="Categories" icon="tag" /> */}
         <Categories categoriesData={categoriesData} isLoading={isLoading} />

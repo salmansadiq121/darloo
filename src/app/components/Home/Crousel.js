@@ -108,7 +108,7 @@ export default function Crousel({ products, loading }) {
         </div>
       ) : (
         <div className="w-full relative grid grid-cols-4 gap-4">
-          <div className=" col-span-4 sm:col-span-3 w-full relative">
+          <div className=" col-span-4 sm:col-span-3 w-full relative h-[200px] sm:h-[400px]">
             <Swiper
               modules={[Navigation, Pagination, Autoplay]}
               spaceBetween={30}
@@ -120,17 +120,17 @@ export default function Crousel({ products, loading }) {
               pagination={{ clickable: true }}
               autoplay={{ delay: 5000, disableOnInteraction: false }}
               loop={true}
-              className="w-full"
+              className="w-full h-full"
             >
               {bannerData.map((banner) => (
                 <SwiperSlide key={banner.id}>
-                  <div className="relative flex flex-col  md:flex-row bg-green-900 text-white overflow-hidden items-center justify-between rounded-lg">
+                  <div className="relative flex flex-col md:flex-row bg-green-900 text-white overflow-hidden items-center justify-between rounded-lg h-full">
                     <Image
                       src={banner.image}
                       alt="Banner Image"
                       width={1000}
-                      height={350}
-                      className=" w-full h-[140px] sm:h-[350px] object-fill"
+                      height={400}
+                      className="w-full h-full object-cover"
                     />
                   </div>
                 </SwiperSlide>
@@ -160,7 +160,7 @@ export default function Crousel({ products, loading }) {
               <span aria-hidden="true">❯</span>
             </button>
           </div>
-          <div className="col-span-4 sm:col-span-1">
+          <div className="col-span-4 sm:col-span-1 h-[200px] sm:h-[400px]">
             <TrendingProducts
               products={products}
               loading={loading}
@@ -282,7 +282,7 @@ const TrendingProducts = ({ products, loading, countryCode }) => {
   };
 
   return (
-    <div className="rounded-xl shadow-lg border border-gray-100 overflow-hidden h-full backdrop-blur-sm bg-white/95">
+    <div className="rounded-xl shadow-lg border border-gray-100 overflow-hidden h-full backdrop-blur-sm bg-white/95 flex flex-col">
       <div className="flex items-center justify-between px-4 py-3.5 bg-gradient-to-r from-red-600 via-red-700 to-red-800 shadow-md">
         <div className="flex items-center gap-2">
           <div className="p-1.5 bg-white/20 rounded-lg backdrop-blur-sm">
@@ -304,7 +304,7 @@ const TrendingProducts = ({ products, loading, countryCode }) => {
         </Link>
       </div>
 
-      <div className="bg-gradient-to-br from-gray-50/50 to-white p-3 max-h-[340px] overflow-y-auto custom-scrollbar">
+      <div className="bg-gradient-to-br from-gray-50/50 to-white p-3 flex-1 overflow-y-auto custom-scrollbar">
         {loading ? (
           <div className="grid grid-cols-2 gap-3">
             {[...Array(6)].map((_, index) => (
@@ -341,6 +341,7 @@ const TrendingProducts = ({ products, loading, countryCode }) => {
                 : product.price;
               const trendingStatus = getTrendingStatus(product);
               const isHovered = hoveredProduct === product._id;
+              const isOutOfStock = !product?.quantity || product?.quantity <= 0;
 
               return (
                 <Link
@@ -387,8 +388,17 @@ const TrendingProducts = ({ products, loading, countryCode }) => {
                           ↗ {trendingStatus.text}
                         </motion.div>
 
-                        {/* Discount Badge */}
-                        {product.sale?.isActive && (
+                        {/* Discount Badge or Out of Stock Badge */}
+                        {isOutOfStock ? (
+                          <motion.div
+                            className="absolute top-2 right-2 bg-gradient-to-br from-gray-700 to-gray-800 text-white text-[9px] font-bold px-2 py-1 rounded-full shadow-lg border border-white/30"
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            transition={{ delay: 0.15 }}
+                          >
+                            {isGerman ? "Ausverkauft" : "Sold Out"}
+                          </motion.div>
+                        ) : product.sale?.isActive ? (
                           <motion.div
                             className="absolute top-2 right-2 bg-gradient-to-br from-red-500 to-red-600 text-white text-[9px] font-bold px-2 py-1 rounded-full shadow-lg border border-white/30"
                             initial={{ scale: 0, rotate: -180 }}
@@ -397,7 +407,7 @@ const TrendingProducts = ({ products, loading, countryCode }) => {
                           >
                             -{product.sale.discountPercentage}%
                           </motion.div>
-                        )}
+                        ) : null}
 
                         {/* Quick View Button - Shows on Hover */}
                         <motion.div
@@ -450,16 +460,23 @@ const TrendingProducts = ({ products, loading, countryCode }) => {
 
                         {/* Quick Add Button */}
                         <motion.button
-                          className="w-full bg-white text-red-600 text-xs font-bold py-2 rounded-lg hover:bg-red-50 transition-colors duration-200 flex items-center justify-center gap-1.5 shadow-lg"
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
+                          className={`w-full text-xs font-bold py-2 rounded-lg transition-colors duration-200 flex items-center justify-center gap-1.5 shadow-lg ${
+                            isOutOfStock
+                              ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                              : "bg-white text-red-600 hover:bg-red-50"
+                          }`}
+                          whileHover={!isOutOfStock ? { scale: 1.05 } : {}}
+                          whileTap={!isOutOfStock ? { scale: 0.95 } : {}}
+                          disabled={isOutOfStock}
                           onClick={(e) => {
                             e.preventDefault();
                             e.stopPropagation();
                           }}
                         >
                           <ShoppingCart size={14} />
-                          Quick Add
+                          {isOutOfStock
+                            ? (isGerman ? "Nicht verfügbar" : "Out of Stock")
+                            : (isGerman ? "Hinzufügen" : "Quick Add")}
                         </motion.button>
                       </div>
                     </motion.div>

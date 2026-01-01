@@ -4,7 +4,7 @@ import { useAuth } from "@/app/content/authContent";
 import React, { useEffect, useState, useMemo } from "react";
 import toast from "react-hot-toast";
 import axios from "axios";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import TrendingProducts from "@/app/components/Home/TrendingProducts";
 import CheckoutElement from "@/app/components/checkout/CheckoutElement";
 import CheckoutStepper from "@/app/components/checkout/CheckoutStepper";
@@ -17,6 +17,7 @@ import { ShoppingBag, ArrowLeft, ArrowRight } from "lucide-react";
 
 export default function Checkout() {
   const { auth, selectedProduct, setSelectedProduct } = useAuth();
+  const searchParams = useSearchParams();
   const [shippingFee, setShippingFee] = useState(0);
   const [cart, setCart] = useState({
     user: "",
@@ -45,6 +46,36 @@ export default function Checkout() {
   const [currentStep, setCurrentStep] = useState(1);
   const [paymentMethod, setPaymentMethod] = useState("card");
   const [isEditingShipping, setIsEditingShipping] = useState(false);
+
+  // Affiliate tracking - capture ref parameter from URL
+  const [affiliateRef, setAffiliateRef] = useState(null);
+
+  // Capture affiliate ref from URL or localStorage on mount
+  useEffect(() => {
+    // Check URL for ref parameter
+    const refParam = searchParams.get("ref");
+    if (refParam) {
+      setAffiliateRef(refParam);
+      // Store in localStorage for persistence across page navigations
+      localStorage.setItem("affiliateRef", refParam);
+      localStorage.setItem("affiliateRefTime", Date.now().toString());
+    } else {
+      // Check localStorage for previously stored ref (valid for 30 days)
+      const storedRef = localStorage.getItem("affiliateRef");
+      const storedTime = localStorage.getItem("affiliateRefTime");
+      if (storedRef && storedTime) {
+        const daysSinceStored =
+          (Date.now() - parseInt(storedTime)) / (1000 * 60 * 60 * 24);
+        if (daysSinceStored <= 30) {
+          setAffiliateRef(storedRef);
+        } else {
+          // Clear expired ref
+          localStorage.removeItem("affiliateRef");
+          localStorage.removeItem("affiliateRefTime");
+        }
+      }
+    }
+  }, [searchParams]);
 
   // Fetch Trending Products
   useEffect(() => {
@@ -201,7 +232,14 @@ export default function Checkout() {
         postalCode: auth?.user?.addressDetails?.pincode || "",
       },
     });
-  }, [selectedProduct, auth?.user, discount, shippingFee, voucherCode, isVoucherApplied]);
+  }, [
+    selectedProduct,
+    auth?.user,
+    discount,
+    shippingFee,
+    voucherCode,
+    isVoucherApplied,
+  ]);
 
   // Calculate totals
   const subtotal = getSubtotal();
@@ -217,8 +255,9 @@ export default function Checkout() {
     auth?.user?.addressDetails?.country &&
     auth?.user?.addressDetails?.city;
 
-  const canCheckout =
-    selectedProduct?.length > 0 && isFormValid && total <= 150 && country;
+  // total <= 150
+
+  const canCheckout = selectedProduct?.length > 0 && isFormValid && country;
 
   // Handle Checkout
   const handleCheckout = () => {
@@ -233,10 +272,10 @@ export default function Checkout() {
       return;
     }
 
-    if (total > 150) {
-      toast.error("Order total cannot exceed €150. Please adjust your cart.");
-      return;
-    }
+    // if (total > 150) {
+    //   toast.error("Order total cannot exceed €150. Please adjust your cart.");
+    //   return;
+    // }
 
     if (!country) {
       toast.error("Shipping not available in your country");
@@ -283,7 +322,10 @@ export default function Checkout() {
     <MainLayout title="Darloo - Checkout">
       <div className="bg-gray-50 min-h-screen w-full relative px-4 sm:px-6 lg:px-8 py-4 sm:py-6 z-10">
         {/* Progress Stepper */}
-        <CheckoutStepper currentStep={currentStep} onStepClick={handleStepClick} />
+        <CheckoutStepper
+          currentStep={currentStep}
+          onStepClick={handleStepClick}
+        />
 
         <div className="max-w-7xl mx-auto mt-6">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -461,6 +503,7 @@ export default function Checkout() {
             setpayment={setShowPayment}
             carts={cart}
             shippingFee={shippingFee}
+            affiliateRef={affiliateRef}
           />
         )}
       </div>

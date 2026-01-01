@@ -61,7 +61,8 @@ const ProductSkeleton = () => (
 
 // Star Rating Component
 const StarRating = ({ rating, size = "sm" }) => {
-  const sizeClass = size === "sm" ? "w-4 h-4" : size === "md" ? "w-5 h-5" : "w-6 h-6";
+  const sizeClass =
+    size === "sm" ? "w-4 h-4" : size === "md" ? "w-5 h-5" : "w-6 h-6";
   return (
     <div className="flex items-center gap-0.5">
       {[1, 2, 3, 4, 5].map((star) => (
@@ -99,9 +100,12 @@ const ReviewCard = ({ review }) => (
       )}
       <div className="flex-1">
         <div className="flex items-center justify-between">
-          <p className="font-semibold text-gray-900">{review.user?.name || "Anonymous"}</p>
+          <p className="font-semibold text-gray-900">
+            {review.user?.name || "Anonymous"}
+          </p>
           <span className="text-xs text-gray-500">
-            {review.createdAt && format(new Date(review.createdAt), "MMM dd, yyyy")}
+            {review.createdAt &&
+              format(new Date(review.createdAt), "MMM dd, yyyy")}
           </span>
         </div>
         <StarRating rating={review.rating} />
@@ -118,14 +122,23 @@ const ReviewCard = ({ review }) => (
             className="w-8 h-8 rounded object-cover"
           />
         )}
-        <span className="text-xs text-gray-600 line-clamp-1">{review.product.name}</span>
+        <span className="text-xs text-gray-600 line-clamp-1">
+          {review.product.name}
+        </span>
       </div>
     )}
     <p className="text-sm text-gray-700 leading-relaxed">{review.comment}</p>
     {review.images?.length > 0 && (
       <div className="flex gap-2 mt-3">
         {review.images.slice(0, 3).map((img, idx) => (
-          <Image key={idx} src={img} alt="Review" width={60} height={60} className="w-15 h-15 rounded-lg object-cover" />
+          <Image
+            key={idx}
+            src={img}
+            alt="Review"
+            width={60}
+            height={60}
+            className="w-15 h-15 rounded-lg object-cover"
+          />
         ))}
       </div>
     )}
@@ -159,64 +172,71 @@ export default function SellerStorePage() {
   const [showFilters, setShowFilters] = useState(false);
 
   // Fetch store data
-  const fetchStoreData = useCallback(async (page = 1, append = false) => {
-    if (!slug) return;
+  const fetchStoreData = useCallback(
+    async (page = 1, append = false) => {
+      if (!slug) return;
 
-    if (page === 1) {
-      setIsLoading(true);
-    } else {
-      setIsLoadingMore(true);
-    }
-
-    try {
-      const queryParams = new URLSearchParams({
-        page: page.toString(),
-        limit: "12",
-        sort: sortBy,
-      });
-
-      if (selectedCategory && selectedCategory !== "all") {
-        queryParams.append("category", selectedCategory);
-      }
-      if (searchQuery) {
-        queryParams.append("search", searchQuery);
-      }
-
-      const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_SERVER_URI}/api/v1/seller/store/${slug}?${queryParams}`
-      );
-
-      if (data?.success) {
-        setSeller(data.seller);
-        setProducts(append ? [...products, ...(data.products || [])] : (data.products || []));
-        setCategories(data.categories || []);
-        setReviews(data.reviews || []);
-        setReviewStats(data.reviewStats || null);
-        setPagination(data.pagination || null);
-        // Set status message if store is pending or inactive
-        if (data.message) {
-          setStoreStatusMessage(data.message);
-        } else {
-          setStoreStatusMessage(null);
-        }
-      }
-    } catch (error) {
-      console.error("Error fetching store:", error);
-      const status = error.response?.status;
-      if (status === 404) {
-        toast.error("Store not found");
-        setSeller(null);
-      } else if (status === 500) {
-        toast.error("Server error. Please try again later.");
-        setSeller(null);
+      if (page === 1) {
+        setIsLoading(true);
       } else {
-        toast.error(error.response?.data?.message || "Failed to load store");
+        setIsLoadingMore(true);
       }
-    } finally {
-      setIsLoading(false);
-      setIsLoadingMore(false);
-    }
-  }, [slug, sortBy, selectedCategory, searchQuery, products]);
+
+      try {
+        const queryParams = new URLSearchParams({
+          page: page.toString(),
+          limit: "12",
+          sort: sortBy,
+        });
+
+        if (selectedCategory && selectedCategory !== "all") {
+          queryParams.append("category", selectedCategory);
+        }
+        if (searchQuery) {
+          queryParams.append("search", searchQuery);
+        }
+
+        const { data } = await axios.get(
+          `${process.env.NEXT_PUBLIC_SERVER_URI}/api/v1/seller/store/${slug}?${queryParams}`
+        );
+
+        if (data?.success) {
+          setSeller(data.seller);
+          setProducts(
+            append
+              ? [...products, ...(data.products || [])]
+              : data.products || []
+          );
+          setCategories(data.categories || []);
+          setReviews(data.reviews || []);
+          setReviewStats(data.reviewStats || null);
+          setPagination(data.pagination || null);
+          // Set status message if store is pending or inactive
+          if (data.message) {
+            setStoreStatusMessage(data.message);
+          } else {
+            setStoreStatusMessage(null);
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching store:", error);
+        const status = error.response?.status;
+        if (status === 404) {
+          toast.error("Store not found");
+          setSeller(null);
+        } else if (status === 500) {
+          toast.error("Server error. Please try again later.");
+          setSeller(null);
+        } else {
+          toast.error(error.response?.data?.message || "Failed to load store");
+        }
+      } finally {
+        setIsLoading(false);
+        setIsLoadingMore(false);
+      }
+    },
+    [slug, sortBy, selectedCategory, searchQuery, products]
+  );
 
   useEffect(() => {
     fetchStoreData(1, false);
@@ -293,8 +313,12 @@ export default function SellerStorePage() {
         <div className="min-h-screen bg-gray-50 flex items-center justify-center">
           <div className="text-center">
             <IoStorefront className="text-6xl text-gray-300 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Store Not Found</h2>
-            <p className="text-gray-500 mb-4">The store you're looking for doesn't exist or is no longer active.</p>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">
+              Store Not Found
+            </h2>
+            <p className="text-gray-500 mb-4">
+              The store you're looking for doesn't exist or is no longer active.
+            </p>
             <button
               onClick={() => router.push("/")}
               className="px-6 py-3 bg-red-600 text-white rounded-xl font-semibold hover:bg-red-700 transition-colors"
@@ -311,7 +335,7 @@ export default function SellerStorePage() {
     <Layout>
       <div className="min-h-screen bg-gray-50">
         {/* Store Status Banner */}
-        {storeStatusMessage && (
+        {/* {storeStatusMessage && (
           <div className="bg-amber-50 border-b border-amber-200">
             <div className="max-w-7xl mx-auto px-4 py-3">
               <div className="flex items-center justify-center gap-2 text-amber-800">
@@ -322,7 +346,7 @@ export default function SellerStorePage() {
               </div>
             </div>
           </div>
-        )}
+        )} */}
 
         {/* Store Banner */}
         <div className="relative h-48 md:h-64 lg:h-72 overflow-hidden">
@@ -359,13 +383,13 @@ export default function SellerStorePage() {
           <div className="flex flex-col md:flex-row gap-6 items-start md:items-end mb-6">
             {/* Store Logo */}
             <div className="relative">
-              <div className="w-28 h-28 md:w-36 md:h-36 rounded-full bg-white shadow-xl border-4 border-white overflow-hidden">
+              <div className="w-28 h-28 md:w-36 md:h-36 rounded-full bg-white  shadow-xl border-4 border-white overflow-hidden">
                 {seller.storeLogo ? (
                   <Image
                     src={seller.storeLogo}
                     alt={seller.storeName}
                     fill
-                    className="object-cover"
+                    className="object-cover rounded-full"
                   />
                 ) : (
                   <div className="w-full h-full bg-gradient-to-br from-red-500 to-orange-500 flex items-center justify-center">
@@ -383,7 +407,9 @@ export default function SellerStorePage() {
             {/* Store Details */}
             <div className="flex-1 pb-4">
               <div className="flex flex-wrap items-center gap-3 mb-2">
-                <h1 className="text-2xl md:text-3xl font-bold text-gray-900">{seller.storeName}</h1>
+                <h1 className="text-2xl md:text-3xl font-bold text-white">
+                  {seller.storeName}
+                </h1>
                 {seller.verificationStatus === "approved" && (
                   <span className="px-3 py-1 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full flex items-center gap-1">
                     <MdVerified className="text-sm" />
@@ -400,12 +426,18 @@ export default function SellerStorePage() {
                 {seller.storeAddress?.city && (
                   <div className="flex items-center gap-1">
                     <FaMapMarkerAlt className="text-gray-400" />
-                    <span>{seller.storeAddress.city}, {seller.storeAddress.country}</span>
+                    <span>
+                      {seller.storeAddress.city}, {seller.storeAddress.country}
+                    </span>
                   </div>
                 )}
                 <div className="flex items-center gap-1">
                   <FaCalendarAlt className="text-gray-400" />
-                  <span>Joined {seller.createdAt && format(new Date(seller.createdAt), "MMM yyyy")}</span>
+                  <span>
+                    Joined{" "}
+                    {seller.createdAt &&
+                      format(new Date(seller.createdAt), "MMM yyyy")}
+                  </span>
                 </div>
               </div>
             </div>
@@ -416,7 +448,7 @@ export default function SellerStorePage() {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={handleFollow}
-                className={`px-6 py-2.5 rounded-xl font-semibold transition-all flex items-center gap-2 ${
+                className={`px-6 py-2.5 rounded-xl cursor-pointer font-semibold transition-all flex items-center gap-2 ${
                   isFollowing
                     ? "bg-gray-200 text-gray-700 hover:bg-gray-300"
                     : "bg-red-600 text-white hover:bg-red-700"
@@ -445,8 +477,12 @@ export default function SellerStorePage() {
                   <TbPackage className="text-blue-600 text-2xl" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-gray-900">{seller.totalProducts || 0}</p>
-                  <p className="text-xs text-gray-500 uppercase font-medium">Products</p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {seller.totalProducts || 0}
+                  </p>
+                  <p className="text-xs text-gray-500 uppercase font-medium">
+                    Products
+                  </p>
                 </div>
               </div>
             </div>
@@ -456,10 +492,20 @@ export default function SellerStorePage() {
                   <FaStar className="text-amber-500 text-xl" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-gray-900">
-                    {reviewStats?.avgRating?.toFixed(1) || seller.rating?.average?.toFixed(1) || "0.0"}
+                  <div className="flex items-center gap-1">
+                    <p className="text-2xl font-bold text-gray-900">
+                      {reviewStats?.avgRating?.toFixed(1) ||
+                        seller.rating?.average?.toFixed(1) ||
+                        "0.0"}
+                    </p>
+                    <FaStar className="text-amber-400 w-5 h-5" />
+                  </div>
+                  <p className="text-xs text-gray-500">
+                    {reviewStats?.totalReviews ||
+                      seller.rating?.totalReviews ||
+                      0}{" "}
+                    reviews
                   </p>
-                  <p className="text-xs text-gray-500 uppercase font-medium">Rating</p>
                 </div>
               </div>
             </div>
@@ -469,8 +515,12 @@ export default function SellerStorePage() {
                   <FaThumbsUp className="text-emerald-500 text-xl" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-gray-900">{seller.positivePercentage || 0}%</p>
-                  <p className="text-xs text-gray-500 uppercase font-medium">Positive</p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {seller.positivePercentage || 0}%
+                  </p>
+                  <p className="text-xs text-gray-500 uppercase font-medium">
+                    Positive
+                  </p>
                 </div>
               </div>
             </div>
@@ -480,8 +530,12 @@ export default function SellerStorePage() {
                   <TbTruckDelivery className="text-purple-500 text-2xl" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-gray-900">{seller.totalOrders || 0}</p>
-                  <p className="text-xs text-gray-500 uppercase font-medium">Orders</p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {seller.totalOrders || 0}
+                  </p>
+                  <p className="text-xs text-gray-500 uppercase font-medium">
+                    Orders
+                  </p>
                 </div>
               </div>
             </div>
@@ -491,8 +545,18 @@ export default function SellerStorePage() {
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 mb-6">
             <div className="flex items-center border-b border-gray-100 overflow-x-auto">
               {[
-                { id: "products", label: "Products", icon: TbPackage, count: pagination?.totalProducts },
-                { id: "reviews", label: "Reviews", icon: FaStar, count: reviewStats?.totalReviews },
+                {
+                  id: "products",
+                  label: "Products",
+                  icon: TbPackage,
+                  count: pagination?.totalProducts,
+                },
+                {
+                  id: "reviews",
+                  label: "Reviews",
+                  icon: FaStar,
+                  count: reviewStats?.totalReviews,
+                },
                 { id: "about", label: "About Store", icon: IoStorefront },
               ].map((tab) => {
                 const Icon = tab.icon;
@@ -500,16 +564,22 @@ export default function SellerStorePage() {
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
-                    className={`relative flex items-center gap-2 px-6 py-4 font-semibold transition-colors whitespace-nowrap ${
-                      activeTab === tab.id ? "text-red-600" : "text-gray-500 hover:text-gray-700"
+                    className={`relative cursor-pointer  flex items-center gap-2 px-6 py-4 font-semibold transition-colors whitespace-nowrap ${
+                      activeTab === tab.id
+                        ? "text-red-600"
+                        : "text-gray-500 hover:text-gray-700"
                     }`}
                   >
                     <Icon className="text-lg" />
                     {tab.label}
                     {tab.count !== undefined && (
-                      <span className={`px-2 py-0.5 rounded-full text-xs ${
-                        activeTab === tab.id ? "bg-red-100 text-red-600" : "bg-gray-100 text-gray-600"
-                      }`}>
+                      <span
+                        className={`px-2 py-0.5 rounded-full text-xs ${
+                          activeTab === tab.id
+                            ? "bg-red-100 text-red-600"
+                            : "bg-gray-100 text-gray-600"
+                        }`}
+                      >
                         {tab.count}
                       </span>
                     )}
@@ -517,7 +587,11 @@ export default function SellerStorePage() {
                       <motion.div
                         layoutId="activeStoreTab"
                         className="absolute bottom-0 left-0 right-0 h-0.5 bg-red-600"
-                        transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                        transition={{
+                          type: "spring",
+                          stiffness: 500,
+                          damping: 30,
+                        }}
                       />
                     )}
                   </button>
@@ -558,7 +632,9 @@ export default function SellerStorePage() {
                       >
                         <option value="all">All Categories</option>
                         {categories.map((cat) => (
-                          <option key={cat} value={cat}>{cat}</option>
+                          <option key={cat._id || cat} value={cat._id || cat}>
+                            {cat.name || cat}
+                          </option>
                         ))}
                       </select>
                       <FaChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
@@ -586,7 +662,9 @@ export default function SellerStorePage() {
                       <button
                         onClick={() => setViewMode("grid")}
                         className={`p-2.5 rounded-lg transition-all ${
-                          viewMode === "grid" ? "bg-white shadow-sm text-red-600" : "text-gray-500"
+                          viewMode === "grid"
+                            ? "bg-white shadow-sm text-red-600"
+                            : "text-gray-500"
                         }`}
                       >
                         <IoGrid className="text-lg" />
@@ -594,7 +672,9 @@ export default function SellerStorePage() {
                       <button
                         onClick={() => setViewMode("list")}
                         className={`p-2.5 rounded-lg transition-all ${
-                          viewMode === "list" ? "bg-white shadow-sm text-red-600" : "text-gray-500"
+                          viewMode === "list"
+                            ? "bg-white shadow-sm text-red-600"
+                            : "text-gray-500"
                         }`}
                       >
                         <IoList className="text-lg" />
@@ -606,16 +686,22 @@ export default function SellerStorePage() {
                   {products.length === 0 ? (
                     <div className="text-center py-16">
                       <TbPackage className="text-6xl text-gray-300 mx-auto mb-4" />
-                      <h3 className="text-xl font-bold text-gray-900 mb-2">No Products Found</h3>
-                      <p className="text-gray-500">This seller hasn't added any products yet.</p>
+                      <h3 className="text-xl font-bold text-gray-900 mb-2">
+                        No Products Found
+                      </h3>
+                      <p className="text-gray-500">
+                        This seller hasn't added any products yet.
+                      </p>
                     </div>
                   ) : (
                     <>
-                      <div className={`grid gap-4 md:gap-6 ${
-                        viewMode === "grid"
-                          ? "grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
-                          : "grid-cols-1"
-                      }`}>
+                      <div
+                        className={`grid gap-4 md:gap-6 ${
+                          viewMode === "grid"
+                            ? "grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
+                            : "grid-cols-1"
+                        }`}
+                      >
                         {products.map((product, idx) => (
                           <motion.div
                             key={product._id}
@@ -640,14 +726,31 @@ export default function SellerStorePage() {
                           >
                             {isLoadingMore ? (
                               <span className="flex items-center gap-2">
-                                <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
-                                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                                <svg
+                                  className="animate-spin h-5 w-5"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <circle
+                                    className="opacity-25"
+                                    cx="12"
+                                    cy="12"
+                                    r="10"
+                                    stroke="currentColor"
+                                    strokeWidth="4"
+                                    fill="none"
+                                  />
+                                  <path
+                                    className="opacity-75"
+                                    fill="currentColor"
+                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                  />
                                 </svg>
                                 Loading...
                               </span>
                             ) : (
-                              `Load More (${pagination.totalProducts - products.length} remaining)`
+                              `Load More (${
+                                pagination.totalProducts - products.length
+                              } remaining)`
                             )}
                           </motion.button>
                         </div>
@@ -672,7 +775,10 @@ export default function SellerStorePage() {
                       <p className="text-5xl font-bold text-gray-900 mb-2">
                         {reviewStats?.avgRating?.toFixed(1) || "0.0"}
                       </p>
-                      <StarRating rating={reviewStats?.avgRating || 0} size="lg" />
+                      <StarRating
+                        rating={reviewStats?.avgRating || 0}
+                        size="lg"
+                      />
                       <p className="text-sm text-gray-600 mt-2">
                         {reviewStats?.totalReviews || 0} reviews
                       </p>
@@ -682,23 +788,30 @@ export default function SellerStorePage() {
                     <div className="md:col-span-2 space-y-2">
                       {[5, 4, 3, 2, 1].map((star) => {
                         const count = reviewStats?.[`rating${star}`] || 0;
-                        const percentage = reviewStats?.totalReviews > 0
-                          ? (count / reviewStats.totalReviews) * 100
-                          : 0;
+                        const percentage =
+                          reviewStats?.totalReviews > 0
+                            ? (count / reviewStats.totalReviews) * 100
+                            : 0;
                         return (
                           <div key={star} className="flex items-center gap-3">
                             <span className="flex items-center gap-1 w-12 text-sm text-gray-600">
-                              {star} <FaStar className="text-amber-400 text-xs" />
+                              {star}{" "}
+                              <FaStar className="text-amber-400 text-xs" />
                             </span>
                             <div className="flex-1 h-3 bg-gray-200 rounded-full overflow-hidden">
                               <motion.div
                                 initial={{ width: 0 }}
                                 animate={{ width: `${percentage}%` }}
-                                transition={{ duration: 0.5, delay: 0.1 * (5 - star) }}
+                                transition={{
+                                  duration: 0.5,
+                                  delay: 0.1 * (5 - star),
+                                }}
                                 className="h-full bg-gradient-to-r from-amber-400 to-orange-500 rounded-full"
                               />
                             </div>
-                            <span className="w-12 text-sm text-gray-500 text-right">{count}</span>
+                            <span className="w-12 text-sm text-gray-500 text-right">
+                              {count}
+                            </span>
                           </div>
                         );
                       })}
@@ -709,8 +822,12 @@ export default function SellerStorePage() {
                   {reviews.length === 0 ? (
                     <div className="text-center py-16">
                       <FaStar className="text-6xl text-gray-300 mx-auto mb-4" />
-                      <h3 className="text-xl font-bold text-gray-900 mb-2">No Reviews Yet</h3>
-                      <p className="text-gray-500">Be the first to review products from this store!</p>
+                      <h3 className="text-xl font-bold text-gray-900 mb-2">
+                        No Reviews Yet
+                      </h3>
+                      <p className="text-gray-500">
+                        Be the first to review products from this store!
+                      </p>
                     </div>
                   ) : (
                     <div className="grid md:grid-cols-2 gap-4">
@@ -742,16 +859,24 @@ export default function SellerStorePage() {
                           <div className="flex items-start gap-3">
                             <FaStore className="text-gray-400 mt-1" />
                             <div>
-                              <p className="text-sm font-medium text-gray-700">Store Name</p>
-                              <p className="text-gray-900">{seller.storeName}</p>
+                              <p className="text-sm font-medium text-gray-700">
+                                Store Name
+                              </p>
+                              <p className="text-gray-900">
+                                {seller.storeName}
+                              </p>
                             </div>
                           </div>
                           {seller.storeDescription && (
                             <div className="flex items-start gap-3">
                               <BiMessageDetail className="text-gray-400 mt-1" />
                               <div>
-                                <p className="text-sm font-medium text-gray-700">Description</p>
-                                <p className="text-gray-900">{seller.storeDescription}</p>
+                                <p className="text-sm font-medium text-gray-700">
+                                  Description
+                                </p>
+                                <p className="text-gray-900">
+                                  {seller.storeDescription}
+                                </p>
                               </div>
                             </div>
                           )}
@@ -759,9 +884,16 @@ export default function SellerStorePage() {
                             <div className="flex items-start gap-3">
                               <FaMapMarkerAlt className="text-gray-400 mt-1" />
                               <div>
-                                <p className="text-sm font-medium text-gray-700">Location</p>
+                                <p className="text-sm font-medium text-gray-700">
+                                  Location
+                                </p>
                                 <p className="text-gray-900">
-                                  {[seller.storeAddress.address, seller.storeAddress.city, seller.storeAddress.state, seller.storeAddress.country]
+                                  {[
+                                    seller.storeAddress.address,
+                                    seller.storeAddress.city,
+                                    seller.storeAddress.state,
+                                    seller.storeAddress.country,
+                                  ]
                                     .filter(Boolean)
                                     .join(", ")}
                                 </p>
@@ -771,9 +903,15 @@ export default function SellerStorePage() {
                           <div className="flex items-start gap-3">
                             <FaCalendarAlt className="text-gray-400 mt-1" />
                             <div>
-                              <p className="text-sm font-medium text-gray-700">Member Since</p>
+                              <p className="text-sm font-medium text-gray-700">
+                                Member Since
+                              </p>
                               <p className="text-gray-900">
-                                {seller.createdAt && format(new Date(seller.createdAt), "MMMM dd, yyyy")}
+                                {seller.createdAt &&
+                                  format(
+                                    new Date(seller.createdAt),
+                                    "MMMM dd, yyyy"
+                                  )}
                               </p>
                             </div>
                           </div>
@@ -790,7 +928,10 @@ export default function SellerStorePage() {
                           {seller.contactEmail && (
                             <div className="flex items-center gap-3">
                               <FaEnvelope className="text-gray-400" />
-                              <a href={`mailto:${seller.contactEmail}`} className="text-gray-900 hover:text-red-600 transition-colors">
+                              <a
+                                href={`mailto:${seller.contactEmail}`}
+                                className="text-gray-900 hover:text-red-600 transition-colors"
+                              >
                                 {seller.contactEmail}
                               </a>
                             </div>
@@ -798,7 +939,10 @@ export default function SellerStorePage() {
                           {seller.contactPhone && (
                             <div className="flex items-center gap-3">
                               <FaPhone className="text-gray-400" />
-                              <a href={`tel:${seller.contactPhone}`} className="text-gray-900 hover:text-red-600 transition-colors">
+                              <a
+                                href={`tel:${seller.contactPhone}`}
+                                className="text-gray-900 hover:text-red-600 transition-colors"
+                              >
                                 {seller.contactPhone}
                               </a>
                             </div>
@@ -806,7 +950,12 @@ export default function SellerStorePage() {
                           {seller.socialLinks?.website && (
                             <div className="flex items-center gap-3">
                               <FaGlobe className="text-gray-400" />
-                              <a href={seller.socialLinks.website} target="_blank" rel="noopener noreferrer" className="text-gray-900 hover:text-red-600 transition-colors">
+                              <a
+                                href={seller.socialLinks.website}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-gray-900 hover:text-red-600 transition-colors"
+                              >
                                 {seller.socialLinks.website}
                               </a>
                             </div>
@@ -826,40 +975,67 @@ export default function SellerStorePage() {
                         <div className="grid grid-cols-2 gap-3">
                           <div className="bg-emerald-50 rounded-xl p-4 text-center">
                             <MdVerified className="text-emerald-500 text-3xl mx-auto mb-2" />
-                            <p className="text-sm font-semibold text-gray-900">Verified Seller</p>
+                            <p className="text-sm font-semibold text-gray-900">
+                              Verified Seller
+                            </p>
                           </div>
                           <div className="bg-blue-50 rounded-xl p-4 text-center">
                             <FaShieldAlt className="text-blue-500 text-3xl mx-auto mb-2" />
-                            <p className="text-sm font-semibold text-gray-900">Secure Payments</p>
+                            <p className="text-sm font-semibold text-gray-900">
+                              Secure Payments
+                            </p>
                           </div>
                           <div className="bg-amber-50 rounded-xl p-4 text-center">
                             <MdLocalShipping className="text-amber-500 text-3xl mx-auto mb-2" />
-                            <p className="text-sm font-semibold text-gray-900">Fast Delivery</p>
+                            <p className="text-sm font-semibold text-gray-900">
+                              Fast Delivery
+                            </p>
                           </div>
                           <div className="bg-purple-50 rounded-xl p-4 text-center">
                             <BiMessageDetail className="text-purple-500 text-3xl mx-auto mb-2" />
-                            <p className="text-sm font-semibold text-gray-900">24/7 Support</p>
+                            <p className="text-sm font-semibold text-gray-900">
+                              24/7 Support
+                            </p>
                           </div>
                         </div>
                       </div>
 
                       {/* Social Links */}
-                      {(seller.socialLinks?.facebook || seller.socialLinks?.instagram || seller.socialLinks?.twitter) && (
+                      {(seller.socialLinks?.facebook ||
+                        seller.socialLinks?.instagram ||
+                        seller.socialLinks?.twitter) && (
                         <div>
-                          <h3 className="text-lg font-bold text-gray-900 mb-3">Follow Us</h3>
+                          <h3 className="text-lg font-bold text-gray-900 mb-3">
+                            Follow Us
+                          </h3>
                           <div className="flex items-center gap-3">
                             {seller.socialLinks?.facebook && (
-                              <a href={seller.socialLinks.facebook} target="_blank" rel="noopener noreferrer" className="w-12 h-12 rounded-xl bg-blue-600 text-white flex items-center justify-center hover:bg-blue-700 transition-colors">
+                              <a
+                                href={seller.socialLinks.facebook}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="w-12 h-12 rounded-xl bg-blue-600 text-white flex items-center justify-center hover:bg-blue-700 transition-colors"
+                              >
                                 <FaFacebook className="text-xl" />
                               </a>
                             )}
                             {seller.socialLinks?.instagram && (
-                              <a href={seller.socialLinks.instagram} target="_blank" rel="noopener noreferrer" className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-600 to-pink-500 text-white flex items-center justify-center hover:opacity-90 transition-opacity">
+                              <a
+                                href={seller.socialLinks.instagram}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-600 to-pink-500 text-white flex items-center justify-center hover:opacity-90 transition-opacity"
+                              >
                                 <FaInstagram className="text-xl" />
                               </a>
                             )}
                             {seller.socialLinks?.twitter && (
-                              <a href={seller.socialLinks.twitter} target="_blank" rel="noopener noreferrer" className="w-12 h-12 rounded-xl bg-sky-500 text-white flex items-center justify-center hover:bg-sky-600 transition-colors">
+                              <a
+                                href={seller.socialLinks.twitter}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="w-12 h-12 rounded-xl bg-sky-500 text-white flex items-center justify-center hover:bg-sky-600 transition-colors"
+                              >
                                 <FaTwitter className="text-xl" />
                               </a>
                             )}
@@ -870,7 +1046,9 @@ export default function SellerStorePage() {
                       {/* Store Owner */}
                       {seller.user && (
                         <div>
-                          <h3 className="text-lg font-bold text-gray-900 mb-3">Store Owner</h3>
+                          <h3 className="text-lg font-bold text-gray-900 mb-3">
+                            Store Owner
+                          </h3>
                           <div className="bg-gray-50 rounded-xl p-4 flex items-center gap-4">
                             {seller.user.avatar ? (
                               <Image
@@ -886,8 +1064,12 @@ export default function SellerStorePage() {
                               </div>
                             )}
                             <div>
-                              <p className="font-semibold text-gray-900">{seller.user.name}</p>
-                              <p className="text-sm text-gray-500">{seller.user.email}</p>
+                              <p className="font-semibold text-gray-900">
+                                {seller.user.name}
+                              </p>
+                              <p className="text-sm text-gray-500">
+                                {seller.user.email}
+                              </p>
                             </div>
                           </div>
                         </div>

@@ -107,8 +107,8 @@ function ProfileContent() {
   // Handle Logout
   const handleLogout = async () => {
     try {
-      localStorage.removeItem("@ayoob");
-      Cookies.remove("@ayoob");
+      localStorage.removeItem("@darloo");
+      Cookies.remove("@darloo");
 
       setAuth({ user: null, token: "" });
 

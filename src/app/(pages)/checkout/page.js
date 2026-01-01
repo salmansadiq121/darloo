@@ -1,7 +1,7 @@
 "use client";
 import MainLayout from "@/app/components/Layout/Layout";
 import { useAuth } from "@/app/content/authContent";
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo, Suspense } from "react";
 import toast from "react-hot-toast";
 import axios from "axios";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -15,7 +15,7 @@ import PaymentMethodSelector from "@/app/components/checkout/PaymentMethodSelect
 import { motion, AnimatePresence } from "framer-motion";
 import { ShoppingBag, ArrowLeft, ArrowRight } from "lucide-react";
 
-export default function Checkout() {
+function CheckoutContent() {
   const { auth, selectedProduct, setSelectedProduct } = useAuth();
   const searchParams = useSearchParams();
   const [shippingFee, setShippingFee] = useState(0);
@@ -508,5 +508,19 @@ export default function Checkout() {
         )}
       </div>
     </MainLayout>
+  );
+}
+
+export default function Checkout() {
+  return (
+    <Suspense fallback={
+      <MainLayout title="Darloo - Checkout">
+        <div className="bg-gray-50 min-h-screen w-full flex items-center justify-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-red-500"></div>
+        </div>
+      </MainLayout>
+    }>
+      <CheckoutContent />
+    </Suspense>
   );
 }

@@ -26,6 +26,10 @@ function CheckoutContent() {
     shippingFee: 0,
     discount: 0,
     shippingAddress: {
+      firstName: "",
+      lastName: "",
+      email: "",
+      phone: "",
       address: "",
       country: "",
       state: "",
@@ -225,6 +229,10 @@ function CheckoutContent() {
       couponCode: isVoucherApplied ? voucherCode : "",
       shippingFee: shipping,
       shippingAddress: {
+        firstName: auth?.user?.name || "",
+        lastName: auth?.user?.lastName || "",
+        email: auth?.user?.email || "",
+        phone: auth?.user?.number || "",
         address: auth?.user?.addressDetails?.address || "",
         country: auth?.user?.addressDetails?.country || "",
         state: auth?.user?.addressDetails?.state || "",
@@ -513,13 +521,15 @@ function CheckoutContent() {
 
 export default function Checkout() {
   return (
-    <Suspense fallback={
-      <MainLayout title="Darloo - Checkout">
-        <div className="bg-gray-50 min-h-screen w-full flex items-center justify-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-red-500"></div>
-        </div>
-      </MainLayout>
-    }>
+    <Suspense
+      fallback={
+        <MainLayout title="Darloo - Checkout">
+          <div className="bg-gray-50 min-h-screen w-full flex items-center justify-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-red-500"></div>
+          </div>
+        </MainLayout>
+      }
+    >
       <CheckoutContent />
     </Suspense>
   );

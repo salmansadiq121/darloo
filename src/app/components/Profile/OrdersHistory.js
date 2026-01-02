@@ -124,43 +124,108 @@ export default function OrdersHistory({ userId, countryCode }) {
     status,
     sellerOrderId = null
   ) => {
-    Swal.fire({
-      title: isGerman ? "Bist du sicher?" : "Are you sure?",
-      text:
-        status === "Cancelled"
-          ? isGerman
-            ? "Möchten Sie diese Bestellung stornieren?"
-            : "Do you want to cancel this order?"
-          : isGerman
+    if (status === "Cancelled") {
+      // Ask for cancel reason
+      Swal.fire({
+        title: isGerman ? "Bestellung stornieren" : "Cancel Order",
+        html: `
+          <p class="text-left mb-4">${
+            isGerman
+              ? "Möchten Sie diese Bestellung wirklich stornieren?"
+              : "Are you sure you want to cancel this order?"
+          }</p>
+          <label class="block text-left text-sm font-medium text-gray-700 mb-2">
+            ${
+              isGerman ? "Grund für die Stornierung" : "Cancel Reason"
+            } <span class="text-red-500">*</span>
+          </label>
+          <textarea 
+            id="cancelReason" 
+            class="swal2-textarea w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 resize-none" 
+            rows="4" 
+            placeholder="${
+              isGerman
+                ? "Bitte geben Sie einen Grund für die Stornierung an..."
+                : "Please provide a reason for cancellation..."
+            }"
+            required
+          ></textarea>
+        `,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#ef4444",
+        cancelButtonColor: "#6b7280",
+        confirmButtonText: isGerman ? "Ja, stornieren" : "Yes, cancel it",
+        cancelButtonText: isGerman ? "Abbrechen" : "Cancel",
+        focusConfirm: false,
+        preConfirm: () => {
+          const reason = document.getElementById("cancelReason").value.trim();
+          if (!reason) {
+            Swal.showValidationMessage(
+              isGerman
+                ? "Bitte geben Sie einen Grund für die Stornierung an."
+                : "Please provide a cancel reason."
+            );
+            return false;
+          }
+          if (reason.length < 10) {
+            Swal.showValidationMessage(
+              isGerman
+                ? "Der Grund muss mindestens 10 Zeichen lang sein."
+                : "Cancel reason must be at least 10 characters."
+            );
+            return false;
+          }
+          return reason;
+        },
+      }).then((result) => {
+        if (result.isConfirmed && result.value) {
+          cancelOrder(orderId, status, sellerOrderId, result.value);
+        }
+      });
+    } else {
+      // Return flow (no reason needed)
+      Swal.fire({
+        title: isGerman ? "Bist du sicher?" : "Are you sure?",
+        text: isGerman
           ? "Möchten Sie diese Bestellung zurückgeben?"
           : "Do you want to return this order?",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#ef4444",
-      cancelButtonColor: "#6b7280",
-      confirmButtonText:
-        status === "Cancelled"
-          ? isGerman
-            ? "Ja, stornieren"
-            : "Yes, cancel it"
-          : isGerman
-          ? "Ja, zurückgeben"
-          : "Yes, return it",
-    }).then((result) => {
-      if (result.isConfirmed) cancelOrder(orderId, status, sellerOrderId);
-    });
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#ef4444",
+        cancelButtonColor: "#6b7280",
+        confirmButtonText: isGerman ? "Ja, zurückgeben" : "Yes, return it",
+      }).then((result) => {
+        if (result.isConfirmed) cancelOrder(orderId, status, sellerOrderId);
+      });
+    }
   };
 
-  const cancelOrder = async (orderId, status, sellerOrderId = null) => {
+  const cancelOrder = async (
+    orderId,
+    status,
+    sellerOrderId = null,
+    cancelReason = null
+  ) => {
     try {
       const endpoint = sellerOrderId
         ? `${process.env.NEXT_PUBLIC_SERVER_URI}/api/v1/order/seller-order/status/${sellerOrderId}`
         : `${process.env.NEXT_PUBLIC_SERVER_URI}/api/v1/order/cancel/request/${orderId}`;
-      const { data } = await axios.put(endpoint, { orderStatus: status });
+
+      const requestData = { orderStatus: status };
+      if (cancelReason && status === "Cancelled") {
+        requestData.cancelReason = cancelReason;
+      }
+
+      const { data } = await axios.put(endpoint, requestData);
       if (data) {
         toast.success(
           status === "Cancelled"
-            ? "Order cancelled successfully"
+            ? isGerman
+              ? "Bestellung erfolgreich storniert"
+              : "Order cancelled successfully"
+            : isGerman
+            ? "Rückgabewunsch gesendet"
             : "Return request sent"
         );
         fetchOrders();
@@ -646,6 +711,15 @@ export default function OrdersHistory({ userId, countryCode }) {
         border: "border-emerald-200",
         glow: "shadow-emerald-200/50",
         pulse: "bg-emerald-500",
+      },
+      "partially delivered": {
+        icon: Package,
+        gradient: "from-yellow-500 via-amber-500 to-yellow-600",
+        bg: "bg-gradient-to-r from-yellow-50 to-amber-50",
+        text: "text-yellow-700",
+        border: "border-yellow-200",
+        glow: "shadow-yellow-200/50",
+        pulse: "bg-yellow-500",
       },
       cancelled: {
         icon: XCircle,
@@ -1154,27 +1228,57 @@ export default function OrdersHistory({ userId, countryCode }) {
     );
   };
 
-  // Get overall status from seller orders (most advanced status)
+  // Get overall status from seller orders (returns status based on all seller orders)
   const getOverallStatus = (sellerOrders) => {
     if (!sellerOrders || sellerOrders.length === 0) return "Pending";
 
-    const statusOrder = [
-      "Delivered",
-      "Shipped",
-      "Packing",
-      "Processing",
-      "Pending",
-      "Cancelled",
-      "Returned",
-    ];
+    // Get unique statuses from all seller orders
+    const statuses = sellerOrders.map((so) => so.orderStatus || "Pending");
+    const uniqueStatuses = [...new Set(statuses)];
 
-    // Find the most advanced status
-    for (const status of statusOrder) {
-      if (sellerOrders.some((so) => so.orderStatus === status)) {
-        return status;
-      }
+    // If all have the same status, return that status
+    if (uniqueStatuses.length === 1) {
+      return uniqueStatuses[0];
     }
-    return "Pending";
+
+    // If all are delivered, return delivered
+    if (uniqueStatuses.length === 1 && uniqueStatuses[0] === "Delivered") {
+      return "Delivered";
+    }
+
+    // If all are cancelled, return cancelled
+    if (uniqueStatuses.every((s) => s === "Cancelled")) {
+      return "Cancelled";
+    }
+
+    // If all are returned, return returned
+    if (uniqueStatuses.every((s) => s === "Returned")) {
+      return "Returned";
+    }
+
+    // Mixed statuses - return "In Progress" or "Partially Delivered" etc.
+    // Priority: Delivered > Shipped > Packing > Processing > Pending
+    const statusPriority = {
+      Delivered: 5,
+      Shipped: 4,
+      Packing: 3,
+      Processing: 2,
+      Pending: 1,
+      Cancelled: 0,
+      Returned: 0,
+    };
+
+    // Return the highest priority status (but indicate it's partial)
+    const sortedStatuses = uniqueStatuses.sort(
+      (a, b) => (statusPriority[b] || 0) - (statusPriority[a] || 0)
+    );
+
+    // If we have delivered and other statuses, it's partially delivered
+    if (sortedStatuses[0] === "Delivered" && sortedStatuses.length > 1) {
+      return "Partially Delivered";
+    }
+
+    return sortedStatuses[0];
   };
 
   // Main Order Card Component
@@ -1183,7 +1287,10 @@ export default function OrdersHistory({ userId, countryCode }) {
     const isMultiVendor = order.orderType === "multi" || hasSellerOrders;
     const isExpanded = expandedOrderId === order._id;
 
-    // Get status counts from seller orders
+    // IMPORTANT: When seller orders exist, we ALWAYS use seller orders' statuses,
+    // NOT the parent order's orderStatus field. This ensures accurate status display
+    // when different seller orders have different statuses (e.g., one delivered, one pending).
+    // Get status counts from seller orders (not from parent order.status)
     const statusCounts = hasSellerOrders
       ? order.sellerOrders.reduce((acc, so) => {
           acc[so.orderStatus] = (acc[so.orderStatus] || 0) + 1;

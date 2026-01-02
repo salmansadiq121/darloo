@@ -232,99 +232,101 @@ const Header = () => {
           {/* Desktop Actions */}
           <div className="hidden lg:flex items-center gap-2">
             {/* Notifications */}
-            <div ref={closeNotification} className="relative">
-              <button
-                onClick={() => setShowNotification(!showNotification)}
-                className={`relative p-2.5 rounded-full transition-all duration-200 ${
-                  showNotification
-                    ? "bg-rose-100 text-rose-600"
-                    : "hover:bg-gray-100 text-gray-600"
-                }`}
-              >
-                <Bell className="w-5 h-5" />
-                {unreadNotifications > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 w-5 h-5 bg-rose-500 text-white text-xs font-bold rounded-full flex items-center justify-center animate-pulse">
-                    {unreadNotifications > 9 ? "9+" : unreadNotifications}
-                  </span>
-                )}
-              </button>
+            {auth?.user && (
+              <div ref={closeNotification} className="relative">
+                <button
+                  onClick={() => setShowNotification(!showNotification)}
+                  className={`relative p-2.5 rounded-full transition-all duration-200 ${
+                    showNotification
+                      ? "bg-rose-100 text-rose-600"
+                      : "hover:bg-gray-100 text-gray-600"
+                  }`}
+                >
+                  <Bell className="w-5 h-5" />
+                  {unreadNotifications > 0 && (
+                    <span className="absolute -top-0.5 -right-0.5 w-5 h-5 bg-rose-500 text-white text-xs font-bold rounded-full flex items-center justify-center animate-pulse">
+                      {unreadNotifications > 9 ? "9+" : unreadNotifications}
+                    </span>
+                  )}
+                </button>
 
-              <AnimatePresence>
-                {showNotification && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                    className="absolute right-0 mt-2 w-80 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden"
-                  >
-                    <div className="px-4 py-3 bg-gradient-to-r from-rose-500 to-rose-600 text-white flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <Bell className="w-5 h-5" />
-                        <span className="font-semibold">
-                          {isGerman ? "Benachrichtigungen" : "Notifications"}
-                        </span>
+                <AnimatePresence>
+                  {showNotification && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                      className="absolute right-0 mt-2 w-80 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden"
+                    >
+                      <div className="px-4 py-3 bg-gradient-to-r from-rose-500 to-rose-600 text-white flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <Bell className="w-5 h-5" />
+                          <span className="font-semibold">
+                            {isGerman ? "Benachrichtigungen" : "Notifications"}
+                          </span>
+                        </div>
+                        {unreadNotifications > 0 && (
+                          <span className="px-2 py-0.5 bg-white/20 rounded-full text-xs">
+                            {unreadNotifications} new
+                          </span>
+                        )}
                       </div>
-                      {unreadNotifications > 0 && (
-                        <span className="px-2 py-0.5 bg-white/20 rounded-full text-xs">
-                          {unreadNotifications} new
-                        </span>
-                      )}
-                    </div>
-                    <div className="max-h-80 overflow-y-auto">
-                      {notifications?.length > 0 ? (
-                        notifications.slice(0, 5).map((notification) => (
-                          <div
-                            key={notification._id}
-                            onClick={() =>
-                              router.push(
-                                `/profile/${auth?.user?._id}?tab=notifications`
-                              )
-                            }
-                            className={`px-4 py-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 transition-colors ${
-                              !notification.read ? "bg-rose-50/50" : ""
-                            }`}
-                          >
-                            <p className="text-sm font-medium text-gray-900 line-clamp-1">
-                              {notification?.subject}
-                            </p>
-                            <p className="text-xs text-gray-500 line-clamp-2 mt-0.5">
-                              {notification?.message}
-                            </p>
-                            <p className="text-xs text-gray-400 mt-1">
-                              {notification?.createdAt
-                                ? formatDistanceToNow(
-                                    new Date(notification?.createdAt),
-                                    { addSuffix: true }
-                                  )
-                                : isGerman
-                                ? "Gerade eben"
-                                : "Just now"}
+                      <div className="max-h-80 overflow-y-auto">
+                        {notifications?.length > 0 ? (
+                          notifications.slice(0, 5).map((notification) => (
+                            <div
+                              key={notification._id}
+                              onClick={() =>
+                                router.push(
+                                  `/profile/${auth?.user?._id}?tab=notifications`
+                                )
+                              }
+                              className={`px-4 py-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 transition-colors ${
+                                !notification.read ? "bg-rose-50/50" : ""
+                              }`}
+                            >
+                              <p className="text-sm font-medium text-gray-900 line-clamp-1">
+                                {notification?.subject}
+                              </p>
+                              <p className="text-xs text-gray-500 line-clamp-2 mt-0.5">
+                                {notification?.message}
+                              </p>
+                              <p className="text-xs text-gray-400 mt-1">
+                                {notification?.createdAt
+                                  ? formatDistanceToNow(
+                                      new Date(notification?.createdAt),
+                                      { addSuffix: true }
+                                    )
+                                  : isGerman
+                                  ? "Gerade eben"
+                                  : "Just now"}
+                              </p>
+                            </div>
+                          ))
+                        ) : (
+                          <div className="p-6 text-center text-gray-500">
+                            <Bell className="w-8 h-8 mx-auto mb-2 text-gray-300" />
+                            <p className="text-sm">
+                              {isGerman
+                                ? "Keine Benachrichtigungen"
+                                : "No notifications yet"}
                             </p>
                           </div>
-                        ))
-                      ) : (
-                        <div className="p-6 text-center text-gray-500">
-                          <Bell className="w-8 h-8 mx-auto mb-2 text-gray-300" />
-                          <p className="text-sm">
-                            {isGerman
-                              ? "Keine Benachrichtigungen"
-                              : "No notifications yet"}
-                          </p>
-                        </div>
+                        )}
+                      </div>
+                      {notifications?.length > 5 && (
+                        <Link
+                          href={`/profile/${auth?.user?._id}?tab=notifications`}
+                          className="block px-4 py-3 text-center text-sm font-medium text-rose-600 hover:bg-rose-50 border-t border-gray-100 transition-colors"
+                        >
+                          {isGerman ? "Alle anzeigen" : "View All"}
+                        </Link>
                       )}
-                    </div>
-                    {notifications?.length > 5 && (
-                      <Link
-                        href={`/profile/${auth?.user?._id}?tab=notifications`}
-                        className="block px-4 py-3 text-center text-sm font-medium text-rose-600 hover:bg-rose-50 border-t border-gray-100 transition-colors"
-                      >
-                        {isGerman ? "Alle anzeigen" : "View All"}
-                      </Link>
-                    )}
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            )}
 
             {/* Cart */}
             <button
@@ -340,12 +342,14 @@ const Header = () => {
             </button>
 
             {/* Chat */}
-            <button
-              onClick={() => router.push(`/chat`)}
-              className="p-2.5 rounded-full hover:bg-gray-100 text-gray-600 transition-colors"
-            >
-              <MessageCircle className="w-5 h-5" />
-            </button>
+            {auth?.user && (
+              <button
+                onClick={() => router.push(`/chat`)}
+                className="p-2.5 rounded-full hover:bg-gray-100 text-gray-600 transition-colors"
+              >
+                <MessageCircle className="w-5 h-5" />
+              </button>
+            )}
 
             {/* User Menu */}
             {auth?.user ? (
@@ -452,17 +456,19 @@ const Header = () => {
               <Search className="w-6 h-6" />
             </button>
 
-            <button
-              onClick={() => setShowNotification(!showNotification)}
-              className="relative p-2 rounded-full hover:bg-gray-100 text-gray-600 transition-colors"
-            >
-              <Bell className="w-6 h-6" />
-              {unreadNotifications > 0 && (
-                <span className="absolute top-0 right-0 w-4 h-4 bg-rose-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
-                  {unreadNotifications}
-                </span>
-              )}
-            </button>
+            {auth?.user && (
+              <button
+                onClick={() => setShowNotification(!showNotification)}
+                className="relative p-2 rounded-full hover:bg-gray-100 text-gray-600 transition-colors"
+              >
+                <Bell className="w-6 h-6" />
+                {unreadNotifications > 0 && (
+                  <span className="absolute top-0 right-0 w-4 h-4 bg-rose-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                    {unreadNotifications}
+                  </span>
+                )}
+              </button>
+            )}
 
             <button
               onClick={() => router.push("/checkout")}

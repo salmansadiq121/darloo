@@ -208,11 +208,11 @@ export default function Verification() {
           >
             <div className="relative">
               <Image
-                src="/logo.png"
+                src="/logo2.jpg"
                 alt="Logo"
                 width={120}
                 height={50}
-                className="h-12 w-auto object-contain"
+                className="h-12 w-auto object-contain rounded-full"
               />
               <motion.div
                 className="absolute -top-2 -right-2 w-8 h-8 bg-red-500 rounded-full flex items-center justify-center shadow-lg"
@@ -355,9 +355,7 @@ export default function Verification() {
             {countdown > 0 ? (
               <p className="text-slate-400 text-sm">
                 Resend code in{" "}
-                <span className="text-red-600 font-semibold">
-                  {countdown}s
-                </span>
+                <span className="text-red-600 font-semibold">{countdown}s</span>
               </p>
             ) : (
               <button
@@ -391,8 +389,7 @@ export default function Verification() {
               onClick={() => router.push("/authentication")}
               className="text-slate-500 cursor-pointer hover:text-slate-700 text-sm transition-colors"
             >
-              Back to{" "}
-              <span className="text-red-600 font-semibold">Login</span>
+              Back to <span className="text-red-600 font-semibold">Login</span>
             </button>
           </motion.div>
         </div>

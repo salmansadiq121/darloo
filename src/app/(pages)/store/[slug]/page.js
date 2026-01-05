@@ -405,9 +405,9 @@ export default function SellerStorePage() {
             </div>
 
             {/* Store Details */}
-            <div className="flex-1 pb-4">
+            <div className="flex-1 -pb-4 ">
               <div className="flex flex-wrap items-center gap-3 mb-2">
-                <h1 className="text-2xl md:text-3xl font-bold text-white">
+                <h1 className="text-2xl md:text-3xl font-bold text-black">
                   {seller.storeName}
                 </h1>
                 {seller.verificationStatus === "approved" && (
@@ -417,11 +417,7 @@ export default function SellerStorePage() {
                   </span>
                 )}
               </div>
-              {seller.storeDescription && (
-                <p className="text-gray-600 text-sm md:text-base line-clamp-2 mb-3 max-w-2xl">
-                  {seller.storeDescription}
-                </p>
-              )}
+
               <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500">
                 {seller.storeAddress?.city && (
                   <div className="flex items-center gap-1">
@@ -443,7 +439,7 @@ export default function SellerStorePage() {
             </div>
 
             {/* Action Buttons */}
-            <div className="flex items-center gap-3 pb-4">
+            <div className="flex items-center gap-3 -pb-4">
               <motion.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
@@ -669,7 +665,7 @@ export default function SellerStorePage() {
                       >
                         <IoGrid className="text-lg" />
                       </button>
-                      <button
+                      {/* <button
                         onClick={() => setViewMode("list")}
                         className={`p-2.5 rounded-lg transition-all ${
                           viewMode === "list"
@@ -678,7 +674,7 @@ export default function SellerStorePage() {
                         }`}
                       >
                         <IoList className="text-lg" />
-                      </button>
+                      </button> */}
                     </div>
                   </div>
 

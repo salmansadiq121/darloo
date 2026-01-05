@@ -250,7 +250,7 @@ export default function AllProducts() {
     () => (
       <div className="sm:hidden relative">
         <div
-          className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide scroll-smooth snap-x snap-mandatory px-2"
+          className="flex gap-[3px] overflow-x-auto pb-4 scrollbar-hide scroll-smooth snap-x snap-mandatory px-2"
           style={{
             scrollbarWidth: "none",
             msOverflowStyle: "none",
@@ -262,7 +262,7 @@ export default function AllProducts() {
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.3, delay: index * 0.05 }}
-              className="flex-shrink-0 w-[85vw] snap-start"
+              className="flex-shrink-0 w-[calc((100%-3px)/2)] snap-start"
             >
               <ProductCard
                 product={product}

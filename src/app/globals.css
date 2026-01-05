@@ -827,3 +827,17 @@ audio::-webkit-media-controls-duration-display {
 .animate-scale-in {
   animation: scale-in 0.3s ease-out forwards;
 }
+
+/* React Select Menu Portal Fix - Ensure dropdown appears above modals */
+body > div[id*="react-select"] {
+  z-index: 99999999 !important;
+}
+
+.address-country-select__menu-portal {
+  z-index: 99999999 !important;
+}
+
+.address-country-select__menu {
+  z-index: 99999999 !important;
+  position: fixed !important;
+}

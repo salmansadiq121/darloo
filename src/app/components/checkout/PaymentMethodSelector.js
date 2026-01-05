@@ -15,13 +15,13 @@ const paymentMethods = [
       "https://img.icons8.com/color/32/amex.png",
     ],
   },
-  {
-    id: "paypal",
-    name: "PayPal",
-    description: "Pay securely with PayPal",
-    icon: "https://img.icons8.com/color/48/paypal.png",
-    badges: [],
-  },
+  // {
+  //   id: "paypal",
+  //   name: "PayPal",
+  //   description: "Pay securely with PayPal",
+  //   icon: "https://img.icons8.com/color/48/paypal.png",
+  //   badges: [],
+  // },
 ];
 
 export default function PaymentMethodSelector({
@@ -112,9 +112,7 @@ export default function PaymentMethodSelector({
         <div className="bg-green-50 rounded-lg p-3 flex items-start gap-3">
           <Shield className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
           <div>
-            <p className="text-sm font-medium text-green-800">
-              Secure Payment
-            </p>
+            <p className="text-sm font-medium text-green-800">Secure Payment</p>
             <p className="text-xs text-green-600 mt-0.5">
               Your payment information is encrypted and secure. We never store
               your card details.

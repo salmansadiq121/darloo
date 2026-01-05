@@ -178,11 +178,11 @@ export default function UpdatePassword() {
           >
             <div className="relative">
               <Image
-                src="/logo.png"
+                src="/logo2.jpg"
                 alt="Logo"
                 width={120}
                 height={50}
-                className="h-12 w-auto object-contain"
+                className="h-12 w-auto object-contain rounded-full"
               />
               <motion.div
                 className="absolute -top-2 -right-2 w-8 h-8 bg-red-500 rounded-full flex items-center justify-center shadow-lg"
@@ -434,8 +434,7 @@ export default function UpdatePassword() {
               onClick={() => router.push("/authentication")}
               className="text-slate-500 hover:text-slate-700 cursor-pointer text-sm transition-colors"
             >
-              Back to{" "}
-              <span className="text-red-600 font-semibold">Login</span>
+              Back to <span className="text-red-600 font-semibold">Login</span>
             </button>
           </motion.div>
         </div>

@@ -54,18 +54,18 @@ export default function TrendingProducts({ products, loading }) {
       {/* Mobile Swipeable Carousel */}
       <div className="sm:hidden relative">
         {loading ? (
-          <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
+          <div className="flex gap-[3px] overflow-x-auto pb-4 scrollbar-hide px-2">
             {Array.from({ length: 6 }).map((_, index) => (
               <div
                 key={index}
-                className="flex-shrink-0 w-[85vw] h-[320px] bg-gradient-to-br from-gray-200 to-gray-300 animate-pulse rounded-2xl"
+                className="flex-shrink-0 w-[calc((100%-3px)/2)] h-[320px] bg-gradient-to-br from-gray-200 to-gray-300 animate-pulse rounded-2xl"
               ></div>
             ))}
           </div>
         ) : (
           <div className="relative">
             <div
-              className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide scroll-smooth snap-x snap-mandatory px-2"
+              className="flex gap-[3px] overflow-x-auto pb-4 scrollbar-hide scroll-smooth snap-x snap-mandatory px-2"
               style={{
                 scrollbarWidth: "none",
                 msOverflowStyle: "none",
@@ -74,7 +74,7 @@ export default function TrendingProducts({ products, loading }) {
               {products?.map((product, index) => (
                 <div
                   key={product._id}
-                  className="flex-shrink-0 w-[85vw] snap-start"
+                  className="flex-shrink-0 w-[calc((100%-3px)/2)] snap-start"
                 >
                   <ProductCard
                     product={product}

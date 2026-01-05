@@ -22,7 +22,7 @@ export default function PromoBannerPage({ countryCode }) {
   const promos = [
     {
       icon: Truck,
-      text: isGerman ? "Kostenloser Versand ab 50€" : "Free Shipping Over €50",
+      text: isGerman ? "Kostenloser Versand " : "Free Shipping",
       highlight: isGerman ? "50€" : "€50",
       color: "text-emerald-600",
       bgColor: "bg-emerald-50",

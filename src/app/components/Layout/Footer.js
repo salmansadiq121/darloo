@@ -148,7 +148,7 @@ const Footer = () => {
     {
       icon: Truck,
       title: isGerman ? "Kostenloser Versand" : "Free Shipping",
-      desc: isGerman ? "Ab 50€ Bestellwert" : "On orders over €50",
+      desc: isGerman ? "Bestellwert" : "On orders",
       color: "text-emerald-500",
       bgColor: "bg-emerald-500/10",
     },
@@ -169,7 +169,7 @@ const Footer = () => {
     {
       icon: CreditCard,
       title: isGerman ? "Einfache Rückgabe" : "Easy Returns",
-      desc: isGerman ? "30 Tage Rückgaberecht" : "30-day return policy",
+      desc: isGerman ? "14 Tage Rückgaberecht" : "14-day return policy",
       color: "text-orange-500",
       bgColor: "bg-orange-500/10",
     },
@@ -436,7 +436,7 @@ const Footer = () => {
               <h4 className="text-slate-400 text-xs font-semibold uppercase tracking-wider mb-3">
                 {t("paymentMethods")}
               </h4>
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-4 gap-2">
                 <div className="bg-white rounded-md px-2 py-1.5">
                   <Image
                     src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg"
@@ -452,10 +452,10 @@ const Footer = () => {
                     alt="Mastercard"
                     width={36}
                     height={24}
-                    className="h-5 w-auto"
+                    className="h-5 w-full"
                   />
                 </div>
-                <div className="bg-white rounded-md px-2 py-1.5">
+                {/* <div className="bg-white rounded-md px-2 py-1.5">
                   <Image
                     src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg"
                     alt="PayPal"
@@ -463,7 +463,7 @@ const Footer = () => {
                     height={24}
                     className="h-5 w-auto"
                   />
-                </div>
+                </div> */}
               </div>
             </div>
           </div>

@@ -103,10 +103,10 @@ export default function ProductCarousel({ products }) {
             spaceBetween: 24,
           },
 
-          1636: {
-            slidesPerView: 6,
-            spaceBetween: 24,
-          },
+          // 1636: {
+          //   slidesPerView: 5,
+          //   spaceBetween: 24,
+          // },
         }}
         navigation={{
           nextEl: ".custom-next",

@@ -256,7 +256,11 @@ export default function ProductDetail() {
 
     // Prevent adding out of stock products
     if (isOutOfStock) {
-      toast.error(isGerman ? "Dieses Produkt ist nicht auf Lager" : "This product is out of stock");
+      toast.error(
+        isGerman
+          ? "Dieses Produkt ist nicht auf Lager"
+          : "This product is out of stock"
+      );
       return;
     }
 
@@ -307,7 +311,11 @@ export default function ProductDetail() {
   const handleOneClickBuy = async (product) => {
     // Prevent buying out of stock products
     if (isOutOfStock) {
-      toast.error(isGerman ? "Dieses Produkt ist nicht auf Lager" : "This product is out of stock");
+      toast.error(
+        isGerman
+          ? "Dieses Produkt ist nicht auf Lager"
+          : "This product is out of stock"
+      );
       return;
     }
 
@@ -1105,9 +1113,9 @@ export default function ProductDetail() {
                           <p className="text-[11px] font-bold text-gray-900">
                             {isGerman ? "Kostenloser Versand" : "Free Shipping"}
                           </p>
-                          <p className="text-[10px] text-gray-500">
+                          {/* <p className="text-[10px] text-gray-500">
                             {isGerman ? "3-5 Werktage" : "3-5 business days"}
-                          </p>
+                          </p> */}
                         </div>
                       </motion.div>
 
@@ -1415,16 +1423,22 @@ export default function ProductDetail() {
                       disabled={isOutOfStock}
                       title={
                         isOutOfStock
-                          ? (isGerman ? "Nicht auf Lager" : "Out of Stock")
-                          : (isGerman
-                            ? "Jede Farbe/Größe-Kombination wird als separates Produkt hinzugefügt"
-                            : "Each color/size combination will be added as a separate item")
+                          ? isGerman
+                            ? "Nicht auf Lager"
+                            : "Out of Stock"
+                          : isGerman
+                          ? "Jede Farbe/Größe-Kombination wird als separates Produkt hinzugefügt"
+                          : "Each color/size combination will be added as a separate item"
                       }
                     >
                       <ShoppingCart className="mr-1.5 h-4 w-4" />
                       {isOutOfStock
-                        ? (isGerman ? "Nicht verfügbar" : "Out of Stock")
-                        : (isGerman ? "In den Warenkorb" : "Add to Cart")}
+                        ? isGerman
+                          ? "Nicht verfügbar"
+                          : "Out of Stock"
+                        : isGerman
+                        ? "In den Warenkorb"
+                        : "Add to Cart"}
                     </Button>
                   </motion.div>
                   <motion.div
@@ -1545,7 +1559,9 @@ export default function ProductDetail() {
                   <div className="flex flex-col sm:flex-row items-start justify-between gap-4">
                     {/* Clickable Seller Info - Links to Store */}
                     <Link
-                      href={`/store/${product.seller.storeSlug || product.seller._id}`}
+                      href={`/store/${
+                        product.seller.storeSlug || product.seller._id
+                      }`}
                       className="flex items-start gap-3 sm:gap-4 flex-1 w-full sm:w-auto group cursor-pointer"
                     >
                       {/* Seller Avatar */}
@@ -1604,7 +1620,8 @@ export default function ProductDetail() {
                           <div className="flex items-center gap-1">
                             <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
                             <span className="text-xs sm:text-sm font-medium text-gray-700">
-                              {product.seller.rating?.average?.toFixed(1) || "4.8"}
+                              {product.seller.rating?.average?.toFixed(1) ||
+                                "4.8"}
                             </span>
                             {product.seller.rating?.totalReviews > 0 && (
                               <span className="text-xs text-gray-500">
@@ -1628,7 +1645,9 @@ export default function ProductDetail() {
                         className="w-full sm:w-auto"
                       >
                         <Link
-                          href={`/store/${product.seller.storeSlug || product.seller._id}`}
+                          href={`/store/${
+                            product.seller.storeSlug || product.seller._id
+                          }`}
                         >
                           <Button
                             variant="outline"
@@ -1658,11 +1677,7 @@ export default function ProductDetail() {
                           className="w-full sm:w-auto flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-4 py-2.5 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 text-xs sm:text-sm font-semibold"
                         >
                           <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5" />
-                          <span>
-                            {isGerman
-                              ? "Chat"
-                              : "Chat"}
-                          </span>
+                          <span>{isGerman ? "Chat" : "Chat"}</span>
                         </Button>
                       </motion.div>
                     </div>
@@ -1901,8 +1916,12 @@ export default function ProductDetail() {
                 >
                   <ShoppingBag className="mr-2 h-5 w-5" />
                   {isOutOfStock
-                    ? (isGerman ? "Nicht verfügbar" : "Out of Stock")
-                    : (isGerman ? "In den Warenkorb" : "Add to Cart")}
+                    ? isGerman
+                      ? "Nicht verfügbar"
+                      : "Out of Stock"
+                    : isGerman
+                    ? "In den Warenkorb"
+                    : "Add to Cart"}
                 </Button>
               </div>
             </motion.div>

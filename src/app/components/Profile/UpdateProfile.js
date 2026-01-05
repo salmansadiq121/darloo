@@ -23,7 +23,20 @@ import { authUri } from "@/app/utils/ServerURI";
 import { uploadImage } from "@/app/utils/Upload";
 import countries from "world-countries";
 import ReactCountryFlag from "react-country-flag";
-import Select from "react-select";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import { Check, ChevronsUpDown } from "lucide-react";
 import PhoneNumberInput from "@/app/utils/PhoneInput";
 
 export default function UpdateProfileModal({
@@ -57,6 +70,7 @@ export default function UpdateProfileModal({
   );
   const [addressSuggestions, setAddressSuggestions] = useState([]);
   const [isAddressLoading, setIsAddressLoading] = useState(false);
+  const [isCountryOpen, setIsCountryOpen] = useState(false);
   const isGerman = countryCode === "DE";
 
   useEffect(() => {
@@ -198,28 +212,20 @@ export default function UpdateProfileModal({
     }
   };
 
-  // Sort countries alphabetically
-  const sortedCountries = [...countries].sort((a, b) =>
-    a.name.common.localeCompare(b.name.common)
+  // Sort countries alphabetically - memoized for performance
+  const sortedCountries = React.useMemo(
+    () =>
+      [...countries].sort((a, b) => a.name.common.localeCompare(b.name.common)),
+    []
   );
 
-  const countryOptions = sortedCountries.map((country) => ({
-    value: country.name.common,
-    label: (
-      <div className="flex items-center gap-2">
-        <ReactCountryFlag
-          countryCode={country.cca2}
-          svg
-          style={{
-            width: "1.5em",
-            height: "1.5em",
-          }}
-        />
-        <span>{country.name.common}</span>
-      </div>
-    ),
-    name: country.name.common,
-  }));
+  const selectedCountry = React.useMemo(
+    () =>
+      sortedCountries.find(
+        (country) => country.name.common === formData.country
+      ),
+    [sortedCountries, formData.country]
+  );
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -527,7 +533,7 @@ export default function UpdateProfileModal({
                       placeholder={
                         isGerman ? "Gib deine Stadt ein" : "Enter your city"
                       }
-                      className="rounded-xl border-gray-200 bg-white/80 focus-visible:ring-red-500 focus-visible:border-red-400 transition-all"
+                      className=" border-gray-200 bg-white/80 min-h-[2.6rem] rounded-full focus-visible:ring-red-500 focus-visible:border-red-400 transition-all"
                     />
                   </motion.div>
 
@@ -550,7 +556,7 @@ export default function UpdateProfileModal({
                           ? "Gib dein Bundesland ein"
                           : "Enter your state"
                       }
-                      className="rounded-xl border-gray-200 bg-white/80 focus-visible:ring-red-500 focus-visible:border-red-400 transition-all"
+                      className=" min-h-[2.6rem] rounded-full border-gray-200 bg-white/80 focus-visible:ring-red-500 focus-visible:border-red-400 transition-all"
                     />
                   </motion.div>
 
@@ -563,57 +569,103 @@ export default function UpdateProfileModal({
                       {isGerman ? "Land" : "Country"}
                       <span className="text-red-700 ml-0.5">*</span>
                     </label>
-                    <div className="rounded-xl border border-gray-200 bg-white/80 px-1.5 py-1.5 focus-within:border-red-400 focus-within:ring-1 focus-within:ring-red-500 transition-all">
-                      <Select
-                        options={countryOptions}
-                        value={countryOptions.find(
-                          (option) => option.value === formData.country
-                        )}
-                        onChange={(selected) =>
-                          setFormData({
-                            ...formData,
-                            country: selected?.value || "",
-                          })
-                        }
-                        isSearchable
-                        filterOption={(option, inputValue) =>
-                          option.data.name
-                            .toLowerCase()
-                            .includes(inputValue.toLowerCase())
-                        }
-                        classNamePrefix="address-country-select"
-                        menuPortalTarget={
-                          typeof document !== "undefined" ? document.body : null
-                        }
-                        styles={{
-                          control: (base, state) => ({
-                            ...base,
-                            borderRadius: 9999,
-                            borderColor: state.isFocused
-                              ? "#f97373"
-                              : "#e5e7eb",
-                            boxShadow: state.isFocused
-                              ? "0 0 0 1px rgba(248, 113, 113, 0.5)"
-                              : "none",
-                            paddingLeft: 4,
-                            paddingRight: 4,
-                            minHeight: 40,
-                          }),
-                          menu: (base) => ({
-                            ...base,
-                            borderRadius: 12,
-                            overflow: "hidden",
-                            zIndex: 9999,
-                          }),
-                          option: (base, state) => ({
-                            ...base,
-                            backgroundColor: state.isFocused
-                              ? "rgba(248, 113, 113, 0.08)"
-                              : "white",
-                            color: "#111827",
-                          }),
-                        }}
-                      />
+                    <div className="rounded-full border border-gray-200 bg-white/80 px-1.5 py-1 focus-within:border-red-400 focus-within:ring-1 focus-within:ring-red-500 transition-all">
+                      <Popover
+                        open={isCountryOpen}
+                        onOpenChange={setIsCountryOpen}
+                      >
+                        <PopoverTrigger asChild>
+                          <button
+                            type="button"
+                            className="w-full h-10 rounded-full border-0 bg-transparent shadow-none focus:ring-0 focus:ring-offset-0 px-2 flex items-center justify-between text-sm"
+                          >
+                            <div className="flex items-center gap-2 min-w-0 flex-1">
+                              {selectedCountry ? (
+                                <>
+                                  <ReactCountryFlag
+                                    countryCode={selectedCountry.cca2}
+                                    svg
+                                    style={{
+                                      width: "1.5em",
+                                      height: "1.5em",
+                                      flexShrink: 0,
+                                    }}
+                                  />
+                                  <span className="truncate">
+                                    {selectedCountry.name.common}
+                                  </span>
+                                </>
+                              ) : (
+                                <span className="text-gray-500">
+                                  {isGerman
+                                    ? "Land auswählen"
+                                    : "Select country"}
+                                </span>
+                              )}
+                            </div>
+                            <ChevronsUpDown className="h-4 w-4 opacity-50 flex-shrink-0 ml-2" />
+                          </button>
+                        </PopoverTrigger>
+                        <PopoverContent
+                          className="w-[var(--radix-popover-trigger-width)] p-0 z-[99999999] max-h-[400px]"
+                          align="start"
+                          sideOffset={4}
+                          style={{ zIndex: 99999999 }}
+                        >
+                          <Command className="rounded-lg border-0">
+                            <CommandInput
+                              placeholder={
+                                isGerman
+                                  ? "Land suchen..."
+                                  : "Search country..."
+                              }
+                              className="h-9"
+                            />
+                            <CommandList className="max-h-[300px] overflow-y-auto">
+                              <CommandEmpty>
+                                {isGerman
+                                  ? "Kein Land gefunden"
+                                  : "No country found"}
+                              </CommandEmpty>
+                              <CommandGroup>
+                                {sortedCountries.map((country) => (
+                                  <CommandItem
+                                    key={country.cca2}
+                                    value={country.name.common}
+                                    onSelect={() => {
+                                      setFormData({
+                                        ...formData,
+                                        country: country.name.common,
+                                      });
+                                      setIsCountryOpen(false);
+                                    }}
+                                    className="cursor-pointer data-[selected=true]:bg-red-50 data-[selected=true]:text-red-900"
+                                  >
+                                    <div className="flex items-center gap-2 w-full">
+                                      <ReactCountryFlag
+                                        countryCode={country.cca2}
+                                        svg
+                                        style={{
+                                          width: "1.5em",
+                                          height: "1.5em",
+                                          flexShrink: 0,
+                                        }}
+                                      />
+                                      <span className="flex-1">
+                                        {country.name.common}
+                                      </span>
+                                      {formData.country ===
+                                        country.name.common && (
+                                        <Check className="h-4 w-4 text-red-600" />
+                                      )}
+                                    </div>
+                                  </CommandItem>
+                                ))}
+                              </CommandGroup>
+                            </CommandList>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
                     </div>
                   </motion.div>
 
@@ -636,7 +688,7 @@ export default function UpdateProfileModal({
                           ? "Gib deine Postleitzahl ein"
                           : "Enter your postal code"
                       }
-                      className="rounded-xl border-gray-200 bg-white/80 focus-visible:ring-red-500 focus-visible:border-red-400 transition-all"
+                      className=" min-h-[2.6rem] rounded-full border-gray-200 bg-white/80  focus-visible:ring-red-500 focus-visible:border-red-400 transition-all"
                     />
                   </motion.div>
                 </div>

@@ -36,8 +36,8 @@ export default function PromoBannerPage({ countryCode }) {
     },
     {
       icon: RotateCcw,
-      text: isGerman ? "7 Tage Rückgabe" : "7-Day Returns",
-      highlight: "7",
+      text: isGerman ? "14 Tage Rückgabe" : "14-Day Returns",
+      highlight: "14",
       color: "text-blue-600",
       bgColor: "bg-blue-50",
     },

@@ -174,7 +174,7 @@ export default function FilterProducts({
             {isPriceFilterActive && (
               <div className="flex items-center gap-1 bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs font-medium">
                 <span>
-                  ${values[0]} - ${values[1]}
+                €{values[0].toLocaleString()} - €{values[1].toLocaleString()}
                 </span>
                 <button
                   onClick={() => removeFilter("price")}
@@ -234,14 +234,14 @@ export default function FilterProducts({
               <div className="bg-white px-3 py-2 rounded-lg border border-gray-200 shadow-sm">
                 {/* <span className="text-xs text-gray-500 block">Min</span> */}
                 <span className="text-sm font-semibold text-gray-900">
-                  ${values[0]}
+                  €{values[0].toLocaleString()}
                 </span>
               </div>
               <div className="flex-1 mx-3 h-px bg-gray-300"></div>
               <div className="bg-white px-3 py-2 rounded-lg border border-gray-200 shadow-sm">
                 {/* <span className="text-xs text-gray-500 block">Max</span> */}
                 <span className="text-sm font-semibold text-gray-900">
-                  ${values[1]}
+                  €{values[1].toLocaleString()}
                 </span>
               </div>
             </div>

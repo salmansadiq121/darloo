@@ -250,14 +250,14 @@ export default function OrderSummaryCard({
                   />
                   <span>Stripe</span>
                 </div>
-                <div className="flex items-center gap-1">
+                {/* <div className="flex items-center gap-1">
                   <img
                     src="https://img.icons8.com/color/24/paypal.png"
                     alt="PayPal"
                     className="w-4 h-4"
                   />
                   <span>PayPal</span>
-                </div>
+                </div> */}
               </div>
             </div>
           </motion.div>

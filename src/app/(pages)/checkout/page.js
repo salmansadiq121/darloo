@@ -13,7 +13,8 @@ import OrderSummaryCard from "@/app/components/checkout/OrderSummaryCard";
 import ShippingForm from "@/app/components/checkout/ShippingForm";
 import PaymentMethodSelector from "@/app/components/checkout/PaymentMethodSelector";
 import { motion, AnimatePresence } from "framer-motion";
-import { ShoppingBag, ArrowLeft, ArrowRight } from "lucide-react";
+import { ShoppingBag, ArrowLeft, ArrowRight, Wallet } from "lucide-react";
+import Cookies from "js-cookie";
 
 function CheckoutContent() {
   const { auth, selectedProduct, setSelectedProduct } = useAuth();
@@ -50,6 +51,18 @@ function CheckoutContent() {
   const [currentStep, setCurrentStep] = useState(1);
   const [paymentMethod, setPaymentMethod] = useState("card");
   const [isEditingShipping, setIsEditingShipping] = useState(false);
+  const [walletBalance, setWalletBalance] = useState(0);
+  const [walletLoading, setWalletLoading] = useState(false);
+  const [walletError, setWalletError] = useState("");
+  const [useWallet, setUseWallet] = useState(false);
+  const [walletUseAmount, setWalletUseAmount] = useState(0);
+
+  // Points/Rewards state
+  const [pointsBalance, setPointsBalance] = useState(0);
+  const [pointsLoading, setPointsLoading] = useState(false);
+  const [usePoints, setUsePoints] = useState(false);
+  const [pointsToUse, setPointsToUse] = useState(0);
+  const [pointsConversionRate, setPointsConversionRate] = useState(100); // 100 points = €1
 
   // Affiliate tracking - capture ref parameter from URL
   const [affiliateRef, setAffiliateRef] = useState(null);
@@ -212,6 +225,67 @@ function CheckoutContent() {
     getShippingFee();
   }, [auth?.user?.addressDetails?.country]);
 
+  // Fetch wallet balance for logged-in user
+  useEffect(() => {
+    const fetchWallet = async () => {
+      if (!auth?.user?._id) return;
+      setWalletLoading(true);
+      setWalletError("");
+      try {
+        const token = Cookies.get("@darloo");
+        if (!token) return;
+
+        const { data } = await axios.get(
+          `${process.env.NEXT_PUBLIC_SERVER_URI}/api/v1/wallet/me`,
+          {
+            headers: { Authorization: token },
+          }
+        );
+        setWalletBalance(data?.wallet?.balance || 0);
+      } catch (error) {
+        console.error("Error fetching wallet:", error);
+        setWalletError(
+          error.response?.data?.message || "Failed to load wallet balance"
+        );
+      } finally {
+        setWalletLoading(false);
+      }
+    };
+
+    fetchWallet();
+  }, [auth?.user?._id]);
+
+  // Fetch points balance for logged-in user
+  useEffect(() => {
+    const fetchPoints = async () => {
+      if (!auth?.user?._id) return;
+      setPointsLoading(true);
+      try {
+        const token = Cookies.get("@darloo");
+        if (!token) return;
+
+        const { data } = await axios.get(
+          `undefined/api/v1/rewards/me`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (data?.success && data?.program) {
+          setPointsBalance(data.program.points || 0);
+        }
+      } catch (error) {
+        console.error("Error fetching points:", error);
+      } finally {
+        setPointsLoading(false);
+      }
+    };
+
+    fetchPoints();
+  }, [auth?.user?._id]);
+
   // Update Cart
   useEffect(() => {
     const subtotal = getSubtotal();
@@ -219,7 +293,22 @@ function CheckoutContent() {
     const shipping = parseFloat(shippingFee || 0);
     const subtotalAfterDiscount = subtotal - discountAmount;
     const gst = subtotalAfterDiscount * 0.01;
-    const finalTotal = subtotalAfterDiscount + shipping + gst;
+    const grossTotal = subtotalAfterDiscount + shipping + gst;
+
+    // Clamp wallet usage
+    const maxWalletUsable = Math.min(walletBalance, grossTotal);
+    const appliedWallet = useWallet
+      ? Math.min(Math.max(0, walletUseAmount || 0), maxWalletUsable)
+      : 0;
+
+    // Calculate points discount (100 points = €1)
+    const maxPointsUsable = Math.min(pointsBalance, (grossTotal - appliedWallet) * pointsConversionRate);
+    const appliedPoints = usePoints
+      ? Math.min(Math.max(0, pointsToUse || 0), maxPointsUsable)
+      : 0;
+    const pointsDiscount = appliedPoints / pointsConversionRate;
+
+    const finalTotal = grossTotal - appliedWallet - pointsDiscount;
 
     setCart({
       user: auth?.user?._id,
@@ -228,6 +317,8 @@ function CheckoutContent() {
       discount: discountAmount,
       couponCode: isVoucherApplied ? voucherCode : "",
       shippingFee: shipping,
+      walletAmount: appliedWallet.toFixed(2),
+      pointsUsed: appliedPoints,
       shippingAddress: {
         firstName: auth?.user?.name || "",
         lastName: auth?.user?.lastName || "",
@@ -247,12 +338,24 @@ function CheckoutContent() {
     shippingFee,
     voucherCode,
     isVoucherApplied,
+    walletBalance,
+    walletUseAmount,
+    useWallet,
+    pointsBalance,
+    pointsToUse,
+    usePoints,
+    pointsConversionRate,
   ]);
 
   // Calculate totals
   const subtotal = getSubtotal();
   const tax = (subtotal - discount) * 0.01;
-  const total = subtotal - discount + shippingFee + tax;
+  const grossTotal = subtotal - discount + shippingFee + tax;
+  const maxWalletUsable = Math.min(walletBalance, grossTotal);
+  const appliedWallet = useWallet
+    ? Math.min(Math.max(0, walletUseAmount || 0), maxWalletUsable)
+    : 0;
+  const total = grossTotal - appliedWallet;
 
   // Validation
   const isFormValid =
@@ -493,6 +596,24 @@ function CheckoutContent() {
                 onCheckout={handleCheckout}
                 isCheckoutDisabled={!canCheckout || !auth?.user}
                 isProcessing={showPayment}
+                // Wallet props
+                walletBalance={walletBalance}
+                useWallet={useWallet}
+                setUseWallet={setUseWallet}
+                walletUseAmount={walletUseAmount}
+                setWalletUseAmount={setWalletUseAmount}
+                maxWalletUsable={maxWalletUsable}
+                appliedWallet={appliedWallet}
+                // Points props
+                pointsBalance={pointsBalance}
+                usePoints={usePoints}
+                setUsePoints={setUsePoints}
+                pointsToUse={pointsToUse}
+                setPointsToUse={setPointsToUse}
+                maxPointsUsable={maxPointsUsable}
+                appliedPoints={appliedPoints}
+                pointsDiscount={pointsDiscount}
+                pointsConversionRate={pointsConversionRate}
               />
             </div>
           </div>

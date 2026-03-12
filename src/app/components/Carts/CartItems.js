@@ -358,7 +358,6 @@ export default function CartItems({ products }) {
             <div className="mt-4 flex items-center justify-center gap-3 opacity-60">
               <Image src="/visa.svg" alt="Visa" width={32} height={20} className="h-5 w-auto" />
               <Image src="/mastercard.svg" alt="Mastercard" width={32} height={20} className="h-5 w-auto" />
-              <Image src="/paypal.svg" alt="PayPal" width={32} height={20} className="h-5 w-auto" />
               <Image src="/applepay.svg" alt="Apple Pay" width={32} height={20} className="h-5 w-auto" />
             </div>
           </motion.div>

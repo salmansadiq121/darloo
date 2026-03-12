@@ -140,11 +140,6 @@ export default function PaymentMethodSelector({
             className="h-6 object-contain opacity-70 hover:opacity-100 transition-opacity"
           />
           <img
-            src="https://img.icons8.com/color/32/paypal.png"
-            alt="PayPal"
-            className="h-6 object-contain opacity-70 hover:opacity-100 transition-opacity"
-          />
-          <img
             src="https://img.icons8.com/color/32/stripe.png"
             alt="Stripe"
             className="h-6 object-contain opacity-70 hover:opacity-100 transition-opacity"

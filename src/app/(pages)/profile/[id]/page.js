@@ -23,6 +23,7 @@ import {
   Star,
   User,
   Users,
+  Wallet,
 } from "lucide-react";
 import { FiTruck } from "react-icons/fi";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -53,6 +54,8 @@ import AffiliateSection from "@/app/components/Profile/AffiliateSection";
 import SupportSection from "@/app/components/Profile/SupportSection";
 import ChatSection from "@/app/components/Profile/ChatSection";
 import NotificationSection from "@/app/components/Profile/NotificationSection";
+import WalletSection from "@/app/components/Profile/WalletSection";
+import RewardsSection from "@/app/components/Profile/RewardsSection";
 import OrdersTracking from "@/app/components/Profile/OrdersTracking";
 import { TbTruckReturn } from "react-icons/tb";
 import ReturnHistory from "@/app/components/Profile/ReturnHistory";
@@ -186,7 +189,7 @@ function ProfileContent() {
                         </Button>
                       </div>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-6">
                       <div className="flex items-center gap-2">
                         <User className="h-5 w-5 text-[#C6080A]" />
                         <div>
@@ -216,6 +219,17 @@ function ProfileContent() {
                           </p>
                           <p className="font-medium">
                             {isGerman ? "Bankverbindung" : "Bank Account"}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Gift className="h-5 w-5 text-[#C6080A]" />
+                        <div>
+                          <p className="text-sm text-gray-500">
+                            {isGerman ? "Punkte" : "Points"}
+                          </p>
+                          <p className="font-medium">
+                            {userDetails?.rewardsPoints?.toLocaleString() || "0"} pts
                           </p>
                         </div>
                       </div>
@@ -275,6 +289,16 @@ function ProfileContent() {
                           : "Notifications",
                         value: "notifications",
                         // badge: notificationCount,
+                      },
+                      {
+                        icon: <Wallet className="h-5 w-5" />,
+                        label: isGerman ? "Wallet" : "Wallet",
+                        value: "wallet",
+                      },
+                      {
+                        icon: <Gift className="h-5 w-5" />,
+                        label: isGerman ? "Belohnungen" : "Rewards",
+                        value: "rewards",
                       },
                       {
                         icon: <Percent className="h-5 w-5" />,
@@ -375,7 +399,7 @@ function ProfileContent() {
             {/* Main Content */}
             <div className="md:col-span-3">
               <Tabs value={activeTab} onValueChange={setActiveTab}>
-                <TabsList className="grid grid-cols-4 mb-6">
+                <TabsList className="grid grid-cols-6 mb-6">
                   <TabsTrigger value="profile" className={"cursor-pointer"}>
                     {isGerman ? "Profil" : "Profile"}
                   </TabsTrigger>
@@ -384,6 +408,12 @@ function ProfileContent() {
                   </TabsTrigger>
                   <TabsTrigger value="favorites" className={"cursor-pointer"}>
                     {isGerman ? "Favoriten" : "Favorites"}
+                  </TabsTrigger>
+                  <TabsTrigger value="wallet" className={"cursor-pointer"}>
+                    {isGerman ? "Wallet" : "Wallet"}
+                  </TabsTrigger>
+                  <TabsTrigger value="rewards" className={"cursor-pointer"}>
+                    {isGerman ? "Belohnungen" : "Rewards"}
                   </TabsTrigger>
                   <TabsTrigger value="chat" className={"cursor-pointer"}>
                     {isGerman ? "Chat" : "Chat"}
@@ -555,6 +585,14 @@ function ProfileContent() {
 
                 <TabsContent value="favorites">
                   <FavoritesSection countryCode={countryCode} />
+                </TabsContent>
+
+                <TabsContent value="wallet">
+                  <WalletSection countryCode={countryCode} auth={auth} />
+                </TabsContent>
+
+                <TabsContent value="rewards">
+                  <RewardsSection countryCode={countryCode} auth={auth} />
                 </TabsContent>
 
                 <TabsContent value="activity">

@@ -2,9 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { IoClose } from "react-icons/io5";
 import { FaRegCreditCard } from "react-icons/fa6";
-import { FaCcPaypal } from "react-icons/fa6";
 import CheckoutElement from "./CheckoutElement";
-import PaypalCheckout from "./PaypalCheckout";
 
 export default function PaymentMethodModal({
   isOpen,
@@ -19,9 +17,12 @@ export default function PaymentMethodModal({
   useEffect(() => {
     product.paymentMethod = paymentMethod;
   }, [paymentMethod, product]);
+
+  if (!isOpen) return null;
+
   return (
     <div className="fixed inset-0 z-[999] flex items-center justify-center bg-gray-200/70">
-      <div className="relative w-full max-w-lg max-h-[95vh] min-h-[14rem] mt-[4rem]  overflow-y-auto paymentmethod shidden border-2 border-red-800 rounded-md bg-white py-6 px-7 shadow-lg">
+      <div className="relative w-full max-w-lg max-h-[95vh] min-h-[14rem] mt-[4rem] overflow-y-auto paymentmethod shidden border-2 border-red-800 rounded-md bg-white py-6 px-7 shadow-lg">
         <div className="w-full flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-semibold text-black">
@@ -35,9 +36,9 @@ export default function PaymentMethodModal({
             </button>
           </div>
           {/* Select Payment Method */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mt-8">
+          <div className="grid grid-cols-1 gap-5 mt-8">
             <button
-              className="w-full flex items-center rounded-lg justify-center py-3   bg-sky-600 hover:bg-sky-700 text-white cursor-pointer transition-all duration-300 "
+              className="w-full flex items-center rounded-lg justify-center py-3 bg-sky-600 hover:bg-sky-700 text-white cursor-pointer transition-all duration-300"
               onClick={() => {
                 setPaymentMethod("Credit Card");
                 setpayment(true);
@@ -46,35 +47,17 @@ export default function PaymentMethodModal({
               <FaRegCreditCard size={20} className="mr-2" />
               Checkout with Card
             </button>
-            <button
-              className="w-full flex items-center justify-center rounded-lg  py-3 bg-red-600 hover:bg-red-700 transition-all duration-300 text-white cursor-pointer "
-              onClick={() => {
-                setPaymentMethod("Paypal");
-                setpayment(true);
-              }}
-            >
-              <FaCcPaypal size={20} className="mr-2" />
-              Checkout with Paypal
-            </button>
           </div>
         </div>
       </div>
-      {/* Credit Card */}
+      {/* Credit Card Payment Modal */}
       {payment && (
         <div className="fixed top-[3rem] left-0 p-2 sm:p-4 w-full h-full flex items-center justify-center z-[99999] bg-gray-300/80 overflow-y-auto shidden">
-          {paymentMethod === "Credit Card" ? (
-            <CheckoutElement
-              setpayment={setpayment}
-              carts={product}
-              shippingFee={shippingFee}
-            />
-          ) : (
-            <PaypalCheckout
-              setpayment={setpayment}
-              carts={product}
-              shippingFee={shippingFee}
-            />
-          )}
+          <CheckoutElement
+            setpayment={setpayment}
+            carts={product}
+            shippingFee={shippingFee}
+          />
         </div>
       )}
     </div>

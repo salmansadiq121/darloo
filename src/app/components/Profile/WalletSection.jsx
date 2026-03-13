@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { format } from "date-fns";
+import { motion } from "framer-motion";
 import {
   Card,
   CardContent,
@@ -341,11 +342,26 @@ export default function WalletSection({ countryCode, auth }) {
             <TabsContent value="transactions">
               <div className="space-y-4">
                 {transactions.length === 0 ? (
-                  <p className="text-gray-500 text-center py-8">
-                    {isGerman
-                      ? "Noch keine Transaktionen"
-                      : "No transactions yet"}
-                  </p>
+                  <div className="flex flex-col items-center justify-center py-10 px-4 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200">
+                    <motion.div
+                      initial={{ y: -10, opacity: 0 }}
+                      animate={{ y: 0, opacity: 1 }}
+                      transition={{ type: "spring", stiffness: 120, damping: 10 }}
+                      className="p-4 rounded-full bg-blue-100 mb-4"
+                    >
+                      <ArrowDownLeft className="h-8 w-8 text-blue-600" />
+                    </motion.div>
+                    <p className="text-gray-700 font-semibold mb-1 text-center">
+                      {isGerman
+                        ? "Noch keine Transaktionen"
+                        : "No transactions yet"}
+                    </p>
+                    <p className="text-xs text-gray-500 text-center max-w-xs">
+                      {isGerman
+                        ? "Ihre ersten Ein- und Auszahlungen werden hier angezeigt."
+                        : "Your first credits and debits will appear here once you start using your wallet."}
+                    </p>
+                  </div>
                 ) : (
                   transactions.map((tx) => (
                     <div
@@ -390,11 +406,26 @@ export default function WalletSection({ countryCode, auth }) {
             <TabsContent value="withdrawals">
               <div className="space-y-4">
                 {withdrawals.length === 0 ? (
-                  <p className="text-gray-500 text-center py-8">
-                    {isGerman
-                      ? "Noch keine Auszahlungen"
-                      : "No withdrawals yet"}
-                  </p>
+                  <div className="flex flex-col items-center justify-center py-10 px-4 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200">
+                    <motion.div
+                      initial={{ scale: 0.8, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ type: "spring", stiffness: 140, damping: 12 }}
+                      className="p-4 rounded-full bg-rose-100 mb-4"
+                    >
+                      <Download className="h-8 w-8 text-rose-600" />
+                    </motion.div>
+                    <p className="text-gray-700 font-semibold mb-1 text-center">
+                      {isGerman
+                        ? "Noch keine Auszahlungsanfragen"
+                        : "No withdrawal requests yet"}
+                    </p>
+                    <p className="text-xs text-gray-500 text-center max-w-xs">
+                      {isGerman
+                        ? "Erstellen Sie Ihre erste Auszahlungsanfrage über die Schaltfläche oben rechts."
+                        : "Create your first withdrawal request using the button in the top right."}
+                    </p>
+                  </div>
                 ) : (
                   withdrawals.map((withdrawal) => (
                     <div

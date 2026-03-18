@@ -146,8 +146,8 @@ export default function RootLayout({ children }) {
         <meta name="linkedin" content={metadata.linkedin} />
 
         {/* Favicon */}
-        <link rel="icon" href="/rb_616.png" />
-        <link rel="apple-touch-icon" sizes="180x180" href="/rb_616.png" />
+        <link rel="icon" href="/favicon.ico" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/logo.png" />
         <link rel="manifest" href="/site.webmanifest" />
 
         <title>{metadata.title}</title>

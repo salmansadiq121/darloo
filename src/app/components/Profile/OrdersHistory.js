@@ -1663,7 +1663,7 @@ export default function OrdersHistory({ userId, countryCode }) {
 
       <CardContent className="px-0">
         <Tabs defaultValue="all">
-          <TabsList className="flex items-center justify-start gap-1.5 py-1 h-10 w-full mb-8 overflow-x-auto shidden bg-gradient-to-r from-slate-100 via-slate-50 to-slate-100 p-2 rounded-2xl border border-slate-200/60 shadow-sm">
+          <TabsList className="flex items-center justify-start gap-1.5 w-full mb-8 overflow-x-auto bg-gradient-to-r from-slate-100 via-slate-50 to-slate-100 p-2 rounded-2xl border border-slate-200/60 shadow-sm h-auto" style={{ scrollbarWidth: "none" }}>
             {[
               {
                 value: "all",

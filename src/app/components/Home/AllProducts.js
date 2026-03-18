@@ -99,7 +99,7 @@ export default function AllProducts() {
         setTotalProducts(total);
         setRetryCount(0);
       } catch (error) {
-        if (error.name === "AbortError") return;
+        if (axios.isCancel(error) || error.name === "AbortError") return;
 
         console.error("Error fetching products:", error);
 

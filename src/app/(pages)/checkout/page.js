@@ -265,7 +265,7 @@ function CheckoutContent() {
         if (!token) return;
 
         const { data } = await axios.get(
-          `undefined/api/v1/rewards/me`,
+          `${process.env.NEXT_PUBLIC_SERVER_URI}/api/v1/rewards/me`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -357,6 +357,13 @@ function CheckoutContent() {
     : 0;
   const total = grossTotal - appliedWallet;
 
+  // Points calculations for render
+  const maxPointsUsable = Math.min(pointsBalance, (grossTotal - appliedWallet) * pointsConversionRate);
+  const appliedPoints = usePoints
+    ? Math.min(Math.max(0, pointsToUse || 0), maxPointsUsable)
+    : 0;
+  const pointsDiscount = appliedPoints / pointsConversionRate;
+
   // Validation
   const isFormValid =
     auth?.user?.name &&
@@ -368,7 +375,7 @@ function CheckoutContent() {
 
   // total <= 150
 
-  const canCheckout = selectedProduct?.length > 0 && isFormValid && country;
+  const canCheckout = selectedProduct?.length > 0 && isFormValid;
 
   // Handle Checkout
   const handleCheckout = () => {
